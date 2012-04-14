@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * Website alias management
+ * @package siteadm
+ */
+class website_alias_manager extends db_object_manager
+{
+
+static protected $name = "website_alias";
+
+}
+
+/**
+ * Website alias
+ * @package siteadm
+ */
+class website_alias extends db_object
+{
+
+static protected $_name = "website_alias";
+static protected $_db_table = "website_alias";
+
+public $alias_name;
+public $domain_id;
+public $website_id;
+public $website_redirect;
+public $redirect_url;
+
+static public $_f = array
+(
+	"domain_id" => array("type"=>"object", "otype"=>"domain", "nonempty"=>true),
+	"alias_name" => array("type"=>"string", "nonempty"=>true),
+	"website_id" => array("type"=>"object", "otype"=>"website"),
+	"website_redirect" => array("type"=>"boolean"),
+	"redirect_url" => array("type"=>"string"),
+);
+
+function __toString()
+{
+
+if ($domain=$this->domain())
+	return $this->alias_name.".".$domain->name;
+else
+	return "";
+
+}
+
+function url()
+{
+
+if ($this->id)
+	return "website.php?alias_id=$this->id";
+
+}
+
+// ACCESS
+
+function alias()
+{
+
+if ($this->website_id)
+	return website($this->website_id);
+
+}
+
+function alias_url()
+{
+
+if ($website=$this->website())
+{
+	return (string)$website;
+}
+else
+{
+	return (string)$this->website_url;
+}
+
+}
+
+function domain()
+{
+
+if ($this->domain_id)
+	return domain($this->domain_id);
+
+}
+
+// PERM
+
+static public function insert_perm()
+{
+
+// Admin
+if (login()->perm("admin"))
+{
+	return "admin";
+}
+// Special account access
+elseif (login()->perm("manager"))
+{
+	return "domain_manager";
+}
+// Domain User
+elseif (login()->id)
+{
+	return "domain_user";
+}
+else
+{
+	return false;
+}
+
+}
+
+public function update_perm()
+{
+
+// Admin
+if (login()->perm("admin"))
+{
+	return "admin";
+}
+// Special account access
+elseif ($account=account($this->account_id))
+{
+	if ($this->account_id == login()->id)
+		return "user";
+	elseif ($account->manager_id == login()->id)
+		return "manager";
+	else
+		return false;
+}
+// Domain Manager
+elseif (($domain=$this->domain()) && ($account=$domain->account()) && $account->manager_id == login()->id)
+{
+	return "domain_manager";
+}
+// Domain User
+elseif (($domain=$this->domain()) && $domain->account_id == login()->id)
+{
+	return "domain_user";
+}
+else
+{
+	return false;
+}
+
+}
+
+// DB
+
+function insert($infos=array())
+{
+
+if (!isset($infos["domain_id"]) || !isset($infos["alias_name"]))
+	return false;
+if (!isset($infos["website_redirect"]))
+	$infos["website_redirect"] = "0";
+
+return db_object::insert();
+
+}
+
+function update($infos=array())
+{
+
+if (!($perm=$this->update_perm()))
+	return false;
+
+if (isset($infos["account_id"]) && $perm != "admin" && ($perm != "manager" || !isset($infos["account_id"]) || !($account=account($infos["account_id"])) || $account->manager_id != login()->id) && ($infos["account_id"] != login()->id))
+{
+	unset($infos["account_id"]);
+}
+
+if (isset($infos["domain_id"]))
+	unset($infos["domain_id"]);
+if (isset($infos["alias_name"]))
+	unset($infos["alias_name"]);
+
+return db_object::update();
+
+}
+
+}
+
+?>

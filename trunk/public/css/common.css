@@ -1,0 +1,125 @@
+@CHARSET "UTF-8";
+
+body, form, table
+{
+	margin : 0;
+	border: 0;
+	padding: 0;
+}
+
+body, p, td, li, option
+{
+	font-size: 9pt;
+}
+
+/* Générique */
+table .colname
+{
+	font-weight: bold;
+}
+table .colname td
+{
+	border: 0px;
+}
+table .noborder
+{
+	border: 0px;
+}
+table .label
+{
+	width: 250px;
+}
+.info
+{
+	color: orange;
+}
+
+/* Login */
+.login
+{
+	float: right;
+}
+.login p
+{
+	margin: 0;
+}	
+
+/* Menu */
+.menu
+{
+	border-bottom: 1px black solid;
+}
+.menu span
+{
+	border: 1px transparent solid;
+}
+.menu span.selected
+{
+	border: 1px gray solid;
+	background-color: #aaa;
+}
+.menu span a
+{
+	text-decoration : none;
+}
+.menu span.selected a
+{
+	color: white;
+}
+.menu span:hover
+{
+	border: 1px gray solid;
+	background-color: #666;
+}
+.menu span:hover a
+{
+	color: white;
+}
+
+/* Emails */
+.mail .edit a
+{
+	text-decoration: none;
+}
+.mail .delete a
+{
+	text-decoration: none;
+	color: red;
+}
+
+.account .label
+{
+	font-weight: bold;
+}
+
+.account .submit
+{
+	text-align: right;
+}
+
+.cadre
+{
+	margin: 5px;
+	border: 1px gray solid;
+	padding: 4px;
+}
+.cadre h3, .cadre h4, .cadre p
+{
+	margin: 0px;
+}
+.cadre td
+{
+	vertical-align: top;
+}
+
+.objectlist td
+{
+	padding: 0 2px;
+}
+
+.info_text p
+{
+	margin: 0;
+}
+
+ 

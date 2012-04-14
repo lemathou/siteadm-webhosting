@@ -1,0 +1,5 @@
+user = siteadm_postfix
+password = siteadm2275
+hosts = 127.0.0.1
+dbname = siteadm
+query = SELECT t2.redirect_email as destination FROM email_alias AS t2 , domain as t3 WHERE t3.email_actif='1' AND t2.actif='1' AND t2.domain_id=t3.id AND t2.email_id='0' AND CONCAT(t2.name, '@', t3.name)='%s'

@@ -1,0 +1,5 @@
+user = siteadm_postfix
+password = siteadm2275
+hosts = 127.0.0.1
+dbname = siteadm
+query = SELECT 1 FROM domain WHERE email_actif='1' AND name='%s'

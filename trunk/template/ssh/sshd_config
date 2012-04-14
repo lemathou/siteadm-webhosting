@@ -1,0 +1,10 @@
+##
+# A insérer à la fin du fichier
+# Penser à créer un groupe hosts avant toute chose ..!
+##
+
+Match group hosts
+	ChrootDirectory %h
+	X11Forwarding no
+	AllowTcpForwarding no
+	ForceCommand internal-sftp

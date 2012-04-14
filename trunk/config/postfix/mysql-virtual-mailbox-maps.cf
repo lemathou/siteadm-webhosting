@@ -1,0 +1,5 @@
+user = siteadm_postfix
+password = siteadm2275
+hosts = 127.0.0.1
+dbname = siteadm
+query = SELECT CONCAT(domain.name,"/",email.name,"/") FROM email , domain WHERE domain.email_actif='1' AND email.actif='1' AND email.domain_id=domain.id AND CONCAT(email.name,'@',domain.name)='%s'

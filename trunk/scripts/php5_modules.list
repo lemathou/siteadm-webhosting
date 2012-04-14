@@ -1,0 +1,32 @@
+php-auth - PHP PEAR modules for creating an authentication system
+php5-geoip - GeoIP module for php5
+php5-imagick - ImageMagick module for php5
+php5-imap - IMAP module for php5
+php5-interbase - interbase/firebird module for php5
+php5-mapscript - php5-cgi module for MapServer
+php5-mcrypt - MCrypt module for php5
+php5-memcache - memcache extension module for PHP5
+php5-memcached - memcached extension module for PHP5
+php5-ming - Ming module for php5
+php5-suhosin - advanced protection module for php5
+php5-uuid - OSSP uuid module for php5
+libapache2-mod-php5 - server-side, HTML-embedded scripting language (Apache 2 module)
+php5-curl - CURL module for php5
+php5-dev - Files for PHP5 module development
+php5-gd - GD module for php5
+php5-gmp - GMP module for php5
+php5-ldap - LDAP module for php5
+php5-mysql - MySQL module for php5
+php5-odbc - ODBC module for php5
+php5-pgsql - PostgreSQL module for php5
+php5-pspell - pspell module for php5
+php5-recode - recode module for php5
+php5-snmp - SNMP module for php5
+php5-sqlite - SQLite module for php5
+php5-sybase - Sybase / MS SQL Server module for php5
+php5-tidy - tidy module for php5
+php5-xmlrpc - XML-RPC module for php5
+php5-xsl - XSL module for php5
+libapache2-mod-php5filter - server-side, HTML-embedded scripting language (apache 2 filter module)
+php5-enchant - Enchant module for php5
+php5-intl - internationalisation module for php5
