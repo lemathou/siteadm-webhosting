@@ -23,37 +23,6 @@ class email extends db_object
 static protected $_name = "email";
 static protected $_db_table = "email";
 
-/*
- * Domain
- * @var int
- */
-public $domain_id;
-/*
- * Domain prefix
- * @var string
- */
-public $name;
-/*
- * Password
- * @var string
- */
-protected $password;
-/*
- * Quota
- * @var int
- */
-public $quota;
-/*
- * Active mailbox
- * @var bool
- */
-public $actif;
-/*
- * Special management account
- * @var int
- */
-public $account_id;
-
 static public $_f = array
 (
 	"name" => array("type"=>"string", "nonempty"=>true),
@@ -64,6 +33,9 @@ static public $_f = array
 	"actif" => array("type"=>"boolean", "default"=>"1"),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 

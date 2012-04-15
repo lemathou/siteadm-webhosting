@@ -9,10 +9,12 @@ define("MYSQL_DB","siteadm");
 define("MYSQL_ADMIN_USER","siteadm_root");
 define("MYSQL_ADMIN_PASS","siteadm2275");
 
-define("SITEADM_TEMPLATE_DIR","/home/documents/workspace/SiteAdm/trunk/template");
-define("SITEADM_PUBLIC_DIR","/home/documents/workspace/SiteAdm/trunk/public");
-define("SITEADM_EXEC_DIR","/home/documents/workspace/SiteAdm/trunk/scripts");
-define("INIT_SCRIPT_DIR","/home/documents/workspace/SiteAdm/trunk/template/php");
+define("SITEADM_ADMIN_DIR", "/home/siteadm_admin");
+define("SITEADM_TEMPLATE_DIR", SITEADM_ADMIN_DIR."/template");
+define("SITEADM_PUBLIC_DIR", SITEADM_ADMIN_DIR."/public");
+define("SITEADM_PRIVATE_DIR", SITEADM_ADMIN_DIR."/private");
+define("SITEADM_EXEC_DIR", SITEADM_ADMIN_DIR."/scripts");
+define("INIT_SCRIPT_DIR", SITEADM_ADMIN_DIR."/template/php");
 define("SITEADM_ROOT","/home/siteadm");
 
 // Common/Shared path
@@ -31,10 +33,10 @@ define("WEBSERVER_USER","www-data");
 define("WEBSERVER_GROUP","www-data");
 // Apache
 define("APACHE_VHOST","/etc/apache2/sites-siteadm");
-define("APACHE_EXEC_RELOAD","/etc/init.d/apache2 reload");
-define("APACHE_EXEC_RESTART","/etc/init.d/apache2 restart");
-define("APACHE_EXEC_STOP","/etc/init.d/apache2 stop");
-define("APACHE_EXEC_START","/etc/init.d/apache2 start");
+define("APACHE_EXEC_RELOAD","service apache2 reload");
+define("APACHE_EXEC_RESTART","service apache2 restart");
+define("APACHE_EXEC_STOP","service apache2 stop");
+define("APACHE_EXEC_START","service apache2 start");
 define("APACHE_SSL_CERT","server");
 define("APACHE_PUBLIC_WEBMASTER_EMAIL","webmaster@iprospective.fr");
 
@@ -74,8 +76,8 @@ define("PHP_APC_LAZY", false);
 // MySQL
 define("MYSQL_CONFIG","/etc/mysql");
 define("MYSQL_CONFIGFILE","my.cnf");
-define("MYSQL_EXEC_RELOAD","/etc/init.d/mysqld reload");
-define("MYSQL_EXEC_RESTART","/etc/init.d/mysqld start");
+define("MYSQL_EXEC_RELOAD","service mysqld reload");
+define("MYSQL_EXEC_RESTART","service mysqld start");
 define("MYSQL_DUMP","mysqldump");
 define("MYSQL_MAX_QUERIES","1000");
 define("MYSQL_MAX_USER_CONNECTIONS","10");

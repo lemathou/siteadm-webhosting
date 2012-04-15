@@ -10,14 +10,14 @@
 	<td class="noborder">Mot de passe</td>
 </tr>
 <?php
-$query = mysql_query("SELECT * FROM `db` WHERE `account_id`='$account->id' ORDER BY `name`");
+$query = mysql_query("SELECT * FROM `db` WHERE `account_id`='$account->id' ORDER BY `dbname`");
 while ($row=mysql_fetch_assoc($query))
 {
 ?>
 <tr class="mail">
 	<td class="noborder"><input type="checkbox" name="_list_id[]" value="<?=$row["id"]?>" /></td>
-	<td><a href="?account_id=<?php echo $row[account_id]; ?>&id=<?php echo $row["id"]; ?>"><?=$row["name"]?></a></td>
-	<td><?=$row["name"]?></td>
+	<td><a href="?account_id=<?php echo $row[account_id]; ?>&id=<?php echo $row["id"]; ?>"><?=$row["dbname"]?></a></td>
+	<td><?=$row["username"]?></td>
 	<td><?=$row["password"]?></td>
 	<td class="delete noborder"><a href="?account_id=<?=$account->id?>&db_del_id=<?=$row["id"]?>" onclick="return(confirm('Êtes-vous certain de vouloir supprimer cette base de donnée ?'))">X</a></td>
 </tr>

@@ -23,18 +23,6 @@ class email_alias extends db_object
 static protected $_name = "email_alias";
 static protected $_db_table = "email_alias";
 
-public $name;
-public $domain_id;
-public $email_id;
-public $redirect_email;
-/*
- * @var boolean
- */
-public $actif;
-/*
- * Special management
- * @var integer
- */
 public $account_id;
 
 static public $_f = array
@@ -46,6 +34,9 @@ static public $_f = array
 	"actif" => array("type"=>"bool")
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -53,6 +44,9 @@ return $this->name."@".$this->domain()->name;
 
 }
 
+/**
+ * @see db_object::url()
+ */
 function url()
 {
 

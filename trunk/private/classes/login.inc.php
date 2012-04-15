@@ -34,6 +34,9 @@ if ($infos=mysql_fetch_assoc($query))
 
 }
 
+/**
+ * Disconnect the logged in user
+ */
 function disconnect()
 {
 

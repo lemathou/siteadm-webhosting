@@ -23,16 +23,6 @@ class account extends db_object
 static protected $_name = "account";
 static protected $_db_table = "account";
 
-public $name;
-public $actif;
-public $type;
-public $manager_id;
-public $offre_id;
-public $folder;
-public $nom;
-public $prenom;
-public $email;
-public $societe;
 protected $password;
 
 public $language_bin_list = array();
@@ -49,8 +39,13 @@ static public $_f = array
 	"prenom" => array("type"=>"string"),
 	"email" => array("type"=>"string"),
 	"societe" => array("type"=>"string"),
+	"disk_quota_soft" => array("type"=>"int"),
+	"disk_quota_hard" => array("type"=>"int"),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -58,12 +53,17 @@ return "$this->nom $this->prenom [$this->name]";
 
 }
 
+/**
+ * @see db_object::url()
+ */
 function url()
 {
 
 return "account.php?id=$this->id";
 
 }
+
+// ACCESS
 
 function manager()
 {
@@ -73,6 +73,9 @@ if ($this->manager_id)
 
 }
 
+/**
+ * @return offer
+ */
 function offer()
 {
 
@@ -87,9 +90,8 @@ function language_bin_list()
 if (!$this->id)
 	return array();
 
-
 $list = array();
-$query_string = "SELECT `langage_bin_id` FROM `account_langage_bin_ref` WHERE `account_id`='$this->id'";
+$query_string = "SELECT `language_bin_id` FROM `account_language_bin_ref` WHERE `account_id`='$this->id'";
 $query = mysql_query($query_string);
 while (list($id)=mysql_fetch_row($query))
 {
@@ -203,7 +205,7 @@ elseif ($this->account_id == login()->id)
 {
 	return "user";
 }
-// Not connected
+// Bad User or not connected
 else
 {
 	return false;
@@ -215,7 +217,7 @@ else
  * Returns if the account has the permission $name
  *  
  * @param string $name
- * @return bool
+ * @return boolean
  */
 function perm($name)
 {
@@ -229,6 +231,9 @@ elseif ($name == "admin")
 
 // UPDATE
 
+/**
+ * @see db_object::insert()
+ */
 public function insert($infos)
 {
 
@@ -250,6 +255,9 @@ return db_object::insert($infos);
 
 }
 
+/**
+ * @see db_object::update()
+ */
 public function update($infos)
 {
 
@@ -279,6 +287,9 @@ return db_object::update($infos);
 
 // DB
 
+/**
+ * @see db_object::db_retrieve()
+ */
 protected function db_retrieve($id)
 {
 
@@ -295,19 +306,22 @@ return true;
 
 }
 
+/**
+ * @see db_object::db_insert()
+ */
 protected function db_insert($infos)
 {
 
 if (db_object::db_insert($infos))
 {
-	if (isset($infos["langage_bin_list"]) && is_array($infos["langage_bin_list"]))
+	if (isset($infos["language_bin_list"]) && is_array($infos["language_bin_list"]))
 	{
 		$query_list = array();
-		foreach($infos["langage_bin_list"] as $lang_id)
+		foreach($infos["language_bin_list"] as $lang_id)
 			$query_list[] = "('$this->id', '$lang_id')";
 		if (count($query_list))
 		{
-			$query_string = "INSERT INTO account_langage_bin_ref (account_id, langage_bin_id) VALUES ".implode(" , ",$query_list);
+			$query_string = "INSERT INTO account_language_bin_ref (account_id, language_bin_id) VALUES ".implode(" , ",$query_list);
 			mysql_query($query_string);
 		}
 	}
@@ -320,22 +334,25 @@ else
 
 }
 
+/**
+ * @see db_object::db_update()
+ */
 protected function db_update($infos)
 {
 
 $return = false;
 
-if (isset($infos["langage_bin_list"]))
+if (isset($infos["language_bin_list"]))
 {
-	mysql_query("DELETE FROM `account_langage_bin_ref` WHERE `account_id`='$this->id'");
-	if (is_array($infos["langage_bin_list"]))
+	mysql_query("DELETE FROM `account_language_bin_ref` WHERE `account_id`='$this->id'");
+	if (is_array($infos["language_bin_list"]))
 	{
 		$query_list = array();
-		foreach($infos["langage_bin_list"] as $lang_id)
+		foreach($infos["language_bin_list"] as $lang_id)
 			$query_list[] = "('$this->id', '$lang_id')";
 		if (count($query_list))
 		{
-			$query_string = "INSERT INTO account_langage_bin_ref (account_id, langage_bin_id) VALUES ".implode(" , ",$query_list);
+			$query_string = "INSERT INTO account_language_bin_ref (account_id, language_bin_id) VALUES ".implode(" , ",$query_list);
 			mysql_query($query_string);
 		}
 	}
@@ -364,23 +381,47 @@ if (!$passwd) // TODO : tests de robustesse de mot de passe
 {
 	exec("makepasswd --chars 8 > $passfile");
 	$passwd = fread(fopen($passfile,"r"), filesize($passfile));
+	$passwd = str_replace(array("\r\n","\n","\r"), "", $passwd);
 }
 else
 {
 	fwrite(fopen($passfile_crypt,"w"), $passwd);
 }
+$this->passwd = $passwd;
 
 // Encrypt password
 exec("makepasswd --crypt --clearfrom $passfile > $passfile_crypt");
 unlink("$passfile");
 exec("chmod 600 $passfile_crypt");
-$passwd_crypt = str_replace(array("\n","\r"),"",array_pop(explode(" ",fread(fopen($passfile_crypt,"r"),filesize($passfile_crypt)))));
+$passwd_crypt = array_pop(explode(" ",fread(fopen($passfile_crypt,"r"),filesize($passfile_crypt))));
+$passwd_crypt = str_replace(array("\r\n","\n","\r"), "", $passwd_crypt);
 
 // Update password in database
 mysql_query("UPDATE `account` SET `password`='$passwd', `password_md5`=MD5('$passwd') WHERE `id`='$this->id'");
 
 // Update system password
 exec("usermod -p $passwd_crypt ".$this->system_name());
+
+}
+
+function quota_update()
+{
+
+if ($offer=$this->offer())
+{
+	if ($offer->disk_quota_soft)
+		exec("quotatool -u ".$this->system_name()." -b -q ".($offer->disk_quota_soft*1048576)." /");
+	else
+		exec("quotatool -u ".$this->system_name()." -b -q 0 /");
+	if ($offer->disk_quota_hard)
+		exec("quotatool -u ".$this->system_name()." -b -l ".($offer->disk_quota_soft*1048576)." /");
+	else
+		exec("quotatool -u ".$this->system_name()." -b -l 0 /");
+}
+else
+{
+	exec("quotatool -u ".$this->system_name()." -b -q 0 -l 0 /");
+}
 
 }
 
@@ -509,6 +550,9 @@ $this->mkdir("data", "750");
 
 }
 
+/**
+ * Create config files
+ */
 function script_insert()
 {
 
@@ -519,9 +563,9 @@ exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->fo
 
 // Add www-data in system group
 exec("addgroup ".WEBSERVER_USER." ".$this->system_group());
-// Add user in hosts group,
-// so that sshd_config section authorize only internal-sftp for users matching group hosts
-exec("addgroup ".$this->system_name()." hosts");
+// Add user in siteadm_user group,
+// so that sshd_config section authorize only internal-sftp for users matching group siteadm_user
+exec("addgroup ".$this->system_name()." siteadm_user");
 
 // Root folder with private subfolder
 $this->mkdir("", "750", "root");
@@ -533,7 +577,7 @@ $this->script_update();
 }
 
 /**
- * Create/Update config files
+ * Update config files
  */
 function script_update()
 {

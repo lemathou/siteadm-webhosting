@@ -1,23 +1,8 @@
 <?php
 
-include "../config/config.inc.php";
-include "include/autoload.inc.php";
-include "include/db.inc.php";
-session_start();
-
-/*
- * Login
- */
-
-if (isset($_POST["_login"]["username"]) && isset($_POST["_login"]["password"]))
-{
-	login()->connect($_POST["_login"]["username"], $_POST["_login"]["password"]);
-}
-
-if (isset($_POST["_login"]["disconnect"]))
-{
-	login()->disconnect();
-}
+include SITEADM_PRIVATE_DIR."/include/autoload.inc.php";
+include SITEADM_PRIVATE_DIR."/include/db.inc.php";
+include SITEADM_PRIVATE_DIR."/include/login.inc.php";
 
 /*
  * Menu

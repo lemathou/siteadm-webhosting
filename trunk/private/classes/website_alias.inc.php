@@ -2,6 +2,7 @@
 
 /**
  * Website alias management
+ * 
  * @package siteadm
  */
 class website_alias_manager extends db_object_manager
@@ -13,6 +14,7 @@ static protected $name = "website_alias";
 
 /**
  * Website alias
+ * 
  * @package siteadm
  */
 class website_alias extends db_object
@@ -20,12 +22,6 @@ class website_alias extends db_object
 
 static protected $_name = "website_alias";
 static protected $_db_table = "website_alias";
-
-public $alias_name;
-public $domain_id;
-public $website_id;
-public $website_redirect;
-public $redirect_url;
 
 static public $_f = array
 (
@@ -36,6 +32,9 @@ static public $_f = array
 	"redirect_url" => array("type"=>"string"),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -46,6 +45,9 @@ else
 
 }
 
+/**
+ * @see db_object::url()
+ */
 function url()
 {
 
@@ -113,6 +115,9 @@ else
 
 }
 
+/**
+ * @see db_object::update_perm()
+ */
 public function update_perm()
 {
 
@@ -150,6 +155,9 @@ else
 
 // DB
 
+/**
+ * @see db_object::insert()
+ */
 function insert($infos=array())
 {
 
@@ -162,6 +170,9 @@ return db_object::insert();
 
 }
 
+/**
+ * @see db_object::update()
+ */
 function update($infos=array())
 {
 

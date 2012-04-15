@@ -10,7 +10,5 @@ foreach ($account_list as $row)
 	else
 		echo "<option value=\"$row[id]\">$row[nom] $row[prenom] [$row[name]]</option>";
 }
-?>
-</select> <input type="submit" value="Gérer" /></p>
+?></select> <input type="submit" value="Gérer" /></p>
 </form>
-

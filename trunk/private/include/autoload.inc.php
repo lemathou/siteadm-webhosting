@@ -94,8 +94,8 @@ if (!is_string($class_name))
 	return;
 
 if ((substr($class_name, -8, 8) != "_manager" || ($class_name=substr($class_name, 0, -8))) && isset($GLOBALS["object_list"][$class_name]))
-	include "../private/classes/$class_name.inc.php";
-elseif (file_exists($filename="../private/classes/$class_name.inc.php"))
+	include SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php";
+elseif (file_exists($filename=SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php"))
 	include $filename;
 
 }

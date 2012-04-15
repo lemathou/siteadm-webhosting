@@ -23,94 +23,6 @@ class phppool extends db_object
 static protected $_name = "phppool";
 static protected $_db_table = "phppool";
 
-/*
- * @var int
- */
-public $account_id;
-/*
- * @var string
- */
-public $name;
-
-/*
- * @var  string
- */
-public $system_user;
-/*
- * @var string
- */
-public $system_group;
-
-/*
- * @var int
- */
-public $phpapp_id;
-// If PHP version < 5.3, using own SWPAN_FCGI instead of (not provided by default) PHP-FPM
-// Can also use simple CGI requests for sporadic requests (slow but memory-safe, useful in some cases)
-/*
- * @var int
- */
-public $language_bin_id;
-
-// CGI
-/*
- * @var int
- */
-public $worker_nb_max = PHP_WORKER_NB_MAX;
-/*
- * @var int
- */
-public $worker_max_requests = PHP_WORKER_MAX_REQUESTS;
-
-/*
- * @var string
- */
-public $webmaster_email;
-
-// Debugging
-/*
- * @var string
- */
-public $error_reporting = PHP_ERROR_REPORTING;
-/*
- * @var int
- */
-public $error_display = PHP_ERROR_DISPLAY;
-/*
- * @var int
- */
-public $error_filesave = PHP_ERROR_FILESAVE;
-
-// Perf
-/*
- * @var int
- */
-public $max_execution_time = PHP_MAX_EXECUTION_TIME;
-/*
- * @var int
- */
-public $max_input_time = PHP_MAX_INPUT_TIME;
-/*
- * @var int
- */
-public $memory_limit = PHP_MEMORY_LIMIT;
-
-// Upload
-public $post_max_size = PHP_POST_MAX_SIZE;
-public $file_uploads = PHP_FILE_UPLOADS;
-public $upload_max_filesize = PHP_UPLOAD_MAX_FILESIZE;
-public $max_file_upload = PHP_MAX_FILE_UPLOAD;
-
-// Coding facilities / Security
-public $short_open_tag = PHP_SHORT_OPEN_TAG;
-
-// Include
-public $include_path = PHP_INCLUDE_PATH;
-
-// APC
-public $apc_stat = PHP_APC_STAT;
-public $apc_lazy = PHP_APC_LAZY; // functions and classes;
-
 // Extensions
 public $extension = array();
 // Functions
@@ -125,25 +37,28 @@ static public $_f = array
 	"account_id" => array("type"=>"object", "otype"=>"account"),
 	"phpapp_id" => array("type"=>"object", "otype"=>"phpapp"),
 	"language_bin_id" => array("type"=>"object", "otype"=>"language_bin"),
-	"worker_nb_max" => array("type"=>"int"),
-	"worker_max_requests" => array("type"=>"int"),
+	"worker_nb_max" => array("type"=>"int", "default"=>PHP_WORKER_NB_MAX),
+	"worker_max_requests" => array("type"=>"int", "default"=>PHP_WORKER_MAX_REQUESTS),
 	"webmaster_email" => array("type"=>"string"),
-	"error_reporting" => array("type"=>"string"),
-	"error_display" => array("type"=>"bool"),
-	"error_filesave" => array("type"=>"bool"),
-	"max_execution_time" => array("type"=>"int"),
-	"max_input_time" => array("type"=>"int"),
-	"memory_limit" => array("type"=>"int"),
-	"post_max_size" => array("type"=>"int"),
-	"file_uploads" => array("type"=>"bool"),
-	"upload_max_filesize" => array("type"=>"int"),
-	"max_file_upload" => array("type"=>"int"),
-	"short_open_tag" => array("type"=>"bool"),
-	"include_path" => array("type"=>"string"),
-	"apc_stat" => array("type"=>"bool"),
-	"apc_lazy" => array("type"=>"bool"),
+	"error_reporting" => array("type"=>"string", "default"=>PHP_ERROR_REPORTING),
+	"error_display" => array("type"=>"bool", "default"=>PHP_ERROR_DISPLAY),
+	"error_filesave" => array("type"=>"bool", "default"=>PHP_ERROR_FILESAVE),
+	"max_execution_time" => array("type"=>"int", "default"=>PHP_MAX_EXECUTION_TIME),
+	"max_input_time" => array("type"=>"int", "default"=>PHP_MAX_INPUT_TIME),
+	"memory_limit" => array("type"=>"int", "default"=>PHP_MEMORY_LIMIT),
+	"post_max_size" => array("type"=>"int", "default"=>PHP_POST_MAX_SIZE),
+	"file_uploads" => array("type"=>"bool", "default"=>PHP_FILE_UPLOADS),
+	"upload_max_filesize" => array("type"=>"int", "default"=>PHP_UPLOAD_MAX_FILESIZE),
+	"max_file_upload" => array("type"=>"int", "default"=>PHP_MAX_FILE_UPLOAD),
+	"short_open_tag" => array("type"=>"bool", "default"=>PHP_SHORT_OPEN_TAG),
+	"include_path" => array("type"=>"string", "default"=>PHP_INCLUDE_PATH),
+	"apc_stat" => array("type"=>"bool", "default"=>PHP_APC_STAT),
+	"apc_lazy" => array("type"=>"bool", "default"=>PHP_APC_LAZY),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -151,6 +66,9 @@ return "$this->name";
 
 }
 
+/**
+ * @see db_object::url()
+ */
 function url()
 {
 
@@ -261,6 +179,9 @@ else
 
 }
 
+/**
+ * @see db_object::update_perm()
+ */
 public function update_perm()
 {
 
@@ -288,6 +209,9 @@ else
 
 // UPDATE
 
+/**
+ * @see db_object::insert()
+ */
 public function insert($infos)
 {
 
@@ -307,6 +231,9 @@ return db_object::insert($infos);
 
 }
 
+/**
+ * @see db_object::update()
+ */
 public function update($infos)
 {
 
@@ -330,6 +257,9 @@ return db_object::update($infos);
 
 // DB
 
+/**
+ * @see db_object::db_retrieve()
+ */
 function db_retrieve($id)
 {
 
@@ -349,6 +279,9 @@ if (db_object::db_retrieve($id))
 
 }
 
+/**
+ * @see db_object::db_update()
+ */
 function db_update($infos)
 {
 
@@ -473,6 +406,9 @@ else
 
 }
 
+/**
+ * @see db_object::script_insert()
+ */
 function script_insert()
 {
 
@@ -491,6 +427,9 @@ $account->mkdir("nginx", "750");
 
 }
 
+/**
+ * @see db_object::script_update()
+ */
 function script_update()
 {
 

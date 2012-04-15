@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SITEFOLDER="/home/web/siteadm"
+SITEFOLDER="/home/siteadm_admin"
 export SITEFOLDER
 
 PHPRC="${SITEFOLDER}/php-config/php.ini"

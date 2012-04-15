@@ -23,12 +23,6 @@ class domain extends db_object
 static protected $_name = "domain";
 static protected $_db_table = "domain";
 
-public $name;
-public $account_id;
-public $email_actif;
-public $creation_date;
-public $renew_date;
-
 public $email_nb;
 public $email_alias_nb;
 public $website_nb;
@@ -39,6 +33,8 @@ static public $_f = array
 	"account_id" => array("type"=>"object", "otype"=>"account", "nonempty"=>true),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"email_actif" => array("type"=>"boolean"),
+	"creation_date" => array("type"=>"date"),
+	"renew_date" => array("type"=>"date"),
 );
 
 // ACCESS
@@ -170,6 +166,9 @@ return db_object::update($infos);
 
 // DB
 
+/**
+ * @see db_object::db_retrieve_more()
+ */
 function db_retrieve_more($id)
 {
 
@@ -200,6 +199,9 @@ return array_merge($account->replace_map(), $map);
 
 }
 
+/**
+ * @see db_object::script_insert()
+ */
 function script_insert()
 {
 
@@ -207,6 +209,9 @@ $this->script_update();
 
 }
 
+/**
+ * @see db_object::script_update()
+ */
 function script_update()
 {
 

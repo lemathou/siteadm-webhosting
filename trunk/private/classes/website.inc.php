@@ -2,6 +2,7 @@
 
 /**
  * Website management
+ * 
  * @package siteadm
  */
 class website_manager extends db_object_manager
@@ -13,6 +14,7 @@ static protected $name = "website";
 
 /**
  * Website
+ * 
  * @package siteadm
  */
 class website extends db_object
@@ -20,84 +22,6 @@ class website extends db_object
 
 static protected $_name = "website";
 static protected $_db_table = "website";
-
-/*
- * Special account permission
- * @var integer
- */
-public $account_id;
-
-/*
- * Associated domain
- * @var integer
- */
-public $domain_id;
-/*
- * DNS prefix
- * @var string
- */
-public $name;
-
-public $webmaster_email;
-
-/*
- * SSL (port 443) connection enabled
- * @var bool
- */
-public $ssl;
-/*
- * Redirect non-SSL (port 80) queries to SSL (port 443)
- * @var bool
- */
-public $ssl_force_redirect;
-
-/*
- * Ordered list of default files, separated by a space
- * @example "index.php index.html"
- * @var string
- */
-public $index_files;
-
-/*
- * Default charset
- * @example "iso-8859-1"
- * @example "utf-8"
- * @var string
- */
-public $default_charset;
-
-/*
- * TODO : What is it ?
- */
-public $folder_auth;
-
-/*
- * WebApp reference ID
- * @var integer
- */
-public $webapp_id;
-
-/*
- * PHP Pool reference ID
- * @var integer
- */
-public $phppool_id;
-/*
- * @var bool
- */
-public $php_short_open_tag;
-/*
- * @var string
- */
-public $php_open_basedir;
-/*
- * @var string
- */
-public $php_include_path;
-/*
- * @var bool
- */
-public $php_apc_stat;
 
 static public $_f = array
 (
@@ -118,6 +42,9 @@ static public $_f = array
 	"php_apc_stat" => array("type"=>"bool"),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -353,6 +280,9 @@ return db_object::update($infos);
 
 // DB
 
+/**
+ * @see db_object::db_update_more()
+ */
 function db_update_more($infos)
 {
 
@@ -387,6 +317,9 @@ return $return;
 
 // ROOT ACCESS SCRIPTS
 
+/**
+ * @see db_object::root_preupdate()
+ */
 protected function root_preupdate($infos)
 {
 
@@ -538,6 +471,9 @@ $account->mkdir("public/$this->name.$domain->name", "750");
 
 }
 
+/**
+ * @see db_object::script_insert()
+ */
 function script_insert()
 {
 
@@ -546,6 +482,9 @@ $this->script_update();
 
 }
 
+/**
+ * @see db_object::script_update()
+ */
 function script_update()
 {
 

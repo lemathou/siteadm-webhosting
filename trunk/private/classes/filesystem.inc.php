@@ -190,6 +190,7 @@ else foreach($opt["cols"] as $i=>$j)
 }
 $colnum = count($opt["cols"])+4;
 // Verify $origin exists
+echo $opt["origin"];
 if (!isset($opt["origin"]) || !is_string($origin=$opt["origin"]) || !file_exists($origin) || !is_dir($origin))
 {
 	$e = explode("/", $_SERVER["SCRIPT_FILENAME"]);

@@ -21,7 +21,7 @@ class language_bin extends db_object
 {
 
 static protected $_name = "language_bin";
-static protected $_db_table = "langage_bin";
+static protected $_db_table = "language_bin";
 
 static public $_f = array
 (
@@ -34,35 +34,9 @@ static public $_f = array
 	"exec_bin" => array("type"=>"string"),
 );
 
-/*
- * @var int
+/**
+ * @see db_object::__toString()
  */
-public $language_id;
-/*
- * @var bool
- */
-public $app_compatible;
-/*
- * @var string
- */
-public $version;
-/*
- * @var string
- */
-public $cgi_type;
-/*
- * @var string
- */
-public $options;
-/*
- * @var string
- */
-public $prefix;
-/*
- * @var string
- */
-public $exec_bin;
-
 function __toString()
 {
 
@@ -78,6 +52,10 @@ else
 
 }
 
+/**
+ * Returns langage
+ * @return langage
+ */
 function language()
 {
 

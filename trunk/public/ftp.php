@@ -1,6 +1,7 @@
 <?php
 
-require_once "include/common.inc.php";
+require_once "../config/config.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
 
 // AUTH
 
@@ -16,7 +17,7 @@ $menu = "ftp";
 
 if (isset($_POST["_ftp_add"]) && isset($_POST["name"]))
 {
-	$ftp = new db();
+	$ftp = new ftp();
 	$ftp->db_insert($_POST);
 }
 if (isset($_POST["_ftp_update"]) && isset($_POST["id"]) && ($ftp=ftp($_POST["id"])))
@@ -56,9 +57,12 @@ else
 if (isset($account))
 	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p> <hr />";
 
-?>
+if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && $ftp->account()->id == login()->id)
+	include "template/form/ftp.tpl.php";
+else
+	include "template/page/ftp_list.tpl.php";
 
-<p>http://doc.ubuntu-fr.org/proftpd_et_mysql</p>
+?>
 </body>
 
 </html>

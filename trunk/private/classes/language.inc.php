@@ -21,7 +21,7 @@ class language extends db_object
 {
 
 static protected $_name = "language";
-static protected $_db_table = "langage";
+static protected $_db_table = "language";
 
 static public $_f = array
 (
@@ -29,19 +29,6 @@ static public $_f = array
 	"content_type" => array("type"=>"string"),
 	"extension_list" => array("type"=>"string"),
 );
-
-/*
- * @var string
- */
-public $name;
-/*
- * @var string
- */
-public $content_type;
-/*
- * @var string
- */
-public $extension_list;
 
 }
 

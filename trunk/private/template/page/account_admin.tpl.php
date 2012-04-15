@@ -28,34 +28,50 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	list($row["email_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM email as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["website_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM website as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["mysql_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM db as t1 WHERE t1.account_id=$row[id]"));
-	if (true && file_exists("/home/siteadm/$row[name]")) // @todo : à effectuer en sudo
+	exec("sudo du -s ".$a->folder(), $row["disk_usage"]);
+	$row["disk_usage"] = array_shift(explode("\t", $row["disk_usage"][0]));
+	$row["disk_usage_h"] = $row["disk_usage"];
+	$row["disk_usage_u"] = 1;
+	while ($row["disk_usage_h"]>1024)
 	{
-		exec("sudo du -s /home/siteadm/$row[name]", $row["disk_usage"]);
-		$row["disk_usage"] = array_shift(explode("\t", $row["disk_usage"][0]));
-		$row["disk_usage_h"] = $row["disk_usage"];
-		$row["disk_usage_u"] = 1;
-		while ($row["disk_usage_h"]>1024)
-		{
-			$row["disk_usage_h"] = $row["disk_usage_h"]/1024;
-			$row["disk_usage_u"]++;
-		}
+		$row["disk_usage_h"] = $row["disk_usage_h"]/1024;
+		$row["disk_usage_u"]++;
 	}
-	else
-	{
-		
-	}
+	$offer = $a->offer();
 ?>
 <tr>
 	<td><input type="checkbox" name="list_id[]" value="<?=$row["id"]?>" /></td>
-	<td><a href="?id=<?=$row["id"]?>"><?=$row["name"]?></a></td>
-	<td><?php echo $row["name"].$row["id"]; ?></td>
-	<td><? if ($row["type"]=="admin") echo "<b style=\"color:red\">"; elseif ($row["type"]=="manager") echo "<b>"; ?><?=$account_type_list[$row["type"]]?><? if ($row["type"]=="admin" || $row["type"]=="manager") echo "</b>"; ?></td>
-	<td><a href="?id=<?=$row["manager_id"]?>"><?=$row["manager_name"]?></a></td>
-	<td><?=$row["prenom"]?></td>
-	<td><?=$row["nom"]?></td>
-	<td><?=$row["societe"]?></td>
-	<td><?=$offre_list[$row["offre_id"]]["name"]?></td>
-	<td align="right"><?php if (isset($row["disk_usage_h"])) { echo round($row["disk_usage_h"], 2)." ".$s_list[$row["disk_usage_u"]]; if ($row["offre_id"] && ($row["disk_quota"]=$offre_list[$row["offre_id"]]["disk_quota"])) { $r = ($row["disk_usage"]/1024/1024/$row["disk_quota"]*100); echo " / ".$row["disk_quota"]." GO (".round($r, 2)." %)"; } } else echo "<i>Empty</i>"; ?></td>
+	<td><a href="?id=<?php echo $a->id; ?>"><?php echo $a->name; ?></a></td>
+	<td><?php echo $a->system_name(); ?></td>
+	<td><?php
+		if ($a->type=="admin")
+			echo "<b style=\"color:red\">";
+		elseif ($row["type"]=="manager")
+			echo "<b>";
+		?><?php echo $account_type_list[$a->type]; ?><?php
+		if ($row["type"]=="admin" || $row["type"]=="manager")
+			echo "</b>";
+	?></td>
+	<td><?php if ($m=$a->manager()) {
+		?><a href="?id=<?php echo $m->id; ?>"><?php echo $m->name; ?></a><?php
+	} ?></td>
+	<td><?php echo $a->prenom; ?></td>
+	<td><?php echo $a->nom; ?></td>
+	<td><?php echo $a->societe; ?></td>
+	<td><?php if ($offer) echo $offer; ?></td>
+	<td align="right"><?php
+		if (isset($row["disk_usage_h"]) && $row["disk_usage_h"] > 0) 
+			echo round($row["disk_usage_h"], 2)." ".$s_list[$row["disk_usage_u"]];
+		else
+			echo "<i>0</i>";
+		echo " / ";
+		if ($offer)
+			echo $offer->disk_quota_soft." GO (".round($row["disk_usage"]/1024/1024*100/$offer->disk_quota_soft, 2)." %)";
+		elseif ($a->disk_quota_soft)
+			echo $a->disk_quota_soft." GO (".round($row["disk_usage"]/1024/1024*100/$a->disk_quota_soft, 2)." %)";
+		else
+			echo "&infin;";
+	?></td>
 	<td align="right"><a href="domain.php?account_id=<?=$row["id"]?>"><?=$row["domain_nb"]?></a></td>
 	<td align="right"><a href="php.php?account_id=<?=$row["id"]?>"><?=$row["php_nb"]?></a></td>
 	<td align="right"><a href="email.php?account_id=<?=$row["id"]?>"><?=$row["email_nb"]?></a></td>

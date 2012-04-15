@@ -101,7 +101,7 @@
 <tr>
 	<td valign="top">Processus :</td>
 	<td><?php
-	exec("ps aux | grep $account->name", $ps);
+	exec("ps u -G ".$account->system_id(), $ps);
 	echo implode("<br />", $ps);
 	?></td>
 </tr>

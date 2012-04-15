@@ -25,36 +25,6 @@ class phpapp extends db_object
 static protected $_name = "phpapp";
 static protected $_db_table = "phpapp";
 
-/*
- * @var int
- */
-public $account_id;
-/*
- * @var string
- */
-public $name;
-/*
- * @var string
- */
-public $description;
-
-/*
- * Language bin
- * @var int
- */
-public $language_bin_id;
-
-/*
- * @var string
- */
-public $webmaster_email;
-
-/*
- * APC SHM size (in MO)
- * @var int
- */
-public $apc_shm_size;
-
 static public $_f = array
 (
 	"name" => array("type"=>"string", "nonempty"=>true),
@@ -65,6 +35,9 @@ static public $_f = array
 	"apc_shm_size" => array("type"=>"numeric"),
 );
 
+/**
+ * @see db_object::__toString()
+ */
 function __toString()
 {
 
@@ -72,12 +45,17 @@ return "$this->name";
 
 }
 
+/**
+ * @see db_object::url()
+ */
 function url()
 {
 
 return "php.php?app_id=$this->id";
 
 }
+
+// ACCESS
 
 /**
  * Retrieve managing account
@@ -165,6 +143,9 @@ else
 
 }
 
+/**
+ * @see db_object::update_perm()
+ */
 public function update_perm()
 {
 
@@ -192,6 +173,9 @@ else
 
 // UPDATE
 
+/**
+ * @see db_object::insert()
+ */
 public function insert($infos)
 {
 
@@ -207,6 +191,9 @@ return db_object::insert($infos);
 
 }
 
+/**
+ * @see db_object::update()
+ */
 public function update($infos)
 {
 
@@ -273,6 +260,9 @@ $account->mkdir("php/pool", "755", "root");
 
 }
 
+/**
+ * @see db_object::script_insert()
+ */
 function script_insert()
 {
 
@@ -281,6 +271,9 @@ $this->script_update();
 
 }
 
+/**
+ * @see db_object::script_update()
+ */
 function script_update()
 {
 

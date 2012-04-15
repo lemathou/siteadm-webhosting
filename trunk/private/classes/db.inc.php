@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Database (MySQL) list management class
+ * 
+ * @package siteadm
+ */
 class db_manager extends db_object_manager
 {
 
@@ -17,11 +22,6 @@ class db extends db_object
 
 static protected $_name = "db";
 static protected $_db_table = "db";
-
-public $account_id;
-public $name;
-public $password;
-public $quota;
 
 static public $_f = array
 (

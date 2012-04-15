@@ -1,6 +1,7 @@
 <?php
 
-require_once "include/common.inc.php";
+require_once "../config/config.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
 
 // AUTH
 
@@ -78,7 +79,11 @@ if (login()->perm("admin")) {
 ?>
 <hr />
 <form>
-<p><input type="button" value="Redémarrer MySQL" onclick="mysql_restart()" /> <input type="button" value="Recharger MySQL" onclick="mysql_reload()" /> <input type="button" value="Recharger les privilèges MySQL" onclick="mysql_privileges_reload()" /></p>
+<p>
+	<input type="button" value="Redémarrer MySQL" onclick="mysql_restart()" />
+	<input type="button" value="Recharger MySQL" onclick="mysql_reload()" />
+	<input type="button" value="Recharger les privilèges MySQL" onclick="mysql_privileges_reload()" />
+</p>
 </form>
 <?php } ?>
 </body>

@@ -3,7 +3,6 @@
 <table cellspacing="2" cellpadding="2" border="1">
 <tr class="colname">
 	<td>&nbsp;</td>
-	<td>ID</td>
 	<td>Username</td>
 	<td>Email</td>
 	<td>Civilité</td>
@@ -17,7 +16,6 @@ foreach($account_list as $row)
 ?>
 <tr>
 	<td><input type="checkbox" name="list_id[]" value="<?=$row["id"]?>" /></td>
-	<td><a href="?id=<?=$row["id"]?>"><?=$row["id"]?></a></td>
 	<td><a href="?id=<?=$row["id"]?>"><?=$row["name"]?></a></td>
 	<td><?=$row["email"]?></td>
 	<td><?=$civilite_list[$row["civilite"]]?></td>

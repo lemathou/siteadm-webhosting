@@ -30,7 +30,7 @@ abstract class db_object_manager
 	/**
 	 * Construit la liste à partir de paramètres de recherche
 	 *
-	 * @param mixed params
+	 * @param mixed $params
 	 */
 	public function __construct($params=null)
 	{
@@ -41,7 +41,7 @@ abstract class db_object_manager
 	 * Récupération d'une liste d'objets en base de donnée à partir de paramètres de recherche
 	 * 
 	 * @todo créer un modèle standard pour les paramètres de recherche
-	 * @param mixed params
+	 * @param mixed $params
 	 */
 	public function db_retrieve($params=null)
 	{
@@ -252,8 +252,8 @@ abstract class db_object
 	 */
 	function link()
 	{
-
-		return "<a href=\"".$this->url()."\">".$this->__tostring()."</a>";
+		if ($this->id)
+			return "<a href=\"".$this->url()."\">".$this->__tostring()."</a>";
 
 	}
 
@@ -266,22 +266,24 @@ abstract class db_object
 	 * @param mixed $params
 	 * @param array $infos
 	 */
-	function __construct($params=null, $infos=null)
+	function __construct($params=null, $infos=array())
 	{
-
-		// Directly
-		if (is_array($infos))
+		
+		if (!is_array($infos))
+			$infos = array();
+		
+		foreach(static::$_f as $name=>$field)
 		{
-			foreach($infos as $name=>$value)
-			{
-				if ($name == "id" && is_numeric($value))
-					$this->id = (int)$value;
-				else
-					$this->set($name, $value);
-			}
+			if (!isset($infos[$name]))
+				$this->{$name} = null;
+			elseif ($name == "id" && is_numeric($infos[$name]))
+				$this->{$name} = (int)$infos[$name];
+			else
+				$this->set($name, $infos[$name]);
 		}
+
 		// From DB
-		elseif ($params !== null)
+		if ($params !== null)
 		{
 			$this->db_retrieve($params);
 		}
