@@ -221,8 +221,11 @@ $replace_map = $this->replace_map();
 
 // Awstats
 $account->copy_tpl("awstats/awstats.domain.conf", "awstats/awstats.$this->name.conf", $replace_map, "644", "root");
-if (!file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
-	exec("ln -s ".$account->folder()."/awstats/awstats.$this->name.conf ".AWSTATS_CONFIG_DIR."/");
+if (file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
+	exec("rm ".AWSTATS_CONFIG_DIR."/awstats.$this->name.conf");
+exec("ln -s ".$account->folder()."/awstats/awstats.$this->name.conf ".AWSTATS_CONFIG_DIR."/");
+if (!file_exists(SITEADM_DOMAIN_DIR."/".$this->name))
+exec("mkdir ".SITEADM_DOMAIN_DIR."/".$this->name);
 
 }
 

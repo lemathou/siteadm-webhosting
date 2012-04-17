@@ -6139,3 +6139,18 @@
 [15-Apr-2012 11:50:06] PHP Notice:  Undefined variable: query_domain_where in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 5
 [15-Apr-2012 11:50:08] PHP Notice:  Undefined variable: query_domain_where in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 5
 [15-Apr-2012 11:50:11] PHP Notice:  Undefined variable: query_domain_where in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 5
+[15-Apr-2012 12:11:41] PHP Notice:  Undefined variable: account in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 6
+[15-Apr-2012 12:11:44] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:11:44] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:11:49] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:11:49] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:11:50] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:11:50] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:11:53] PHP Notice:  Undefined variable: account in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 6
+[15-Apr-2012 12:11:56] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:11:56] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:12:14] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:12:14] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:12:37] PHP Warning:  mysql_num_rows() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 19
+[15-Apr-2012 12:12:37] PHP Warning:  mysql_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/documents/workspace/Siteadm/trunk/private/template/page/ftp_list.tpl.php on line 36
+[15-Apr-2012 12:16:48] PHP Warning:  file_exists(): open_basedir restriction in effect. File(/home/siteadm/admin) is not within the allowed path(s): (/home/siteadm_admin/public:/home/siteadm_admin/private:/home/siteadm_admin/config) in /home/documents/workspace/Siteadm/trunk/private/classes/filesystem.inc.php on line 194

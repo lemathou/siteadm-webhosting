@@ -143,7 +143,7 @@ return (SITEADM_ACCOUNT_UID_MIN+$this->id);
 function folder()
 {
 
-return SITEADM_ROOT."/$this->folder";
+return SITEADM_USER_DIR."/$this->folder";
 
 }
 /**

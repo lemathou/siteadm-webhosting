@@ -1,9 +1,9 @@
 ##
 # A insérer à la fin du fichier
-# Penser à créer un groupe hosts avant toute chose ..!
+# Penser à créer un groupe siteadm_user avant toute chose ..!
 ##
 
-Match group hosts
+Match group siteadm_user
 	ChrootDirectory %h
 	X11Forwarding no
 	AllowTcpForwarding no

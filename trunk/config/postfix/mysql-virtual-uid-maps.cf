@@ -1,5 +1,0 @@
-user = siteadm_postfix
-password = siteadm2275
-host = 127.0.0.1
-dbname = siteadm
-query = SELECT (2000+account.id) FROM account, domain, email WHERE account.id=domain.account_id AND email.domain_id=domain.id AND CONCAT(email.name,'@',domain.name)='%s'

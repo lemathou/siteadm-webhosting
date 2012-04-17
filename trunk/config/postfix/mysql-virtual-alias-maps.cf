@@ -1,5 +1,0 @@
-user = siteadm_postfix
-password = siteadm2275
-hosts = 127.0.0.1
-dbname = siteadm
-query = SELECT CONCAT(t1.name, "@", t3.name) as destination FROM email as t1 , email_alias AS t2 , domain as t3 , domain as t4 WHERE t4.email_actif='1' AND t2.actif='1' AND t1.domain_id=t3.id AND t2.domain_id=t4.id AND t1.id=t2.email_id AND CONCAT(t2.name, '@', t4.name)='%s'

@@ -2,7 +2,19 @@
 <table cellspacing="2" cellpadding="2" border="1">
 <?php
 
-$query = mysql_query("SELECT t1.*, t2.name as account_name, t2.manager_id as manager_id FROM ftp_user as t1 INNER JOIN account as t2 ON t1.account_id=t2.id $query_domain_where GROUP BY t1.id ORDER BY t1.username");
+if ($account)
+	$query_ftp_where = "WHERE t2.id='".$account->id."'";
+else
+	$query_ftp_where = "";
+
+$query_string = "SELECT t1.*,
+	t2.name as account_name, t2.manager_id as manager_id
+	FROM ftp_user as t1
+	INNER JOIN account as t2 ON t1.account_id=t2.id
+	$query_ftp_where
+	GROUP BY t1.id
+	ORDER BY t1.username";
+$query = mysql_query($query_string);
 
 if ($nb = mysql_num_rows($query))
 {
@@ -18,8 +30,9 @@ if ($nb = mysql_num_rows($query))
 }
 else
 {
-	echo "<p>Aucun site web associé</p>";
+	echo "<p>Aucun compte FTP</p>";
 }
+
 while($row=mysql_fetch_assoc($query))
 {
 ?>
@@ -32,6 +45,7 @@ while($row=mysql_fetch_assoc($query))
 </tr>
 <?php
 }
+
 ?>
 </table>
 </form>

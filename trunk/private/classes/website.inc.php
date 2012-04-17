@@ -26,7 +26,8 @@ static protected $_db_table = "website";
 static public $_f = array
 (
 	"account_id" => array("type"=>"object", "otype"=>"account"),
-	"domain_id" => array("type"=>"object", "otype"=>"domain", "nonempty"=>true),
+	"name" => array("type"=>"string", "nonempty"=>true),
+	"folder" => array("type"=>"string"),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"default_charset" => array("type"=>"select", "list"=>array("utf-8", "iso-8859-1")),
 	"webmaster_email" => array("type"=>"string"),
@@ -111,9 +112,7 @@ elseif (($domain=$this->domain()) && ($account=$domain->account()))
 public function folder()
 {
 
-$domain = $this->domain();
-$account = $this->account();
-return $account->folder()."/public/$this->name.$domain->name";
+return $account->folder()."/public/$this->folder";
 
 }
 
@@ -165,6 +164,17 @@ public function phperrorlogfile()
 $domain = $this->domain();
 $account = $this->account();
 return $account->log_folder()."/$this->name.".$domain->name.".php_error.log";
+
+}
+
+public function name()
+{
+
+$domain = $this->domain();
+if ($this->name)
+	return $this->name.".".$domain->name;
+else
+	return $domain->name;
 
 }
 
@@ -378,7 +388,7 @@ $map = array
 	"{WEBSITE_INDEX_FILES}" => $this->index_files,
 	"{AWSTATS_DATA_DIR}" => $account->folder()."/awstats",
 	"{WEBSITE_CGI_PATH}" => $account->folder()."/cgi-bin",
-	"{WEBSITE_ROOT}" => $this->folder(),
+	"{WEBSITE_PUBLIC_DIR}" => $this->folder(),
 	"{WEBSITE_CONFIG_DIR}" => $this->config_folder(),
 	"{WEBSITE_CHARSET}" => $this->default_charset,
 	"{WEBSITE_SSL_CERT}" => $account->folder()."/apache/$this->name.$domain->name.crt",
@@ -467,7 +477,8 @@ $account->mkdir("apache", "750", "root");
 $account->mkdir("nginx", "750", "root");
 $account->mkdir("awstats", "750", "root");
 $account->mkdir("public", "750");
-$account->mkdir("public/$this->name.$domain->name", "750");
+$account->mkdir("public/$this->folder", "750");
+exec("mkdir ".SITEADM_WEBSITE_DIR."/".$this->name());
 
 }
 
@@ -496,9 +507,9 @@ $replace_map = $this->replace_map();
 
 // Public file
 if (!file_exists($this->folder()."/index.html"))
-	$account->copy_tpl("website/index.html", "public/$this->name.$domain->name/index.html", $replace_map, "0644", "root");
+	$account->copy_tpl("website/index.html", "public/$this->folder/index.html", $replace_map, "0644", "root");
 if ($phppool && !file_exists($this->folder()."/phpinfo.php"))
-	$account->copy_tpl("website/phpinfo.php", "public/$this->name.$domain->name/phpinfo.php", $replace_map, "0644", "root");
+	$account->copy_tpl("website/phpinfo.php", "public/$this->folder/phpinfo.php", $replace_map, "0644", "root");
 
 // SSL
 if ($this->ssl && !file_exists($account->folder()."/apache/$this->name.$domain->name.key"))
@@ -506,20 +517,9 @@ if ($this->ssl && !file_exists($account->folder()."/apache/$this->name.$domain->
 
 // Awstats
 $account->copy_tpl("awstats/awstats.website.conf", "awstats/awstats.$this->name.$domain->name.conf", $replace_map, "644", "root");
-if (!file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf"))
-	exec("ln -s ".$account->folder()."/awstats/awstats.$this->name.$domain->name.conf ".AWSTATS_CONFIG_DIR."/");
-
-// Webserver config file
-if ($this->ssl && $this->ssl_force_redirect)
-	$account->copy_tpl("apache/vhost-ssl-redirect.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
-elseif ($this->ssl)
-	$account->copy_tpl("apache/vhost-ssl.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
-else
-	$account->copy_tpl("apache/vhost.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
-if (!file_exists(APACHE_VHOST."/$this->name.$domain->name.conf"))
-	exec("ln -s ".$account->folder()."/apache/$this->name.$domain->name.conf ".APACHE_VHOST."/");
-// Reload webserver
-$this->script_webserver_reload();
+if (file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf"))
+	exec("rm ".AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf");
+exec("ln -s ".$account->folder()."/awstats/awstats.$this->name.$domain->name.conf ".AWSTATS_CONFIG_DIR."/");
 
 // PHP vhost config file
 if ($phppool)
@@ -532,8 +532,28 @@ if ($phppool)
 if ($this->folder_auth && !file_exists($account->folder()."/apache/$this->name.$domain->name.htpasswd"))
 	exec("touch ".$account->folder()."/apache/$this->name.$domain->name.htpasswd");
 
+// Webserver config file
+if ($this->ssl && $this->ssl_force_redirect)
+	$account->copy_tpl("apache/vhost-ssl-redirect.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
+elseif ($this->ssl)
+	$account->copy_tpl("apache/vhost-ssl.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
+else
+	$account->copy_tpl("apache/vhost.conf", "apache/$this->name.$domain->name.conf", $replace_map, "0644", "root");
+if (file_exists(APACHE_VHOST."/$this->name.$domain->name.conf"))
+	exc("rm ".APACHE_VHOST."/$this->name.$domain->name.conf");
+exec("ln -s ".$account->folder()."/apache/$this->name.$domain->name.conf ".APACHE_VHOST."/");
+
+// Reload webserver
+$this->script_reload();
+
 }
 
+/**
+ * 
+ * @param string $name
+ * @param int $domain_id
+ * @param int $account_id
+ */
 function script_preupdate($name, $domain_id, $account_id)
 {
 
@@ -552,6 +572,12 @@ if ($name || $domain_id)
 
 }
 
+function script_reload()
+{
+
+$this->script_webserver_reload();
+
+}
 function script_webserver_reload()
 {
 

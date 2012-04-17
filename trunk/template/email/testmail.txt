@@ -1,0 +1,5 @@
+Bonjour {prenom},
+
+Ce message est un test pour vérifier que votre messagerie fonctionne bien.
+
+Cdt
