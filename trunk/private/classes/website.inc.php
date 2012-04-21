@@ -467,6 +467,9 @@ exec("rm ".$account->folder()."/apache/$this->name.$domain->name.sslinfo");
 
 }
 
+/**
+ * @see db_object::script_structure()
+ */
 function script_structure()
 {
 
@@ -479,17 +482,6 @@ $account->mkdir("awstats", "750", "root");
 $account->mkdir("public", "750");
 $account->mkdir("public/$this->folder", "750");
 exec("mkdir ".SITEADM_WEBSITE_DIR."/".$this->name());
-
-}
-
-/**
- * @see db_object::script_insert()
- */
-function script_insert()
-{
-
-$this->script_structure();
-$this->script_update();
 
 }
 

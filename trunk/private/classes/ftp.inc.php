@@ -30,9 +30,6 @@ static public $_f = array
 	"username" => array("type"=>"string"),
 	"password" => array("type"=>"string"),
 	"folder" => array("type"=>"string"),
-	"uid" => array("type"=>"int"),
-	"gid" => array("type"=>"int"),
-	"shell" => array("type"=>"string"),
 );
 
 }

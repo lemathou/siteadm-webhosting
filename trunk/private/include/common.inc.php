@@ -10,11 +10,10 @@ include SITEADM_PRIVATE_DIR."/include/login.inc.php";
 
 if (login()->perm("admin"))
 {
-	$menu_list = array
-	(
+	$menu_list = array(
 		"offer" => "Offres",
 		"webapp" => "Web apps",
-		"langage" => "Langages",
+		"language" => "Langages",
 		"account" => "Compte(s)",
 		"domain" => "Domaines",
 		"php" => "PHP",
@@ -29,8 +28,7 @@ if (login()->perm("admin"))
 }
 else
 {
-	$menu_list = array
-	(
+	$menu_list = array(
 		"account" => "Compte(s)",
 		"domain" => "Domaines",
 		"php" => "PHP",
@@ -148,21 +146,6 @@ exec("mkdir -m $mode $folder");
 if (is_numeric($user))
 	$user=(SITEADM_ACCOUNT_UID_MIN+$user);
 exec("chown $user.$group $folder");
-
-}
-
-function mkdir_user($folder, $mode="700", $id)
-{
-
-$account = account($id);
-mkdir2(SITEADM_ROOT."/$account->name/$folder", $mode, $id);
-
-}
-function mkdir_siteadm($folder, $mode="700", $id)
-{
-
-$account = account($id);
-mkdir2(SITEADM_ROOT."/$account->name/$folder", $mode);
 
 }
 

@@ -35,15 +35,11 @@ static public $_f = array
 	"max_updates" => array("type"=>"numeric", "default"=>MYSQL_MAX_UPDATES),
 );
 
-function url()
-{
-
-return "account.php?id=$this->id";
-
-}
-
 // ACCESS
 
+/**
+ * @return account
+ */
 public function account()
 {
 
@@ -51,9 +47,6 @@ if ($this->account_id)
 	return account($this->account_id);
 
 }
-
-//if (!isset($infos["password"]))
-//	$infos["password"] = password_create(8);
 
 // PERM
 
@@ -172,12 +165,9 @@ return true;
 function script_update()
 {
 
-$query=mysql_query("SELECT `password` FROM `mysql` WHERE `id`='$this->id'");
-if (list($password) = mysql_fetch_row($query))
-{
-	mysql_query("SET PASSWORD FOR '$this->name'@'localhost' = PASSWORD('$this->password')");
-	return true;
-}
+mysql_query("SET PASSWORD FOR '$this->name'@'localhost' = PASSWORD('$this->password')");
+
+return true;
 
 }
 

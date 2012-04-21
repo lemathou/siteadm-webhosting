@@ -68,7 +68,7 @@
 <tr>
 	<td class="label">Processus parent partagé (PHP-FPM) :<br />(optionnel mais recommandé dans la majorité des cas)</td>
 	<td class="field"><select name="phpapp_id" onchange="this.form.submit()"><option></option><?php
-	$query_string = "SELECT t1.*, t2.name as account_name FROM phpapp as t1 LEFT JOIN account as t2 ON t1.account_id=t2.id WHERE t1.account_id IN ('0', '$phppool->account_id')";
+	$query_string = "SELECT t1.*, t2.name as account_name FROM phpapp as t1 LEFT JOIN account as t2 ON t1.account_id=t2.id WHERE t1.account_id IS NULL OR t1.account_id IN ('$phppool->account_id')";
 	$query = mysql_query($query_string);
 	while($row = mysql_fetch_assoc($query))
 	{

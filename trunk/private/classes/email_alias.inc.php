@@ -23,10 +23,9 @@ class email_alias extends db_object
 static protected $_name = "email_alias";
 static protected $_db_table = "email_alias";
 
-public $account_id;
-
 static public $_f = array
 (
+	"account_id" => array("type"=>"object", "otype"=>"account"),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"domain_id" => array("type"=>"object", "otype"=>"domain", "nonempty"=>true),
 	"email_id" => array("type"=>"object", "otype"=>"email"),

@@ -13,7 +13,7 @@ static protected $name = "language";
 }
 
 /**
- * Programming languages
+ * Programming language
  * 
  * @package siteadm
  */

@@ -53,8 +53,8 @@ else
 }
 
 /**
- * Returns langage
- * @return langage
+ * Returns language
+ * @return language
  */
 function language()
 {

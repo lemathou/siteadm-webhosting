@@ -16,7 +16,7 @@
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td class="label" width="250">Compte de gestion :</td>
-	<td class="field"><?php if ($account=$phpapp->account()) echo $account->link(); else echo "Partagé / Pas de compte de gestion"; ?></td>
+	<td class="field"><?php if ($account=$phpapp->account() && $account->id) echo $account->link(); else echo "Partagé / Pas de compte de gestion"; ?></td>
 </tr>
 <tr>
 	<td class="label">Nom :</td>

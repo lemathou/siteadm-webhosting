@@ -58,7 +58,119 @@ return "php.php?app_id=$this->id";
 // ACCESS
 
 /**
+ * @return string
+ */
+function folder()
+{
+
+return $this->account()->conf_folder()."/php/$this->name";
+
+}
+/**
+ * @return string
+ */
+function log_folder()
+{
+
+return $this->account()->log_folder()."/php";
+
+}
+/**
+ * @return string
+ */
+function ext_folder()
+{
+
+return $this->folder()."/ext";
+
+}
+/**
+ * @return string
+ */
+function vhost_folder()
+{
+
+return $this->folder()."/vhost";
+
+}
+/**
+ * @return string
+ */
+function pool_folder()
+{
+
+return $this->folder()."/pool";
+
+}
+/**
+ * @return string
+ */
+public function errorlogfile()
+{
+
+return $this->log_folder()."/phpapp-".$this->name."_error.log";
+
+}
+/**
+ * @return string
+ */
+public function maillogfile()
+{
+
+return $this->log_folder()."/phpapp-".$this->name."_mail.log";
+
+}
+/**
+ * @return string
+ */
+public function pidfile()
+{
+
+return $this->folder()."/".$this->name.".pid";
+
+}
+/**
+ * @return string
+ */
+public function init_script()
+{
+
+return $this->folder()."/php5-fpm-$this->name.sh";
+
+}
+/**
+ * @return string
+ */
+public function configfile()
+{
+
+return $this->folder()."/$this->name.conf";
+
+}
+/**
+ * @return string
+ */
+public function inifile()
+{
+
+return $this->folder()."/$this->name.ini";
+
+}
+
+/**
+ * Returns PID
+ * @return int
+ */
+public function pid()
+{
+
+return (int)file_get_contents($this->pidfile());
+
+}
+
+/**
  * Retrieve managing account
+ * @return account|common
  */
 public function account()
 {
@@ -72,6 +184,7 @@ else
 
 /**
  * Retrieve language
+ * @return language_bin
  */
 public function language_bin()
 {
@@ -81,44 +194,12 @@ if ($this->language_bin_id)
 
 }
 
-public function logfile()
-{
-
-return $this->account()->folder()."/log/php-".$this->name."_error.log";
-
-}
-
-public function pidfile()
-{
-
-return $this->account()->folder()."/php/".$this->name.".pid";
-
-}
-
-public function pid()
-{
-
-return file_get_contents($this->pidfile());
-
-}
-
-function folder()
-{
-
-return $this->account()->folder()."/php";
-
-}
-
-function pool_folder()
-{
-
-return $this->folder()."/$this->name";
-
-}
-
 // PERM
 
-static public function insert_perm()
+/**
+ * @see db_object::insert_perm()
+ */
+static function insert_perm()
 {
 
 // Admin
@@ -146,7 +227,7 @@ else
 /**
  * @see db_object::update_perm()
  */
-public function update_perm()
+function update_perm()
 {
 
 // Admin
@@ -220,27 +301,25 @@ $account = $this->account();
 
 $account_folder = $account->folder();
 $app_folder = $this->folder();
-$pool_folder = $this->pool_folder();
 $language_bin = $this->language_bin();
 
-$map = array
-(
+$map = array(
 	"{PHP_INSTALL_PREFIX}" => $language_bin->prefix,
 	"{PHP_EXT_DIR}" => "$app_folder/ext", // general
 	"{PHP_NAME}" => $this->name,
 	"{PHP_ROOT}" => $app_folder,
-	"{PHP_VHOST_DIR}" => "$app_folder/vhost",
-	"{PHP_POOL_DIR}" => $pool_folder,
-	"{PHP_PID}" => "$app_folder/$this->name.pid",
-	"{PHP_CONF}" =>"$app_folder/$this->name.conf",
-	"{PHP_INI}" => "$app_folder/$this->name.ini",
-	"{PHP_ERROR_LOG}" => "$account_folder/log/php-".$this->name."_error.log",
-	"{PHP_MAIL_LOG}" => "$account_folder/log/php-".$this->name."_mail.log",
+	"{PHP_VHOST_DIR}" => $this->vhost_folder(),
+	"{PHP_POOL_DIR}" => $this->pool_folder(),
+	"{PHP_PID}" => $this->pidfile(),
+	"{PHP_CONF}" => $this->configfile(),
+	"{PHP_INI}" => $this->inifile(),
+	"{PHP_ERROR_LOG}" => $this->errorlogfile(),
+	"{PHP_MAIL_LOG}" => $this->maillogfile(),
 	"{PHP_BASEDIR}" => "$account_folder/public",
 	"{PHP_TMP_DIR}" => "$account_folder/tmp",
-	"{PHP_LOG_DIR}" => "$account_folder/log",
+	"{PHP_LOG_DIR}" => $this->log_folder(),
 	"{PHP_COOKIE_DIR}" => "$account_folder/cookies",
-	"{PHP_WEBMASTER_EMAIL}" => "$this->webmaster_email",
+	"{PHP_WEBMASTER_EMAIL}" => $this->webmaster_email,
 	"{PHP_APC_SHM_SIZE}" => $this->apc_shm_size."M",
 );
 
@@ -248,26 +327,18 @@ return array_merge($account->replace_map(), $map);
 
 }
 
+/**
+ * @see db_object::script_structure()
+ */
 function script_structure()
 {
 
 $account = $this->account();
 
-$account->mkdir("php", "750", "root");
-$account->mkdir("php/$this->name", "755", "root");
-$account->mkdir("php/vhost", "755", "root");
-$account->mkdir("php/pool", "755", "root");
-
-}
-
-/**
- * @see db_object::script_insert()
- */
-function script_insert()
-{
-
-$this->script_structure();
-$this->script_update();
+$account->mkdir($this->folder(), "750", "root");
+$account->mkdir($this->ext_folder(), "750", "root");
+$account->mkdir($this->pool_folder(), "750", "root");
+$account->mkdir($this->vhost_folder(), "750", "root");
 
 }
 
@@ -283,14 +354,19 @@ $language_bin = $this->language_bin();
 $replace_map = $this->replace_map();
 
 // PHP-FPM
-$account->copy_tpl("php/php-fpm.conf", "php/$this->name.conf", $replace_map, "0644", "root");
-$account->copy_tpl("php/php-fpm-init.conf", "php/fpm-$this->name.sh", $replace_map, "0755", "root");
-exec("ln -s ".$account->folder()."/php/fpm-$this->name.sh /etc/init.d/".$account->system_name()."-fpm-$this->name.sh");
-$account->copy_tpl("php/php-".$language_bin->version.".ini", "php/$this->name.ini", $replace_map, "0644", "root");
+$account->copy_tpl("php/php-fpm.conf", $this->configfile(), $replace_map, "0644", "root");
+$account->copy_tpl("php/php-fpm-init.conf", $this->init_script(), $replace_map, "0755", "root");
+$account->copy_tpl("php/php-".$language_bin->version.".ini", $this->inifile(), $replace_map, "0644", "root");
+exec("ln -s ".$this->init_script()." /etc/init.d/php5-fpm-".$account->system_name()."-$this->name.sh");
 
 // VHOSTS
 // @todo : faire mieux (par exemple $this->website_list())
-$query = mysql_query("SELECT t1.`id`, t2.`account_id`, t1.`name`, t2.`name` as domain_name FROM `website` as t1, `domain` as t2, `phppool` as t3 WHERE t1.`domain_id`=t2.`id` AND t1.`phppool_id`=t3.`id` AND t3.`phpapp_id`='$this->id'");
+$query_string = "SELECT t1.`id`, t2.`account_id`, t1.`name`, t2.`name` as domain_name
+	FROM `website` as t1
+	JOIN `domain` as t2 ON t2.`id`=t1.`domain_id`
+	JOIN `phppool` as t3 ON t3.`id`=t1.`phppool_id`
+	WHERE t3.`phpapp_id`='$this->id'";
+$query = mysql_query($query_string);
 $vhost = "";
 while ($row=mysql_fetch_assoc($query))
 {
@@ -303,18 +379,21 @@ while ($row=mysql_fetch_assoc($query))
 		// FORCE UPDATE ?
 	}
 }
-fwrite(fopen($account->folder()."/php/vhost/hosts.ini", "w"), $vhost);
+fwrite(fopen($account->conf_folder()."/php/vhost/hosts.ini", "w"), $vhost);
 
 // Reload process
 $this->script_reload();
 
 }
 
+/**
+ * Reload Application
+ */
 public function script_reload()
 {
 
 sleep(2);
-exec($this->folder()."/fpm-$this->name.sh restart > /dev/null &");
+exec($this->init_script()." restart > /dev/null &");
 
 }
 

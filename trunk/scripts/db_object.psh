@@ -1,7 +1,9 @@
-#!/usr/bin/php
+#!/usr/bin/php -e /home/siteadm_admin/conf/php/php.ini
 <?php
 
-require_once "../config/config.inc.php";
+ini_set("include_path","/home/siteadm_admin/private:/home/siteadm_admin/public");
+
+require_once "config/config.inc.php";
 require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
 
 // ACTION

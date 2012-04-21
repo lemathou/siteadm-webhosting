@@ -157,6 +157,17 @@ function log_folder()
 return $this->folder()."/log";
 
 }
+/**
+ * Conf folder
+ * 
+ * @return string
+ */
+function conf_folder()
+{
+
+return $this->folder()."/conf";
+
+}
 
 // PERM
 
@@ -404,6 +415,9 @@ exec("usermod -p $passwd_crypt ".$this->system_name());
 
 }
 
+/**
+ * Update quota
+ */
 function quota_update()
 {
 
@@ -427,7 +441,7 @@ else
 
 /**
  * Create a subfolder in the account root and eventually chown it
- * 
+ *
  * @param string $folder
  * @param string $mode
  * @param string $usergroup
@@ -435,9 +449,36 @@ else
 function mkdir($folder, $mode="750", $usergroup=null)
 {
 
-exec("mkdir -m $mode \"".$this->folder()."/$folder\"");
-
+if (substr($folder, 0, 1) != "/")
+	$folder = $this->folder()."/".$folder;
+exec("mkdir -m $mode \"".$folder."\"");
 $this->chown($folder, $usergroup);
+
+}
+
+/**
+ * Delete a folder and all subfolders
+ *
+ * @param string $folder
+ */
+function rmdir($folder)
+{
+
+if ($this->folder() && $folder)
+	exec("rm -Rf \"".$this->folder()."/$folder\"");
+
+}
+
+/**
+ * Delete a folder and all subfolders
+ *
+ * @param string $folder
+ */
+function rm($file)
+{
+
+if (file_exists($file=$this->folder()."/$file"))
+	exec("rm \"".$file."\"");
 
 }
 
@@ -457,7 +498,10 @@ elseif (!is_numeric($pos=strpos($usergroup, ".")))
 elseif ($pos == 0)
 	$usergroup = $this->system_name().".".$usergroup;
 
-file_chown($this->folder()."/".$file, $usergroup);
+if (substr($folder, 0, 1) != "/")
+	$folder = $this->folder()."/".$folder;
+
+file_chown($file, $usergroup);
 
 }
 
@@ -506,7 +550,10 @@ function copy_tpl($file_from, $file_to, $replace_map=array(), $mode="0640", $use
 if (is_null($usergroup))
 	$usergroup = $this->system_id().".".$this->system_id();
 
-copy_tpl($file_from, $this->folder()."/".$file_to, $replace_map, $mode, $usergroup);
+if (substr($file_to, 0, 1) != "/")
+	$file_to = $this->folder()."/".$file_to;
+
+copy_tpl($file_from, $file_to, $replace_map, $mode, $usergroup);
 
 }
 
@@ -516,42 +563,57 @@ copy_tpl($file_from, $this->folder()."/".$file_to, $replace_map, $mode, $usergro
 public function script_structure()
 {
 
+$this->mkdir("", "750", "root");
+
+$this->mkdir("conf", "750", "root");	
+// Awstats
+$this->mkdir("conf/awstats", "1750", "root");
 // Apache
-$this->mkdir("apache", "750", "root");
+$this->mkdir("conf/apache", "755", "root");
 // nginx
-$this->mkdir("nginx", "750", "root");
-// Backup
-$this->mkdir("backup", "750", "root");
-// CRON
-$this->mkdir("cron", "750", "root");
-// Logs
-$this->mkdir("log", "770", "root");
+$this->mkdir("conf/nginx", "755", "root");
+// PHP
+$this->mkdir("conf/php", "755", "root");
+$this->mkdir("conf/php/pool", "755", "root");
+$this->mkdir("conf/php/ext", "755", "root");
+$this->mkdir("conf/php/vhost", "755", "root");
 // Fetchmail
-$this->mkdir("fetchmail", "750", "root");
-// eMail
-$this->mkdir("mail", "700");
-// Temp (PHP)
-$this->mkdir("tmp", "1770");
+$this->mkdir("conf/fetchmail", "755", "root");
+// CRON
+$this->mkdir("conf/cron", "755", "root");
 // CGI-BIN
 $this->mkdir("cgi-bin", "750", "root");
-// PHP
+// Backup
+$this->mkdir("backup", "750", "root");
+// Backup
+$this->mkdir("backup/mysql", "755", "root");
+// Logs
+$this->mkdir("log", "750", "root");
+$this->mkdir("log/apache", "1750", "root");
+$this->mkdir("log/php", "1750", "root");
+$this->mkdir("log/awstats", "1750", "root");
+// Temp (PHP)
+$this->mkdir("tmp", "1770");
+// Cookies (PHP)
 $this->mkdir("cookies", "1770");
-$this->mkdir("php", "750", "root");
-$this->mkdir("php/pool", "755", "root");
-$this->mkdir("php/ext", "755", "root");
-$this->mkdir("php/vhost", "755", "root");
+// Private data & config
+$this->mkdir("private", "750", "root");
+$this->mkdir("private/config", "750");
+$this->mkdir("private/scripts", "750");
+$this->mkdir("private/data", "750");
 // Public websites
 $this->mkdir("public", "750", "root");
 $this->mkdir("public/config", "750");
 $this->mkdir("public/scripts", "750");
+$this->mkdir("public/data", "750");
 $this->mkdir("public/ftp", "750");
-// Data
-$this->mkdir("data", "750");
+// eMail
+$this->mkdir("mail", "700");
 
 }
 
 /**
- * Create config files
+ * @see db_object::script_insert()
  */
 function script_insert()
 {
@@ -569,20 +631,25 @@ exec("addgroup ".$this->system_name()." siteadm_user");
 
 // Root folder with private subfolder
 $this->mkdir("", "750", "root");
-$this->mkdir("private", "700");
 
 $this->script_structure();
 $this->script_update();
+$this->script_password_update();
 
 }
 
 /**
- * Update config files
+ * @see db_object::script_update()
  */
 function script_update()
 {
 
-$this->password_update();
+}
+
+function script_password_update($password=null)
+{
+
+$this->password_update($password);
 
 }
 

@@ -61,7 +61,7 @@ public function logaccessfile()
 {
 
 $account = $this->account();
-return $account->log_folder()."/$this->name.access.log";
+return $account->log_folder()."/apache/$this->name.access.log";
 
 }
 
@@ -200,16 +200,6 @@ return array_merge($account->replace_map(), $map);
 }
 
 /**
- * @see db_object::script_insert()
- */
-function script_insert()
-{
-
-$this->script_update();
-
-}
-
-/**
  * @see db_object::script_update()
  */
 function script_update()
@@ -220,12 +210,25 @@ $account = $this->account();
 $replace_map = $this->replace_map();
 
 // Awstats
-$account->copy_tpl("awstats/awstats.domain.conf", "awstats/awstats.$this->name.conf", $replace_map, "644", "root");
+$account->copy_tpl("awstats/awstats.domain.conf", "conf/awstats/awstats.$this->name.conf", $replace_map, "644", "root");
 if (file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
 	exec("rm ".AWSTATS_CONFIG_DIR."/awstats.$this->name.conf");
 exec("ln -s ".$account->folder()."/awstats/awstats.$this->name.conf ".AWSTATS_CONFIG_DIR."/");
 if (!file_exists(SITEADM_DOMAIN_DIR."/".$this->name))
 exec("mkdir ".SITEADM_DOMAIN_DIR."/".$this->name);
+
+}
+
+/**
+ * @see db_object::script_delete()
+ */
+function script_delete()
+{
+
+if (file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
+	exec("rm ".AWSTATS_CONFIG_DIR."/awstats.$this->name.conf");
+exec("rm -Rf ".SITEADM_DOMAIN_DIR."/".$this->name);
+$account->rm("conf/awstats/awstats.$this->name.conf");
 
 }
 

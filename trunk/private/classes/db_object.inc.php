@@ -866,17 +866,29 @@ abstract class db_object
 	/**
 	 * Post-insert trigger
 	 */
-	protected function script_insert()
+	function script_structure()
 	{
 	
 		// TO BE OVERLOADED
 	
 	}
-		
+	
+	/**
+	 * Post-insert trigger
+	 */
+	function script_insert()
+	{
+	
+		// TO BE OVERLOADED
+		$this->script_structure();
+		$this->script_update();
+	
+	}
+	
 	/**
 	 * Post-update trigger
 	 */
-	protected function script_update()
+	function script_update()
 	{
 	
 		// TO BE OVERLOADED
@@ -886,7 +898,7 @@ abstract class db_object
 	/**
 	 * Post-delete trigger
 	 */
-	protected function script_delete()
+	function script_delete()
 	{
 	
 		// TO BE OVERLOADED

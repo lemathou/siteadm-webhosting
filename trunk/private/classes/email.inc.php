@@ -46,7 +46,7 @@ return $this->name."@".$this->domain()->name;
 // ACCESS
 
 /**
- * returns the associated domain
+ * Returns the associated domain
  * 
  * @return domain
  */

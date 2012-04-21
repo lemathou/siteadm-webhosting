@@ -1,0 +1,33 @@
+FastCgiExternalServer /home/siteadm_admin/cgi-bin/php5-cgi -socket /home/siteadm_admin/conf/php/siteadm.sock -pass-header Authorization
+
+<Virtualhost *:80>
+DocumentRoot "/home/siteadm_admin/public"
+ServerName siteadm
+ServerAlias admin.*
+ServerAdmin webmaster@iprospective.fr
+RedirectPermanent / https://admin.iprospective.fr/
+</VirtualHost>
+
+<Virtualhost *:443>
+DocumentRoot "/home/siteadm_admin/public"
+ServerName siteadm
+ServerAlias admin.*
+ServerAdmin webmaster@iprospective.fr
+SSLEngine on
+SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
+SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+SuexecUserGroup siteadm siteadm
+CustomLog /home/siteadm_admin/log/apache/access.log combined
+ErrorLog /home/siteadm_admin/log/apache/error.log
+ScriptAlias /cgi-bin/ /home/siteadm_admin/cgi-bin/
+Action php-fpm /cgi-bin/php5-cgi
+<Directory "/home/siteadm_admin/public">
+	order allow,deny
+	allow from all
+	AddHandler php-fpm .php
+</Directory>
+<location "/cgi-bin/php5-cgi">
+	Order allow,deny
+	Allow from env=REDIRECT_STATUS
+</location>
+</VirtualHost>
