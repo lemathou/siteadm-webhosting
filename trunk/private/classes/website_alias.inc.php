@@ -25,10 +25,10 @@ static protected $_db_table = "website_alias";
 
 static public $_f = array
 (
-	"domain_id" => array("type"=>"object", "otype"=>"domain", "nonempty"=>true),
+	"domain_id" => array("type"=>"object", "otype"=>"domain"),
 	"alias_name" => array("type"=>"string", "nonempty"=>true),
 	"website_id" => array("type"=>"object", "otype"=>"website"),
-	"website_redirect" => array("type"=>"boolean"),
+	"website_redirect" => array("type"=>"boolean", "nonempty"=>true),
 	"redirect_url" => array("type"=>"string"),
 );
 
@@ -161,12 +161,14 @@ else
 function insert($infos=array())
 {
 
-if (!isset($infos["domain_id"]) || !isset($infos["alias_name"]))
+if (!isset($infos["alias_name"]))
+	return false;
+if ((!isset($infos["domain_id"]) || !(domain($infos["domain_id"]))) && $this->insert_perm() != "admin")
 	return false;
 if (!isset($infos["website_redirect"]))
 	$infos["website_redirect"] = "0";
 
-return db_object::insert();
+return db_object::insert($infos);
 
 }
 
@@ -189,7 +191,7 @@ if (isset($infos["domain_id"]))
 if (isset($infos["alias_name"]))
 	unset($infos["alias_name"]);
 
-return db_object::update();
+return db_object::update($infos);
 
 }
 

@@ -24,10 +24,10 @@ if (!login()->id)
 
 if (isset($_GET["id"]))
 {
-	$query = mysql_query("SELECT * FROM `langage_bin` WHERE `id`='$_GET[id]'");
-	if (mysql_num_rows($query) && ($php=mysql_fetch_assoc($query)))
+	$query = mysql_query("SELECT exec_bin FROM `language_bin` WHERE `id`='$_GET[id]'");
+	if (list($exec_bin)=mysql_fetch_row($query))
 	{
-		echo str_replace("\n", "<br />\n", `$php[exec_bin] -r "phpinfo();"`);
+		echo str_replace("\n", "<br />\n", `$exec_bin -r "phpinfo();"`);
 	}
 }
 

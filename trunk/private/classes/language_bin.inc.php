@@ -32,6 +32,8 @@ static public $_f = array
 	"options" => array("type"=>"string"),
 	"prefix" => array("type"=>"string"),
 	"exec_bin" => array("type"=>"string"),
+	"extension_dir" => array("type"=>"string"),
+	"extension" => array(),
 );
 
 /**
@@ -61,6 +63,41 @@ function language()
 
 if ($this->language_id)
 	return language($this->language_id);
+
+}
+
+public function phpext_list()
+{
+
+$list = array();
+if (is_array($this->extension))
+{
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
+	$query = mysql_query($query_string);
+	while($row=mysql_fetch_assoc($query))
+		$list[$row["id"]] = $row;
+}
+return $list;
+
+}
+
+// DB
+
+/**
+ * @see db_object::db_retrieve()
+ */
+function db_retrieve($id)
+{
+
+if (db_object::db_retrieve($id))
+{
+	// Extensions
+	$this->extension = array();
+	$query_string = "SELECT ext_id FROM language_bin_php_ext_ref WHERE language_bin_id='$this->id'";
+	$query = mysql_query($query_string);
+	while(list($ext_id)=mysql_fetch_row($query))
+		$this->extension[] = $ext_id;
+}
 
 }
 

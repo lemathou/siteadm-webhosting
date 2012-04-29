@@ -224,10 +224,10 @@ abstract class db_object
 
 		if (array_key_exists("label", static::$_f) && !is_null($this->label))
 			return "$this->label";
-		elseif (array_key_exists("name", static::$_f) && !is_null($this->label))
+		elseif (array_key_exists("name", static::$_f) && !is_null($this->name))
 			return "$this->name";
 		else
-			return get_called_class($this)." ID#$this->id";
+			return get_called_class()." ID#$this->id";
 
 	}
 
@@ -241,7 +241,7 @@ abstract class db_object
 	{
 
 		if ($this->id)
-			return get_called_class($this).".php?id=$this->id";
+			return get_called_class().".php?id=$this->id";
 
 	}
 
@@ -340,6 +340,22 @@ abstract class db_object
 	
 	}
 	
+	/**
+	 * Returns the init reload permission level of the connected user for this object
+	 * 
+	 * TO BE OVERLOADED
+	 * @return string|bool
+	 */
+	public function reload_perm()
+	{
+	
+	if (login()->perm("admin"))
+		return "admin";
+	else
+		return false;
+	
+	}
+	
 	// UPDATE
 
 	/**
@@ -369,8 +385,10 @@ abstract class db_object
 	public function convert($name, &$value)
 	{
 		
-		if (!is_string($name) || !array_key_exists($name, static::$_f) || !array_key_exists("type", static::$_f[$name]))
+		if (!is_string($name) || !array_key_exists($name, static::$_f))
 			return false;
+		if (!array_key_exists("type", static::$_f[$name]))
+			return true;
 
 		switch (static::$_f[$name]["type"])
 		{
@@ -466,6 +484,8 @@ abstract class db_object
 				unset($infos[$name]);
 		}
 		
+		//var_dump($infos);
+		
 		if (count($infos) && ($this->db_insert($infos)))
 		{
 			foreach($infos as $name=>$value)
@@ -523,6 +543,8 @@ abstract class db_object
 			if (!$this->convert($name, $value))
 				unset($infos[$name]);
 		}
+		
+		//var_dump($infos);
 
 		if (count($infos) && $this->db_update($infos))
 		{
@@ -600,6 +622,18 @@ abstract class db_object
 					unset($classname()->list[$this->{$name}]);
 			}
 		}
+	}
+	
+	public function reload()
+	{
+	
+	if (!$this->reload_perm())
+		return false;
+	if (!$this->id)
+		return false;
+	
+	$this->root_reload();
+	
 	}
 	
 	// DB
@@ -692,7 +726,9 @@ abstract class db_object
 
 		if ($this->id || !is_array($infos))
 			return false;
-
+		
+		//var_dump($infos);
+		
 		// Verif required fields
 		foreach (static::$_f as $name=>$field)
 			if (!empty($field["nonempty"]) && !isset($infos[$name]))
@@ -719,13 +755,14 @@ abstract class db_object
 		}
 		if (count($query_fields))
 		{
-			echo $query_string = "INSERT INTO `".static::$_db_table."` (".implode(", ", $query_fields).") VALUES (".implode(", ", $query_values).")";
+			$query_string = "INSERT INTO `".static::$_db_table."` (".implode(", ", $query_fields).") VALUES (".implode(", ", $query_values).")";
 			$query = mysql_query($query_string);
 			if ($this->id = mysql_insert_id())
 			{
 				$this->db_insert_more($infos);
 				return true;
 			}
+			//echo "<p>".$query_string." : ".mysql_error()."</p>";
 		}
 
 		return false;
@@ -773,7 +810,7 @@ abstract class db_object
 			$query_string = "UPDATE `".static::$_db_table."` SET ".implode(", ", $query_update)." WHERE `id`='$this->id'";
 			$query = mysql_query($query_string);
 			//echo "<p>$query_string : ".mysql_affected_rows()."</p>\n";
-			if (mysql_affected_rows() || $this->db_update_more($infos))
+			if ($this->db_update_more($infos) || mysql_affected_rows())
 			{
 				return true;
 			}
@@ -812,6 +849,15 @@ abstract class db_object
 	}
 
 	// ROOT ACCESS SCRIPTS
+	
+	protected function root_script($action, $var1=null, $var2=null, $var3=null)
+	{
+	
+		// To be extended
+		if ($this->id)
+			exec("(nohup sleep 2; sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3) &");
+	
+	}
 
 	/**
 	 * Script to execute as root
@@ -820,10 +866,7 @@ abstract class db_object
 	protected function root_insert()
 	{
 
-		// To be extended
-		if (!$this->id)
-			return;
-		exec("sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id insert");
+		$this->root_script("insert");
 
 	}
 
@@ -834,7 +877,7 @@ abstract class db_object
 	protected function root_preupdate($infos)
 	{
 
-		// To be extended
+		$this->root_script("preupdate");
 
 	}
 	
@@ -845,9 +888,7 @@ abstract class db_object
 	protected function root_update()
 	{
 
-		// To be extended
-		if ($this->id)
-			exec("sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id update");
+		$this->root_script("update");
 
 	}
 	
@@ -857,14 +898,26 @@ abstract class db_object
 	 */
 	protected function root_delete()
 	{
-
-		if ($this->id)
-			exec("sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id delete");
-
+	
+		$this->root_script("delete");
+	
 	}
 	
 	/**
-	 * Post-insert trigger
+	 * Script to execute as root
+	 * post-deletion trigger
+	 */
+	protected function root_reload()
+	{
+	
+		$this->root_script("reload");
+	
+	}
+	
+	/* SCRIPTS EXECUTED AS ROOT */
+	
+	/**
+	 * Structure creation trigger
 	 */
 	function script_structure()
 	{
@@ -886,6 +939,16 @@ abstract class db_object
 	}
 	
 	/**
+	 * Pre-update trigger
+	 */
+	function script_preupdate()
+	{
+	
+		// TO BE OVERLOADED
+	
+	}
+	
+	/**
 	 * Post-update trigger
 	 */
 	function script_update()
@@ -894,11 +957,21 @@ abstract class db_object
 		// TO BE OVERLOADED
 	
 	}
-		
+	
 	/**
 	 * Post-delete trigger
 	 */
 	function script_delete()
+	{
+	
+		// TO BE OVERLOADED
+	
+	}
+	
+	/**
+	 * Reload associated service
+	 */
+	function script_reload()
 	{
 	
 		// TO BE OVERLOADED

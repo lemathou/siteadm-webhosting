@@ -1,7 +1,7 @@
 <h1>Site web : AJOUT</h1>
 <?php
 $account = $domain->account();
-if ($account) { ?>
+if ($account->id) { ?>
 <p>Compte de gestion du domaine <?php echo $domain->link(); ?> : <?php echo $account->link(); ?></p>
 <?php if ($manager=$account->manager()) { ?>
 <p>Manager du compte : <?php echo $manager->link(); ?></p>

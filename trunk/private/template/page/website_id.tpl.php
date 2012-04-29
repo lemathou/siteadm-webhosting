@@ -2,12 +2,12 @@
 $domain = $website->domain();
 $account = $domain->account();
 ?>
-<h1>Site web : <?=$website->name.".".$domain->name?></h1>
-<p><a href="http://<?=$website->name.".".$domain->name?>" target="_blank">Voir le site</a></p>
+<h1>Site web : <?php echo $website->name(); ?></h1>
+<p><a href="http://<?php echo $website->name(); ?>" target="_blank">Voir le site</a></p>
 <?php
 $account = $domain->account();
 $phppool = phppool($website->phppool_id);
-if ($account) { ?>
+if ($account->id) { ?>
 <p>Compte de gestion du domaine <?php echo $domain->link(); ?> : <?php echo $account->link(); ?></p>
 <?php if ($manager=$account->manager()) { ?>
 <p>Manager du compte : <?php echo $manager->link(); ?></p>
@@ -19,15 +19,15 @@ if ($account) { ?>
 <div style="float: right;width: 320px;" class="cadre">
 <h3>Website acces log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->accesslogfile(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->accesslog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 <h3>Website Error log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->errorlogfile(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->errorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 <h3> Website PHP Error log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->phperrorlogfile(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->phperrorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 </div>
 

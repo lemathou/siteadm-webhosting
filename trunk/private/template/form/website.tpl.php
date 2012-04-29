@@ -1,21 +1,22 @@
 <form method="post" class="edit">
 <input type="hidden" name="domain_id" value="<?php echo $website->domain_id; ?>" />
 <div style="width: 600px;" class="cadre">
-<?php if ($website->id) { ?>
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
+<?php if ($website->id) { ?>
 <tr>
 	<td class="label" width="250">Nom (sous-domaine) :</td>
 	<td class="field"><?php echo "<b>$website->name</b>.$domain->name"; ?></td>
 </tr>
-</table>
 <?php } else { ?>
-<table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td class="label" width="250">Nom (sous-domaine) :</td>
 	<td class="field"><input name="name" value="<?php echo $website->name; ?>" /> .<?php echo $domain->name; ?></td>
 </tr>
-</table>
 <?php } ?>
+<tr>
+	<th>Dossier de stockage :</th>
+	<td class="field"><input name="folder" value="<?php echo $website->folder; ?>" /></td>
+</table>
 </div>
 
 <div style="width: 600px;" class="cadre">
@@ -33,9 +34,9 @@
 <tr>
 	<td class="label">Default charset</td>
 	<td class="field">
-		<input name="default_charset" type="radio" value=""<?php if (!$website->default_charset) echo " checked"; ?> /> AUCUN
-		<input name="default_charset" type="radio" value="utf-8"<?php if ($website->default_charset=="utf-8") echo " checked"; ?> /> UTF-8
-		<input name="default_charset" type="radio" value="iso-8859-1"<?php if ($website->default_charset=="iso-8859-1") echo " checked"; ?> /> ISO-8859-1
+		<input name="default_charset" type="radio" value=""<?php if (!$website->charset_default) echo " checked"; ?> /> AUCUN
+		<input name="default_charset" type="radio" value="utf-8"<?php if ($website->charset_default=="utf-8") echo " checked"; ?> /> UTF-8
+		<input name="default_charset" type="radio" value="iso-8859-1"<?php if ($website->charset_default=="iso-8859-1") echo " checked"; ?> /> ISO-8859-1
 	</td>
 </tr>
 <tr>
@@ -81,14 +82,12 @@
 <tr>
 	<td class="label">Pool PHP à utiliser :<br />(Il est conseillé de créer un pool dédié pour chaque application, toutefois si cela ne pose aucun problème de performance on peut mutualiser)</td>
 	<td class="field"><select name="phppool_id"><option></option><?php
-	$query_string = "SELECT t1.id, t1.name FROM phppool as t1 WHERE t1.account_id='$account->id'";
-	$query = mysql_query($query_string);
-	while ($row=mysql_fetch_assoc($query))
+	foreach($website->account()->phppool_list() as $phppool)
 	{
-		if ($website->phppool_id == $row["id"])
-			echo "<option value=\"$row[id]\" selected>$row[name]</option>";
+		if ($website->phppool_id == $phppool->id)
+			echo "<option value=\"".$phppool->id."\" selected>".$phppool."</option>";
 		else
-			echo "<option value=\"$row[id]\">$row[name]</option>";
+			echo "<option value=\"".$phppool->id."\">".$phppool."</option>";
 	}
 	?></select> <input type="button" value="" class="phppool_edit" style="display: none;" /></td>
 </tr>

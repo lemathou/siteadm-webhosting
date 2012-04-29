@@ -169,11 +169,11 @@ return array
 /**
  * Copy a template file to specified location
  * Used in account and common
- * @param unknown_type $file_from
- * @param unknown_type $file_to
- * @param unknown_type $replace_map
- * @param unknown_type $mode
- * @param unknown_type $user_id
+ * @param string $file_from
+ * @param string $file_to
+ * @param [] $replace_map
+ * @param string $mode
+ * @param int $user_id
  */
 function copy_tpl($file_from, $file_to, $replace_map=array(), $mode="0644", $usergroup=null)
 {
@@ -208,21 +208,33 @@ file_chmod($file_to, $mode);
  * Security
  */
 
-function file_chown($filename, $usergroup, $recurse=false)
+/**
+ * Change file owner
+ * @param string $filename
+ * @param string $usergroup
+ * @param bool $recursive
+ */
+function file_chown($filename, $usergroup, $recursive=false)
 {
 
 $options = "";
-if ($recurse)
+if ($recursive)
 	$options .= " -R";
 
 exec("chown$options $usergroup \"$filename\""); 
 
 }
 
+/**
+ * Change file mode
+ * @param string $filename
+ * @param string $mode
+ */
 function file_chmod($filename, $mode)
 {
 
-exec("chmod $mode \"$filename\"");
+if (file_exists($filename))
+	exec("chmod $mode \"$filename\"");
 
 }
 

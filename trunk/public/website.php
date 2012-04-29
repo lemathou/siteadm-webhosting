@@ -135,7 +135,7 @@ if (isset($_GET["add"]) && isset($_GET["domain_id"]) && ($domain=domain($_GET["d
 {
 	include "template/page/website_add.tpl.php";
 }
-elseif (isset($_GET["alias_add"]) && isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website_alias::insert_perm())
+elseif (isset($_GET["alias_add"]) && ((website_alias::insert_perm() == "admin") || (isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website_alias::insert_perm())))
 {
 	include "template/page/website_alias_add.tpl.php";
 }

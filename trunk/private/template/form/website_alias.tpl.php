@@ -1,15 +1,15 @@
-<form method="post" action="?domain_id=<?php echo $domain->id; ?>">
+<form method="post" action="?domain_id=<?php echo $website_alias->domain_id; ?>">
 <?php if ($website_alias->id) { ?>
 <input type="hidden" name="id" value="<?php echo $website_alias->id; ?>" />
 <?php } else { ?>
-<input type="hidden" name="domain_id" value="<?php echo $domain->id; ?>" />
+<input type="hidden" name="domain_id" value="<?php echo $website_alias->domain_id; ?>" />
 <?php } ?>
 
 <div style="width: 600px;" class="cadre">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td>Sous-domaine :</td>
-	<td><input name="alias_name" value="<?php echo $website_alias->name; ?>" />.<?=$domain->name?></td>
+	<td><input name="alias_name" value="<?php echo $website_alias->name; ?>" />.<?php if ($domain) echo $domain->name; else echo "*"; ?></td>
 </tr>
 <tr>
 	<td>Alias de :</td>

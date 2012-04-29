@@ -33,6 +33,7 @@ static public $_f = array
 	"language_bin_id" => array("type"=>"object", "otype"=>"language_bin"),
 	"webmaster_email" => array("type"=>"string"),
 	"apc_shm_size" => array("type"=>"numeric"),
+	"extension" => array(),
 );
 
 /**
@@ -55,7 +56,7 @@ return "php.php?app_id=$this->id";
 
 }
 
-// ACCESS
+/* FOLDERS */
 
 /**
  * @return string
@@ -87,10 +88,10 @@ return $this->folder()."/ext";
 /**
  * @return string
  */
-function vhost_folder()
+function ini_folder()
 {
 
-return $this->folder()."/vhost";
+return $this->folder()."/ini";
 
 }
 /**
@@ -102,28 +103,31 @@ function pool_folder()
 return $this->folder()."/pool";
 
 }
+
+/* FILES */
+
 /**
  * @return string
  */
-public function errorlogfile()
+public function errorlog_file()
 {
 
-return $this->log_folder()."/phpapp-".$this->name."_error.log";
+return $this->log_folder()."/app-".$this->name."_error.log";
 
 }
 /**
  * @return string
  */
-public function maillogfile()
+public function maillog_file()
 {
 
-return $this->log_folder()."/phpapp-".$this->name."_mail.log";
+return $this->log_folder()."/app-".$this->name."_mail.log";
 
 }
 /**
  * @return string
  */
-public function pidfile()
+public function pid_file()
 {
 
 return $this->folder()."/".$this->name.".pid";
@@ -132,16 +136,25 @@ return $this->folder()."/".$this->name.".pid";
 /**
  * @return string
  */
-public function init_script()
+public function script_file()
 {
 
-return $this->folder()."/php5-fpm-$this->name.sh";
+return $this->folder()."/php-fpm-$this->name.sh";
 
 }
 /**
  * @return string
  */
-public function configfile()
+public function init_script_file()
+{
+
+return "/etc/init.d/php-fpm-".$this->account()->name."-".$this->name.".sh";
+
+}
+/**
+ * @return string
+ */
+public function config_file()
 {
 
 return $this->folder()."/$this->name.conf";
@@ -150,10 +163,19 @@ return $this->folder()."/$this->name.conf";
 /**
  * @return string
  */
-public function inifile()
+public function ini_file()
 {
 
 return $this->folder()."/$this->name.ini";
+
+}
+/**
+ * @return string
+ */
+public function vhost_ini_file()
+{
+
+return $this->ini_folder()."/hosts.ini";
 
 }
 
@@ -164,9 +186,11 @@ return $this->folder()."/$this->name.ini";
 public function pid()
 {
 
-return (int)file_get_contents($this->pidfile());
+return (int)file_get_contents($this->pid_file());
 
 }
+
+/* ACCESS */
 
 /**
  * Retrieve managing account
@@ -194,6 +218,42 @@ if ($this->language_bin_id)
 
 }
 
+/**
+ * @return []website
+ */
+public function website_list()
+{
+
+$query_string = "SELECT `website`.`id`
+	FROM `website`
+	JOIN `phppool` ON `phppool`.`id`=`website`.`phppool_id`
+	WHERE `phppool`.`phpapp_id`='$this->id'";
+
+$query = mysql_query($query_string);
+$list = array();
+while (list($website_id)=mysql_fetch_row($query))
+{
+	$list[] = website($website_id);
+}
+return $list;
+
+}
+
+public function phpext_list()
+{
+
+$list = array();
+if (is_array($this->extension))
+{
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
+	$query = mysql_query($query_string);
+	while($row=mysql_fetch_assoc($query))
+		$list[$row["id"]] = $row;
+}
+return $list;
+
+}
+
 // PERM
 
 /**
@@ -215,7 +275,7 @@ elseif (login()->perm("manager"))
 // User
 elseif (login()->id)
 {
-	return true;
+	return "user";
 }
 else
 {
@@ -292,6 +352,55 @@ return db_object::update($infos);
 
 }
 
+// DB
+
+/**
+ * @see db_object::db_retrieve()
+ */
+function db_retrieve($id)
+{
+
+if (db_object::db_retrieve($id))
+{
+	// Extensions
+	$this->extension = array();
+	$query = mysql_query("SELECT ext_id FROM phpapp_ext_ref WHERE phpapp_id='$this->id'");
+	while(list($ext_id)=mysql_fetch_row($query))
+		$this->extension[] = $ext_id;
+}
+
+}
+
+/**
+ * @see db_object::db_update()
+ */
+function db_update($infos)
+{
+
+//var_dump($infos);
+
+$return = false;
+if (isset($infos["extension"]))
+{
+	mysql_query("DELETE FROM phpapp_ext_ref WHERE phppool_id='$this->id'");
+	if (is_array($infos["extension"]))
+	{
+		$query_list = array();
+		foreach($infos["extension"] as $ext_id)
+			$query_list[] = "('$this->id', '$ext_id')";
+		if (count($query_list))
+		{
+			$query_string = "INSERT INTO phpapp_ext_ref (phpapp_id, ext_id) VALUES ".implode(" , ",$query_list);
+			mysql_query($query_string);
+		}
+	}
+	$return = true;
+}
+
+return (db_object::db_update($infos) || $return);
+
+}
+
 // ROOT SCRIPTS
 
 function replace_map()
@@ -308,14 +417,14 @@ $map = array(
 	"{PHP_EXT_DIR}" => "$app_folder/ext", // general
 	"{PHP_NAME}" => $this->name,
 	"{PHP_ROOT}" => $app_folder,
-	"{PHP_VHOST_DIR}" => $this->vhost_folder(),
+	"{PHP_INI_DIR}" => $this->ini_folder(),
 	"{PHP_POOL_DIR}" => $this->pool_folder(),
-	"{PHP_PID}" => $this->pidfile(),
-	"{PHP_CONF}" => $this->configfile(),
-	"{PHP_INI}" => $this->inifile(),
-	"{PHP_ERROR_LOG}" => $this->errorlogfile(),
-	"{PHP_MAIL_LOG}" => $this->maillogfile(),
-	"{PHP_BASEDIR}" => "$account_folder/public",
+	"{PHP_PID}" => $this->pid_file(),
+	"{PHP_CONF}" => $this->config_file(),
+	"{PHP_INI}" => $this->ini_file(),
+	"{PHP_ERROR_LOG}" => $this->errorlog_file(),
+	"{PHP_MAIL_LOG}" => $this->maillog_file(),
+	"{PHP_BASEDIR}" => $account->public_folder(),
 	"{PHP_TMP_DIR}" => "$account_folder/tmp",
 	"{PHP_LOG_DIR}" => $this->log_folder(),
 	"{PHP_COOKIE_DIR}" => "$account_folder/cookies",
@@ -324,6 +433,24 @@ $map = array(
 );
 
 return array_merge($account->replace_map(), $map);
+
+}
+
+/**
+ * Regen vhost file
+ */
+function script_vhost()
+{
+
+$vhost = "";
+foreach ($this->website_list() as $website)
+{
+	if (file_exists($filename=$website->php_ini_file()))
+	{
+		$vhost .= file_get_contents($filename)."\n";
+	}
+}
+fwrite(fopen($this->vhost_ini_file(), "w"), $vhost);
 
 }
 
@@ -354,32 +481,21 @@ $language_bin = $this->language_bin();
 $replace_map = $this->replace_map();
 
 // PHP-FPM
-$account->copy_tpl("php/php-fpm.conf", $this->configfile(), $replace_map, "0644", "root");
-$account->copy_tpl("php/php-fpm-init.conf", $this->init_script(), $replace_map, "0755", "root");
-$account->copy_tpl("php/php-".$language_bin->version.".ini", $this->inifile(), $replace_map, "0644", "root");
-exec("ln -s ".$this->init_script()." /etc/init.d/php5-fpm-".$account->system_name()."-$this->name.sh");
+$account->copy_tpl("php/php-fpm.conf", $this->config_file(), $replace_map, "0644", "root");
+$account->copy_tpl("php/php-fpm-init.conf", $this->script_file(), $replace_map, "0755", "root");
+$account->copy_tpl("php/php-".$language_bin->version.".ini", $this->ini_file(), $replace_map, "0644", "root");
+if (file_exists($this->init_script_file()))
+	exec("rm ".$this->init_script_file());
+exec("ln -s ".$this->script_file()." ".$this->init_script_file());
+
+// PHP ext
+foreach($language_bin->phpext_list() as $ext)
+{
+	exec("ln -s ".$language_bin->extension_dir."/".$ext["name"].".so ".$this->ext_folder()."/");
+}
 
 // VHOSTS
-// @todo : faire mieux (par exemple $this->website_list())
-$query_string = "SELECT t1.`id`, t2.`account_id`, t1.`name`, t2.`name` as domain_name
-	FROM `website` as t1
-	JOIN `domain` as t2 ON t2.`id`=t1.`domain_id`
-	JOIN `phppool` as t3 ON t3.`id`=t1.`phppool_id`
-	WHERE t3.`phpapp_id`='$this->id'";
-$query = mysql_query($query_string);
-$vhost = "";
-while ($row=mysql_fetch_assoc($query))
-{
-	if (file_exists($filename=account($row["account_id"])->folder()."/php/vhost/$row[name].$row[domain_name].ini"))
-	{
-		$vhost .= file_get_contents($filename)."\n";
-	}
-	else
-	{
-		// FORCE UPDATE ?
-	}
-}
-fwrite(fopen($account->conf_folder()."/php/vhost/hosts.ini", "w"), $vhost);
+$this->script_vhost();
 
 // Reload process
 $this->script_reload();
@@ -387,13 +503,13 @@ $this->script_reload();
 }
 
 /**
- * Reload Application
+ * @see db_object::script_reload()
  */
 public function script_reload()
 {
 
 sleep(2);
-exec($this->init_script()." restart > /dev/null &");
+exec($this->init_script_file()." restart > /dev/null &");
 
 }
 

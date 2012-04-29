@@ -101,6 +101,49 @@ return $list;
 
 }
 
+function phpext_list($language_bin_id=null)
+{
+
+$list = array();
+$query_string = "SELECT language_php_ext.*, if(language_php_bin_ext_ref.phpext_id, 1, 0) as `already`, if (account_php_ext_ref.account_id, 1, 0) as `authorized`
+FROM language_php_ext
+LEFT JOIN account_php_ext_ref ON language_php_ext.id=account_php_ext_ref.phpext_id AND account_php_ext_ref.account_id='".$this->id."'
+LEFT JOIN language_php_bin_ext_ref ON language_php_ext.id=language_php_bin_ext_ref.phpext_id AND language_php_bin_ext_ref.language_bin_id='".$language_bin_id."'
+WHERE language_php_ext.type='extension'
+ORDER BY language_php_ext.description";
+$query = mysql_query($query_string);
+while($row=mysql_fetch_assoc($query))
+{
+	$list[$row["id"]] = $row;
+}
+return $list;
+
+}
+
+function phpapp_list()
+{
+
+	$list = array();
+	$query_string = "SELECT t1.id FROM phpapp as t1 WHERE t1.account_id IS NULL OR t1.account_id = '$this->id'";
+	$query = mysql_query($query_string);
+	while(list($id)=mysql_fetch_row($query))
+		$list[] = phpapp($id);
+	return $list;
+
+}
+
+function phppool_list()
+{
+
+	$list = array();
+	$query_string = "SELECT t1.id FROM phppool as t1 LEFT JOIN phpapp AS t2 ON t2.id=t1.phpapp_id AND (t2.account_id IS NULL OR t2.account_id='$this->id') WHERE t1.account_id IS NULL OR t1.account_id = '$this->id'";
+	$query = mysql_query($query_string);
+	while(list($id)=mysql_fetch_row($query))
+		$list[] = phpapp($id);
+	return $list;
+
+}
+
 /**
  * OS (Linux) system user name
  * 
@@ -134,6 +177,20 @@ public function system_id()
 return (SITEADM_ACCOUNT_UID_MIN+$this->id);
 
 }
+function php_user()
+{
+
+return "php_".$this->name;
+
+}
+function php_group()
+{
+
+return $this->system_group();
+
+}
+
+/* FOLDERS */
 
 /**
  * Returns root folder
@@ -166,6 +223,39 @@ function conf_folder()
 {
 
 return $this->folder()."/conf";
+
+}
+/**
+ * PHP sockets folder
+ * 
+ * @return string
+ */
+function socket_folder()
+{
+
+return $this->folder()."/socket";
+
+}
+/**
+ * Public folder
+ *
+ * @return string
+ */
+function public_folder()
+{
+
+return $this->folder()."/public";
+
+}
+/**
+ * Temp folder
+ *
+ * @return string
+ */
+function tmp_folder()
+{
+
+return $this->folder()."/tmp";
 
 }
 
@@ -421,6 +511,7 @@ exec("usermod -p $passwd_crypt ".$this->system_name());
 function quota_update()
 {
 
+// Limitations by offer
 if ($offer=$this->offer())
 {
 	if ($offer->disk_quota_soft)
@@ -432,6 +523,7 @@ if ($offer=$this->offer())
 	else
 		exec("quotatool -u ".$this->system_name()." -b -l 0 /");
 }
+// No limitations
 else
 {
 	exec("quotatool -u ".$this->system_name()." -b -q 0 -l 0 /");
@@ -451,7 +543,10 @@ function mkdir($folder, $mode="750", $usergroup=null)
 
 if (substr($folder, 0, 1) != "/")
 	$folder = $this->folder()."/".$folder;
-exec("mkdir -m $mode \"".$folder."\"");
+
+if (!file_exists($folder))
+	exec("mkdir \"".$folder."\"");
+$this->chmod($folder, $mode);
 $this->chown($folder, $usergroup);
 
 }
@@ -465,7 +560,7 @@ function rmdir($folder)
 {
 
 if ($this->folder() && $folder)
-	exec("rm -Rf \"".$this->folder()."/$folder\"");
+	exec("rm -Rf \"$folder\"");
 
 }
 
@@ -477,6 +572,9 @@ if ($this->folder() && $folder)
 function rm($file)
 {
 
+if (substr($file, 0, 1) != "/")
+	$file = $this->folder()."/".$folder;
+
 if (file_exists($file=$this->folder()."/$file"))
 	exec("rm \"".$file."\"");
 
@@ -484,24 +582,40 @@ if (file_exists($file=$this->folder()."/$file"))
 
 /**
  * Chown a file in the account root
- * 
+ *
  * @param string $file
  * @param string $usergroup
  */
-function chown($file, $usergroup=null)
+function chown($file, $usergroup=null, $recursive=false)
 {
 
-if (is_null($usergroup))
-	$usergroup = $this->system_name().".".$this->system_group();
-elseif (!is_numeric($pos=strpos($usergroup, ".")))
-	$usergroup = $usergroup.".".$this->system_group();
-elseif ($pos == 0)
-	$usergroup = $this->system_name().".".$usergroup;
+	if (is_null($usergroup))
+		$usergroup = $this->system_name().".".$this->system_group();
+	elseif (!is_numeric($pos=strpos($usergroup, ".")))
+		$usergroup = $usergroup.".".$this->system_group();
+	elseif ($pos == 0)
+		$usergroup = $this->system_name().".".$usergroup;
 
-if (substr($folder, 0, 1) != "/")
-	$folder = $this->folder()."/".$folder;
+	if (substr($file, 0, 1) != "/")
+		$file = $this->folder()."/".$folder;
 
-file_chown($file, $usergroup);
+	file_chown($file, $usergroup, $recursive);
+
+}
+
+/**
+ * Chown a file in the account root
+ *
+ * @param string $file
+ * @param string $usergroup
+ */
+function chmod($file, $mode="750")
+{
+
+	if (substr($file, 0, 1) != "/")
+		$file = $this->folder()."/".$folder;
+
+	file_chmod($file, $mode);
 
 }
 

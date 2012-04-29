@@ -59,7 +59,9 @@ define("CGI_SPAWN_EXEC","/usr/bin/spawn-fcgi");
 // PHP Installation
 define("PHP_INSTALL_PREFIX","/opt/php5");
 define("PHP_LIB_FOLDER","/etc/php5/conf.d");
+define("PHP_EXT_FOLDER","/etc/php5/conf.d");
 define("PHP_DEFAULT_SYSTEM_USER", "nobody");
+define("PHP_UID_MIN", 3000);
 define("PHP_DEFAULT_EXEC", "/usr/bin/php5-cgi");
 // PHP Compilation
 // PHP CGI & FPM

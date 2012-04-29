@@ -12,7 +12,7 @@ echo str_replace("\n", "<br />", $whois);
 ?></p>
 </div>
 
-<?php if ($account) { ?>
+<?php if ($account->id) { ?>
 <div style="width: 600px;" class="cadre">
 <p>Account : <?php echo $account->link(); ?></p>
 <?php if ($manager=account($account->manager_id)) { ?>
@@ -21,18 +21,16 @@ echo str_replace("\n", "<br />", $whois);
 </div>
 <?php } ?>
 
-<!--
 <div style="width: 600px;" class="cadre">
 <p>Registrar : </p>
 <p>Date de création : <?php echo $domain->creation_date; ?></p>
-<p>Date de renouvellement : <?php echo $domain->creation_date; ?></p>
+<p>Date de renouvellement : <?php echo $domain->renew_date; ?></p>
 <p>Serveurs DNS : </p>
 </div>
 
 <div style="width: 600px;" class="cadre">
 <h3>Gestion DNS</h3>
 </div>
--->
 
 <div style="width: 600px;" class="cadre">
 <h3><a href="email.php?domain_id=<?php echo $domain->id; ?>">Emails</a></h3>

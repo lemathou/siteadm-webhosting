@@ -1,3 +1,9 @@
+# USER
+GRANT SELECT ON `siteadm`.`postfix_alias` TO 'siteadm_postfix'@'localhost';
+GRANT SELECT ON `siteadm`.`postfix_redirect` TO 'siteadm_postfix'@'localhost';
+GRANT SELECT ON `siteadm`.`postfix_domain` TO 'siteadm_postfix'@'localhost';
+GRANT SELECT ON `siteadm`.`postfix_mbox` TO 'siteadm_postfix'@'localhost';
+
 # VIEW postfix_alias
 select `t5`.`id` AS `account_id`,`t5`.`name` AS `account_name`,concat(`t1`.`name`,'@',`t3`.`name`) AS `destination`,concat(`t2`.`name`,'@',`t4`.`name`) AS `origine`,(`t5`.`actif` and `t2`.`actif` and `t4`.`email_actif`) AS `actif`
 from `email` `t1`
@@ -15,7 +21,7 @@ INNER JOIN account as t5 ON t5.id=t3.account_id
 WHERE t2.redirect_email !=  '' AND t2.redirect_email IS NOT NULL
 
 # VIEW postfix_domain
-ELECT t2.id account_id, t2.name account_name, t1.name, (t2.actif AND t1.email_actif) actif
+SELECT t2.id account_id, t2.name account_name, t1.name, (t2.actif AND t1.email_actif) actif
 FROM `domain` t1
 INNER JOIN account t2 ON t2.id = t1.account_id
 

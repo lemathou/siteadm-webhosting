@@ -25,7 +25,7 @@ while($row=mysql_fetch_assoc($query))
 {
 ?>
 <tr>
-	<td><a href="?account_id=<?php echo $row[account_id]; ?>&pool_id=<?=$row["id"]?>"><?=$row["name"]?></a></td>
+	<td><a href="?account_id=<?php echo $row["account_id"]; ?>&pool_id=<?=$row["id"]?>"><?=$row["name"]?></a></td>
 	<td><?php if ($row["account_id"]) echo account($row["account_id"])->link(); else echo "Common"; ?></td>
 	<td><?php
 	if ($row["phpapp_id"])

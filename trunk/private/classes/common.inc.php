@@ -9,25 +9,44 @@ class common
 {
 
 public $id = 0;
-	
 public $name = "common";
+public $email = "webmaster";
+
+function __toString()
+{
+
+return $this->name;
+
+}
 
 function system_id()
 {
 
-return "65534"; // User nobody/nogroup
+return SITEADM_ACCOUNT_UID_MIN; // User nobody/nogroup
 
 }
 function system_name()
 {
 
-return "nobody"; // User nobody/nogroup
+return "siteadm_common"; // User nobody/nogroup
 
 }
 function system_group()
 {
 
-return "www-data"; // User nobody/nogroup
+return "siteadm_common"; // User nobody/nogroup
+
+}
+function php_user()
+{
+
+return "php_common";
+
+}
+function php_group()
+{
+
+return $this->system_group();
 
 }
 
@@ -45,12 +64,63 @@ return $list;
 
 }
 
+function phpapp_list()
+{
+
+$list = array();
+$query_string = "SELECT t1.id FROM phpapp as t1 WHERE t1.account_id IS NULL";
+$query = mysql_query($query_string);
+while(list($id)=mysql_fetch_row($query))
+	$list[] = phpapp($id);
+return $list;
+
+}
+
+function phppool_list()
+{
+
+$list = array();
+$query_string = "SELECT DISTINCT t1.id FROM phppool as t1 LEFT JOIN phpapp AS t2 ON t2.id=t1.phpapp_id AND t2.account_id IS NULL WHERE t1.account_id IS NULL";
+$query = mysql_query($query_string);
+while(list($id)=mysql_fetch_row($query))
+	$list[] = phppool($id);
+return $list;
+
+}
+
+function phpext_list($language_bin_id=null)
+{
+
+$list = array();
+$query_string = "SELECT language_php_ext.*, if(language_php_bin_ext_ref.phpext_id, 1, 0) as `already`, 1 as `authorized`
+	FROM language_php_ext
+	LEFT JOIN language_php_bin_ext_ref ON language_php_ext.id=language_php_bin_ext_ref.phpext_id AND language_php_bin_ext_ref.language_bin_id='".$language_bin_id."'
+	WHERE language_php_ext.type='extension'
+	ORDER BY language_php_ext.description";
+$query = mysql_query($query_string);
+while($row=mysql_fetch_assoc($query))
+{
+	$list[$row["id"]] = $row;
+}
+return $list;
+
+}
+
+/* FOLDERS */
+
 function folder()
 {
 
-return SITEADM_ROOT."/common";
+return $this->public_folder();
 
 }
+function public_folder()
+{
+
+return SITEADM_USER_DIR."/common";
+
+}
+
 /**
  * Log folder
  *
@@ -59,7 +129,7 @@ return SITEADM_ROOT."/common";
 function log_folder()
 {
 
-	return $this->folder()."/log";
+return $this->folder()."/log";
 
 }
 /**
@@ -70,9 +140,33 @@ function log_folder()
 function conf_folder()
 {
 
-	return $this->folder()."/conf";
+return $this->folder()."/conf";
 
 }
+/**
+ * PHP sockets folder
+ * 
+ * @return string
+ */
+function socket_folder()
+{
+
+return $this->folder()."/socket";
+
+}
+/**
+ * Temp folder
+ *
+ * @return string
+ */
+function tmp_folder()
+{
+
+return $this->folder()."/tmp";
+
+}
+
+/* SCRIPTS */
 
 function mkdir($folder, $mode="750", $usergroup=null)
 {
@@ -140,20 +234,15 @@ $this->chown($file_to, $usergroup);
 
 // ROOT SCRIPTS
 
-/**
- * 
- */
-function script_insert()
+function script_structure()
 {
-	
+
 $this->mkdir("", "750", "root");
 $this->mkdir("conf", "750", "root");
 // Awstats
 $this->mkdir("conf/awstats", "1750", "root");
 // Apache
 $this->mkdir("conf/apache", "755", "root");
-// nginx
-$this->mkdir("conf/nginx", "755", "root");
 // PHP
 $this->mkdir("conf/php", "755", "root");
 $this->mkdir("conf/php/pool", "755", "root");
@@ -175,9 +264,9 @@ $this->mkdir("log/apache", "1750", "root");
 $this->mkdir("log/php", "1750", "root");
 $this->mkdir("log/awstats", "1750", "root");
 // Temp (PHP)
-$this->mkdir("tmp", "1770");
+$this->mkdir("tmp", "1770", "root");
 // Cookies (PHP)
-$this->mkdir("cookies", "1770");
+$this->mkdir("cookies", "1770", "root");
 // Private data & config
 $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");
@@ -185,10 +274,22 @@ $this->mkdir("private/scripts", "750");
 $this->mkdir("private/data", "750");
 // Public websites
 $this->mkdir("public", "750", "root");
-$this->mkdir("public/config", "750");
-$this->mkdir("public/scripts", "750");
-$this->mkdir("public/data", "750");
-$this->mkdir("public/ftp", "750");
+exec("setfacl -m u:www-data rx ".$this->folder());
+exec("setfacl -m u:www-data rx ".$this->public_folder());
+$this->mkdir("public/config", "755");
+$this->mkdir("public/scripts", "755");
+$this->mkdir("public/data", "755");
+$this->mkdir("public/ftp", "755");
+
+}
+
+/**
+ * 
+ */
+function script_insert()
+{
+	
+$this->script_structure();
 
 }
 

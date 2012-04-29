@@ -30,16 +30,9 @@
 <tr>
 	<td class="label">Processus parent :</td>
 	<td class="field"><?php
-	if ($phpapp=$phppool->phpapp())
-	{
-		$language_bin = $phpapp->language_bin();
-		echo $phpapp->link();
-	}
-	else
-	{
-		$language_bin = $phppool->language_bin();
-		echo "<i>Aucun</i>";
-	}
+	$phpapp = $phppool->phpapp();
+	$language_bin = $phpapp->language_bin();
+	echo $phpapp->link();
 	?></td>
 </tr>
 <tr>
@@ -51,7 +44,7 @@
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td class="label" width="250">Compte de gestion :</td>
-	<td class="field"><select name="account_id" onchange="this.form.submit()"><option value="0">Partagé / Pas de compte de gestion</option><?php
+	<td class="field"><select name="account_id" onchange="this.form.submit()"><option value="">Partagé / Pas de compte de gestion</option><?php
 	foreach($account_list as $row)
 	{
 		if ($row["id"] == $phppool->account_id)
@@ -68,18 +61,16 @@
 <tr>
 	<td class="label">Processus parent partagé (PHP-FPM) :<br />(optionnel mais recommandé dans la majorité des cas)</td>
 	<td class="field"><select name="phpapp_id" onchange="this.form.submit()"><option></option><?php
-	$query_string = "SELECT t1.*, t2.name as account_name FROM phpapp as t1 LEFT JOIN account as t2 ON t1.account_id=t2.id WHERE t1.account_id IS NULL OR t1.account_id IN ('$phppool->account_id')";
-	$query = mysql_query($query_string);
-	while($row = mysql_fetch_assoc($query))
+	foreach($phppool->account()->phpapp_list() as $phpapp)
 	{
-		if ($row[account_id])
-			$phpapp_name = "$row[name] [$row[account_name]]";
+		if ($phpapp->account_id)
+			$phpapp_name = $phpapp." [".$phpapp->account()."]";
 		else
-			$phpapp_name = "$row[name] (partagé)";
-		if ($phppool->phpapp_id == $row[id])
-			echo "<option value=\"$row[id]\" selected>$phpapp_name</option>";
+			$phpapp_name = $phpapp." (partagé)";
+		if ($phppool->phpapp_id == $phpapp->id)
+			echo "<option value=\"$phpapp->id\" selected>$phpapp_name</option>";
 		else
-			echo "<option value=\"$row[id]\">$phpapp_name</option>";
+			echo "<option value=\"$phpapp->id\">$phpapp_name</option>";
 	}
 	?></select></td>
 </tr>
@@ -87,19 +78,6 @@
 <tr>
 	<td class="label">Langage / CGI / options de compilation :<br />(lié au processus parent)</td>
 	<td class="field"><?php echo $phpapp->language_bin(); ?></td>
-</tr>
-<?php } else { ?>
-<tr>
-	<td class="label">Langage / CGI / options de compilation :<br />(si pas de processus parent)</td>
-	<td class="field"><select name="language_id" onchange="this.form.submit()"><option></option><?php
-	foreach($account>language_bin_list() as $language_bin) if ($language_bin->app_compatible)
-	{
-		if ($language_bin->id == $phppool->language_bin_id)
-			echo "<option value=\"$language_bin->id\" selected>$language_bin</option>";
-		else
-			echo "<option value=\"$language_bin->id\">$language_bin</option>";
-	}
-	?></select></td>
 </tr>
 <?php } ?>
 </table>
@@ -207,17 +185,12 @@
 	<td class="label"><a href="http://www.php.net/manual/en/ini.core.php#ini.extension" target="_blank">Extensions dynamique chargées</a> :<br />(Parmis la liste des modules disponibles à l'utilisateur - certains modules sont aussi intégrés à PHP à la compilation)</td>
 	<td class="field"><input type="hidden" name="extension" /><select name="extension[]" multiple size="5">
 	<?php
-	$query=mysql_query("SELECT langage_php_ext.*, langage_php_bin_ext_ref.ext_id as `already`, account_php_ext_ref.account_id as `authorized` FROM langage_php_ext LEFT JOIN account_php_ext_ref ON langage_php_ext.id=account_php_ext_ref.ext_id AND account_php_ext_ref.account_id='$phppool->account_id' LEFT JOIN langage_php_bin_ext_ref ON langage_php_ext.id=langage_php_bin_ext_ref.ext_id AND langage_php_bin_ext_ref.langage_bin_id='$phppool->langage_id' WHERE langage_php_ext.type='extension' ORDER BY langage_php_ext.description");
-	while($ext=mysql_fetch_assoc($query))
+	foreach($phpapp->phpext_list() as $ext)
 	{
-		if ($ext["already"])
-			echo "<option value=\"$ext[id]\" disabled style=\"color:red;\">$ext[description] (core)</option>\n";
-		elseif (in_array($ext["id"], $phppool->extension))
-			echo "<option value=\"$ext[id]\" selected>$ext[description]</option>\n";
-		elseif ($ext["authorized"])
-			echo "<option value=\"$ext[id]\">$ext[description]</option>\n";
+		if (in_array($ext["id"], $phppool->extension))
+			echo "<option value=\"".$ext["id"]."\" selected>".$ext["description"]."</option>\n";
 		else
-			echo "<option value=\"$ext[id]\" disabled>$ext[description] (non autorisé)</option>\n";
+			echo "<option value=\"".$ext["id"]."\">".$ext["description"]."</option>\n";
 	}
 	?>
 	</select><?php echo mysql_error(); ?></td>
@@ -226,7 +199,7 @@
 	<td class="label"><a href="http://www.php.net/manual/en/ini.core.php#ini.disable-functions" target="_blank">Fonctions désactivées</a> :<br />(Pour des raisons de sécurité)</td>
 	<td class="field"><input type="hidden" name="disable_functions" /><select name="disable_functions[]" multiple size="5">
 	<?php
-	$query = mysql_query("SELECT t1.* FROM langage_php_functions as t1 ORDER BY t1.security, t1.name");
+	$query = mysql_query("SELECT t1.* FROM language_php_functions as t1 ORDER BY t1.security, t1.name");
 	$g = "";
 	while ($ext=mysql_fetch_assoc($query))
 	{
