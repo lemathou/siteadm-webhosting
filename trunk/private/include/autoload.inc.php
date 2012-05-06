@@ -143,4 +143,15 @@ else
 
 }
 
+function account_common()
+{
+
+static $account;
+if (!$account)
+	$account = new common();
+
+return $account;
+
+}
+
 ?>

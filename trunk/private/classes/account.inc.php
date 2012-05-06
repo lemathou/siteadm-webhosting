@@ -174,7 +174,13 @@ return $this->system_name();
 public function system_id()
 {
 
-return (SITEADM_ACCOUNT_UID_MIN+$this->id);
+return (ACCOUNT_UID_MIN+$this->id);
+
+}
+function php_id()
+{
+
+return (PHP_UID_MIN+$this->id);
 
 }
 function php_user()
@@ -190,6 +196,22 @@ return $this->system_group();
 
 }
 
+/**
+ * Update usergroup relative to account
+ * @param string $usergroup
+ */
+function usergroup(&$usergroup)
+{
+
+if (is_null($usergroup))
+	$usergroup = $this->system_name().".".$this->system_group();
+elseif (!is_numeric($pos=strpos($usergroup, ".")))
+	$usergroup = $usergroup.".".$this->system_group();
+elseif ($pos == 0)
+	$usergroup = $this->system_name().".".$usergroup;
+
+}
+
 /* FOLDERS */
 
 /**
@@ -201,6 +223,18 @@ function folder()
 {
 
 return SITEADM_USER_DIR."/$this->folder";
+
+}
+/**
+ * Update folder relative to account
+ * @param string $folder
+ * @return string
+ */
+function subfolder(&$folder)
+{
+
+if (substr($folder, 0, 1) != "/")
+	$folder = $this->folder()."/".$folder;
 
 }
 /**
@@ -481,24 +515,24 @@ $passfile_crypt = $this->folder()."/private/passwd_crypt";
 if (!$passwd) // TODO : tests de robustesse de mot de passe
 {
 	exec("makepasswd --chars 8 > $passfile");
-	$passwd = fread(fopen($passfile,"r"), filesize($passfile));
+	$passwd = file_get_contents($passfile);
 	$passwd = str_replace(array("\r\n","\n","\r"), "", $passwd);
 }
 else
 {
-	fwrite(fopen($passfile_crypt,"w"), $passwd);
+	filesystem::write($passfile_crypt, $passwd);
 }
 $this->passwd = $passwd;
 
 // Encrypt password
 exec("makepasswd --crypt --clearfrom $passfile > $passfile_crypt");
-unlink("$passfile");
-exec("chmod 600 $passfile_crypt");
+unlink($passfile);
+filesystem::chmod($passfile_crypt, "600");
 $passwd_crypt = array_pop(explode(" ",fread(fopen($passfile_crypt,"r"),filesize($passfile_crypt))));
 $passwd_crypt = str_replace(array("\r\n","\n","\r"), "", $passwd_crypt);
 
 // Update password in database
-mysql_query("UPDATE `account` SET `password`='$passwd', `password_md5`=MD5('$passwd') WHERE `id`='$this->id'");
+mysql_query("UPDATE `account` SET `password`='$passwd' WHERE `id`='$this->id'");
 
 // Update system password
 exec("usermod -p $passwd_crypt ".$this->system_name());
@@ -541,11 +575,10 @@ else
 function mkdir($folder, $mode="750", $usergroup=null)
 {
 
-if (substr($folder, 0, 1) != "/")
-	$folder = $this->folder()."/".$folder;
+$this->subfolder($folder);
+$this->usergroup($usergroup);
 
-if (!file_exists($folder))
-	exec("mkdir \"".$folder."\"");
+filesystem::mkdir($folder);
 $this->chmod($folder, $mode);
 $this->chown($folder, $usergroup);
 
@@ -559,8 +592,10 @@ $this->chown($folder, $usergroup);
 function rmdir($folder)
 {
 
-if ($this->folder() && $folder)
-	exec("rm -Rf \"$folder\"");
+$this->subfolder($folder);
+
+if ($folder && $folder!= "/")
+	filesystem::rmdir($folder);
 
 }
 
@@ -572,11 +607,9 @@ if ($this->folder() && $folder)
 function rm($file)
 {
 
-if (substr($file, 0, 1) != "/")
-	$file = $this->folder()."/".$folder;
+$this->subfolder($file);
 
-if (file_exists($file=$this->folder()."/$file"))
-	exec("rm \"".$file."\"");
+filesystem::unlink($file);
 
 }
 
@@ -589,17 +622,10 @@ if (file_exists($file=$this->folder()."/$file"))
 function chown($file, $usergroup=null, $recursive=false)
 {
 
-	if (is_null($usergroup))
-		$usergroup = $this->system_name().".".$this->system_group();
-	elseif (!is_numeric($pos=strpos($usergroup, ".")))
-		$usergroup = $usergroup.".".$this->system_group();
-	elseif ($pos == 0)
-		$usergroup = $this->system_name().".".$usergroup;
+$this->subfolder($file);
+$this->usergroup($usergroup);
 
-	if (substr($file, 0, 1) != "/")
-		$file = $this->folder()."/".$folder;
-
-	file_chown($file, $usergroup, $recursive);
+filesystem::chown($file, $usergroup, $recursive);
 
 }
 
@@ -612,10 +638,9 @@ function chown($file, $usergroup=null, $recursive=false)
 function chmod($file, $mode="750")
 {
 
-	if (substr($file, 0, 1) != "/")
-		$file = $this->folder()."/".$folder;
+$this->subfolder($file);
 
-	file_chmod($file, $mode);
+filesystem::chmod($file, $mode);
 
 }
 
@@ -636,13 +661,13 @@ $map = array
 	"{ACCOUNT_SYSTEM_GROUP}" => $this->system_group(),
 	"{ACCOUNT_EMAIL}" => $this->email,
 	"{ACCOUNT_ROOT}" => $this->folder(),
-	"{ACCOUNT_PUBLIC}" => $this->folder()."/public",
+	"{ACCOUNT_PUBLIC}" => $this->public_folder(),
 	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
 	"{ACCOUNT_SYSTEM_NAME}" => $this->system_name(),
-	"{ACCOUNT_TMP_DIR}" => $this->folder()."/tmp",
+	"{ACCOUNT_TMP_DIR}" => $this->tmp_folder(),
 	"{CGI_ROOT}" => $this->folder()."/cgi-bin",
-	"{PHP_TMP_DIR}" => $this->folder()."/tmp",
-	"{PHP_BASEDIR}" => $this->folder()."/public",
+	"{PHP_TMP_DIR}" => $this->tmp_folder(),
+	"{PHP_BASEDIR}" => $this->public_folder(),
 );
 
 return array_merge(replace_map(), $map);
@@ -661,13 +686,21 @@ return array_merge(replace_map(), $map);
 function copy_tpl($file_from, $file_to, $replace_map=array(), $mode="0640", $usergroup=null)
 {
 
-if (is_null($usergroup))
-	$usergroup = $this->system_id().".".$this->system_id();
-
-if (substr($file_to, 0, 1) != "/")
-	$file_to = $this->folder()."/".$file_to;
+$this->subfolder($file_to);
+$this->usergroup($usergroup);
 
 copy_tpl($file_from, $file_to, $replace_map, $mode, $usergroup);
+
+}
+
+/**
+ * Update account password
+ * @param string $password
+ */
+function script_password_update($password=null)
+{
+
+$this->password_update($password);
 
 }
 
@@ -684,8 +717,6 @@ $this->mkdir("conf", "750", "root");
 $this->mkdir("conf/awstats", "1750", "root");
 // Apache
 $this->mkdir("conf/apache", "755", "root");
-// nginx
-$this->mkdir("conf/nginx", "755", "root");
 // PHP
 $this->mkdir("conf/php", "755", "root");
 $this->mkdir("conf/php/pool", "755", "root");
@@ -699,17 +730,16 @@ $this->mkdir("conf/cron", "755", "root");
 $this->mkdir("cgi-bin", "750", "root");
 // Backup
 $this->mkdir("backup", "750", "root");
-// Backup
 $this->mkdir("backup/mysql", "755", "root");
 // Logs
 $this->mkdir("log", "750", "root");
-$this->mkdir("log/apache", "1750", "root");
-$this->mkdir("log/php", "1750", "root");
-$this->mkdir("log/awstats", "1750", "root");
+$this->mkdir("log/apache", "1755", "root");
+$this->mkdir("log/php", "1775", "root");
+$this->mkdir("log/awstats", "1755", "root");
 // Temp (PHP)
-$this->mkdir("tmp", "1770");
+$this->mkdir("tmp", "1770", "root");
 // Cookies (PHP)
-$this->mkdir("cookies", "1770");
+$this->mkdir("cookies", "1770", "root");
 // Private data & config
 $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");
@@ -717,6 +747,8 @@ $this->mkdir("private/scripts", "750");
 $this->mkdir("private/data", "750");
 // Public websites
 $this->mkdir("public", "750", "root");
+exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->folder());
+exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->public_folder());
 $this->mkdir("public/config", "750");
 $this->mkdir("public/scripts", "750");
 $this->mkdir("public/data", "750");
@@ -735,13 +767,11 @@ function script_insert()
 // Add system group
 exec("groupadd -g ".$this->system_id()." ".$this->system_group());
 // Add system user
-exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->folder()."/public"." -s /bin/bash ".$this->system_name());
+exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->public_folder()." -s /bin/bash ".$this->system_name());
 
-// Add www-data in system group
-exec("addgroup ".WEBSERVER_USER." ".$this->system_group());
-// Add user in siteadm_user group,
-// so that sshd_config section authorize only internal-sftp for users matching group siteadm_user
-exec("addgroup ".$this->system_name()." siteadm_user");
+// Add user in siteadm_account group,
+// so that sshd_config section authorize only internal-sftp for users matching group ACCOUNT_SYSTEM_GROUP
+exec("addgroup ".$this->system_name()." ".ACCOUNT_SYSTEM_GROUP);
 
 // Root folder with private subfolder
 $this->mkdir("", "750", "root");
@@ -749,21 +779,6 @@ $this->mkdir("", "750", "root");
 $this->script_structure();
 $this->script_update();
 $this->script_password_update();
-
-}
-
-/**
- * @see db_object::script_update()
- */
-function script_update()
-{
-
-}
-
-function script_password_update($password=null)
-{
-
-$this->password_update($password);
 
 }
 

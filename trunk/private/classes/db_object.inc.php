@@ -276,11 +276,12 @@ abstract class db_object
 		{
 			if (!isset($infos[$name]))
 				$this->{$name} = null;
-			elseif ($name == "id" && is_numeric($infos[$name]))
-				$this->{$name} = (int)$infos[$name];
 			else
 				$this->set($name, $infos[$name]);
 		}
+		if (isset($infos["id"]) && is_numeric($infos["id"]))
+			$this->id = (int)$infos["id"];
+			
 
 		// From DB
 		if ($params !== null)
@@ -855,7 +856,7 @@ abstract class db_object
 	
 		// To be extended
 		if ($this->id)
-			exec("(nohup sleep 2; sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3) &");
+			exec("(nohup sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3) &");
 	
 	}
 

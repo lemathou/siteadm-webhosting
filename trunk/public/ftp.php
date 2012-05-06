@@ -57,10 +57,17 @@ else
 if (isset($account))
 	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p> <hr />";
 
-if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && $ftp->account()->id == login()->id)
+var_dump(ftp($_GET["id"]));
+echo "tt";
+
+if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && ($login->perm("admin") || $ftp->account()->id == login()->id))
+{
 	include "template/form/ftp.tpl.php";
+}
 else
+{
 	include "template/page/ftp_list.tpl.php";
+}
 
 ?>
 </body>

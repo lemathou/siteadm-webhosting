@@ -6,9 +6,48 @@ ini_set("include_path","/home/siteadm_admin/private:/home/siteadm_admin/public")
 require_once "config/config.inc.php";
 require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
 
-$common = new common();
+if (isset($argv[1]))
+	$action = $argv[1];
+else
+	$action = "";
 
+if ($action == "common")
+{
+
+$common = new common();
 $common->script_insert();
 
+}
+
+// Postfix
+elseif ($action == "postfix")
+{
+
+$replace_map = array(
+	"{POSTFIX_MYSQL_USER}" => POSTFIX_MYSQL_USER,
+	"{POSTFIX_MYSQL_PASS}" => POSTFIX_MYSQL_PASS,
+	"{MYSQL_DB}" => MYSQL_DB,
+);
+$fp = opendir(SITEADM_TEMPLATE_DIR."/postfix/virtual");
+while($filename=readdir($fp)) if (substr($filename, 0, 1) != ".")
+{
+	copy_tpl("postfix/virtual/$filename", "/etc/postfix/virtual/$filename", $replace_map, "0644", "root.root");
+}
+// Mettre à jour les tables virtual avec postconf ! 
+
+}
+
+// Dovecot
+elseif ($action == "dovecot")
+{
+
+$replace_map = array(
+	"{DOVECOT_MYSQL_USER}" => DOVECOT_MYSQL_USER,
+	"{DOVECOT_MYSQL_PASS}" => DOVECOT_MYSQL_PASS,
+	"{MYSQL_DB}" => MYSQL_DB,
+);
+copy_tpl("dovecot/dovecot-sql.conf", "/etc/dovecot/dovecot-sql.conf", $replace_map, "0644", "root.root");
+
+}
 
 ?>

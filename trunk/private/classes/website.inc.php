@@ -116,7 +116,7 @@ if ($account=account($this->account_id))
 elseif (($domain=$this->domain()) && ($account=$domain->account()))
 	return $account;
 else
-	return new common();
+	return account_common();
 
 }
 
@@ -155,13 +155,21 @@ return $list;
 public function folder()
 {
 
-return $this->account()->folder()."/public/$this->folder";
+return $this->public_folder();
 
 }
 public function public_folder()
 {
 
-return $this->account()->folder()."/public/$this->folder";
+if ($account=$this->account() && $this->folder)
+	return $account->public_folder()."/".$this->folder;
+
+}
+public function private_folder()
+{
+
+if ($account=$this->account())
+	return $account->private_folder()."/".$this->folder;
 
 }
 /**
@@ -171,7 +179,8 @@ return $this->account()->folder()."/public/$this->folder";
 function config_folder()
 {
 
-return $this->account()->folder()."/public/config";
+if ($account=$this->account())
+	return $account->public_folder()."/config";
 
 }
 
@@ -182,7 +191,8 @@ return $this->account()->folder()."/public/config";
 function apache_log_folder()
 {
 
-return $this->account()->log_folder()."/apache";
+if ($account=$this->account())
+	return $account->log_folder()."/apache";
 
 }
 /**
@@ -192,7 +202,8 @@ return $this->account()->log_folder()."/apache";
 function apache_conf_folder()
 {
 
-return $this->account()->conf_folder()."/apache";
+if ($account=$this->account())
+	return $account->conf_folder()."/apache";
 
 }
 
@@ -203,7 +214,8 @@ return $this->account()->conf_folder()."/apache";
 function awstats_log_folder()
 {
 
-return $this->account()->log_folder()."/awstats";
+if ($account=$this->account())
+	return $account->log_folder()."/awstats";
 
 }
 /**
@@ -213,7 +225,8 @@ return $this->account()->log_folder()."/awstats";
 function awstats_conf_folder()
 {
 
-return $this->account()->conf_folder()."/awstats";
+if ($account=$this->account())
+	return $account->conf_folder()."/awstats";
 
 }
 
@@ -224,7 +237,8 @@ return $this->account()->conf_folder()."/awstats";
 function php_log_folder()
 {
 
-return $this->account()->log_folder()."/php";
+if ($account=$this->account())
+	return $account->log_folder()."/php";
 
 }
 /**
@@ -234,7 +248,8 @@ return $this->account()->log_folder()."/php";
 function php_conf_folder()
 {
 
-return $this->account()->conf_folder()."/php";
+if ($account=$this->account())
+	return $account->conf_folder()."/php";
 
 }
 /**
@@ -243,7 +258,8 @@ return $this->account()->conf_folder()."/php";
 function php_vhost_folder()
 {
 
-return $this->account()->conf_folder()."/php/vhost";
+if ($account=$this->account())
+	return $account->conf_folder()."/php/vhost";
 
 }
 
@@ -540,7 +556,7 @@ else
 
 if ($update)
 {
-	exec("sudo ".SITEADM_EXEC_DIR."/db_object.psh ".get_called_class()." $this->id preupdate '$name' '$domain_id' '$account_id'");
+	exec("sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id preupdate '$name' '$domain_id' '$account_id'");
 }
 
 }
@@ -556,8 +572,6 @@ function replace_map()
 
 $domain = $this->domain();
 $account = $this->account();
-$phppool = $this->phppool();
-$webapp = $this->webapp();
 
 // @todo : alias_list
 
@@ -570,27 +584,27 @@ $map = array
 	"{WEBSITE_INDEX_FILES}" => $this->index_files,
 	"{AWSTATS_DATA_DIR}" => $this->awstats_log_folder(),
 	"{WEBSITE_CGI_PATH}" => $account->folder()."/cgi-bin",
-	"{WEBSITE_PUBLIC_DIR}" => $this->folder(),
+	"{WEBSITE_PUBLIC_DIR}" => $this->public_folder(),
+	"{WEBSITE_PRIVATE_DIR}" => $this->private_folder(),
 	"{WEBSITE_CONFIG_DIR}" => $this->config_folder(),
 	"{WEBSITE_CHARSET}" => $this->charset_default,
 	"{WEBSITE_SSL_CERT}" => $this->ssl_cert_file(),
 	"{WEBSITE_SSL_KEY}" => $this->ssl_key_file(),
-	"{PHP_OPEN_BASEDIR}" => $this->folder()."/",
 	"{WEBSITE_PHP_ERROR_LOG}" => $this->phperrorlog_file(),
 	"{WEBSITE_FOLDER_ALIAS}" => "",
 	"{WEBSITE_FOLDER_AUTH}" => "",
+	"{PHP_SHORT_OPEN_TAG}" => $this->php_short_open_tag,
+	"{PHP_OPEN_BASEDIR}" => ($this->php_open_basedir!==null) ?$this->php_open_basedir :$this->public_folder().":".$this->private_folder(),
+	"{PHP_INCLUDE_PATH}" => $this->php_include_path,
+	"{PHP_APC_STAT}" => $this->php_apc_stat,
 );
 
-if ($this->php_short_open_tag !== null)
-	$map["{PHP_SHORT_OPEN_TAG}"] = $this->php_short_open_tag;
-if ($this->php_open_basedir !== null)
-	$map["{PHP_OPEN_BASEDIR}"] = $this->php_open_basedir;
-if ($this->php_include_path !== null)
-	$map["{PHP_INCLUDE_PATH}"] = $this->php_include_path;
-if ($this->php_apc_stat !== null)
-	$map["{PHP_APC_STAT}"] = $this->php_apc_stat;
+if ($this->webmaster_email)
+	$map["{WEBMASTER_EMAIL}"] = $this->webmaster_email;
+else
+	$map["{WEBMASTER_EMAIL}"] = $account->email;
 
-if ($webapp)
+if ($webapp=$this->webapp())
 {
 	if ($webapp->php_open_basedir !== null)
 		$map["{PHP_OPEN_BASEDIR}"] .= ":$webapp->php_open_basedir";
@@ -610,11 +624,6 @@ if ($webapp)
 	}
 }
 
-if ($this->webmaster_email)
-	$map["{WEBMASTER_EMAIL}"] = $this->webmaster_email;
-else
-	$map["{WEBMASTER_EMAIL}"] = $account->email;
-
 if ($this->folder_auth)
 	$map["{WEBSITE_FOLDER_AUTH}"] = 'AuthName "Authentification requise"
 	AuthUserFile '.$this->htpasswd_file().'
@@ -622,7 +631,12 @@ if ($this->folder_auth)
 	AuthType Basic
 	require valid-user';
 
-return array_merge($phppool->replace_map(), $domain->replace_map(), $map);
+replace_map_merge($map, $domain->replace_map());
+
+if ($phppool=$this->phppool())
+	replace_map_merge($map, $phppool->replace_map());
+
+return $map;
 
 }
 
@@ -662,10 +676,19 @@ $account->mkdir($this->awstats_conf_folder(), "750", "root");
 $account->mkdir($this->php_conf_folder(), "750", "root");
 $account->mkdir($this->apache_log_folder(), "1750", "root");
 $account->mkdir($this->awstats_log_folder(), "1750", "root");
-$account->mkdir($this->php_log_folder(), "1750", "root");
-$account->mkdir($this->public_folder(), "750");
+$account->mkdir($this->php_log_folder(), "1770", "root");
+$account->mkdir($this->public_folder(), "755");
+$account->mkdir($this->private_folder(), "750");
 $account->mkdir($this->config_folder(), "750");
-exec("mkdir ".SITEADM_WEBSITE_DIR."/".$this->name());
+filesystem::link($this->public_folder(), SITEADM_WEBSITE_DIR."/".$this->name());
+
+$replace_map = $this->replace_map();
+
+// Default public files
+if (!file_exists($this->folder()."/index.html"))
+	$account->copy_tpl("website/index.html", $this->public_folder()."/index.html", $replace_map, "0644");
+if ($phppool && !file_exists($this->folder()."/phpinfo.php"))
+	$account->copy_tpl("website/phpinfo.php", $this->public_folder()."/phpinfo.php", $replace_map, "0644");
 
 }
 
@@ -677,32 +700,20 @@ function script_update()
 
 $domain = $this->domain();
 $account = $this->account();
-$phppool = $this->phppool();
 
 $replace_map = $this->replace_map();
 
-// Public file
-if (!file_exists($this->folder()."/index.html"))
-	$account->copy_tpl("website/index.html", $this->public_folder()."/index.html", $replace_map, "0644");
-if ($phppool && !file_exists($this->folder()."/phpinfo.php"))
-	$account->copy_tpl("website/phpinfo.php", $this->public_folder()."/phpinfo.php", $replace_map, "0644");
+// PHP vhost config file
+if (($phppool=$this->phppool()) && ($phpapp=$phppool->phpapp()))
+{
+	$account->copy_tpl("php/vhost.conf", $this->php_ini_file(), $replace_map, "0644", "root");
+	$phpapp->script_vhost();
+	$phpapp->script_reload();
+}
 
 // SSL
 if ($this->ssl && !file_exists($this->ssl_key_file()))
 	$this->script_ssl_create();
-
-// Awstats
-$account->copy_tpl("awstats/awstats.website.conf", $this->awstats_conf_file(), $replace_map, "644", "root");
-if (file_exists(AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf"))
-	exec("rm ".AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf");
-exec("ln -s ".$this->awstats_conf_file()." ".AWSTATS_CONFIG_DIR."/");
-
-// PHP vhost config file
-if ($phppool)
-{
-	$account->copy_tpl("php/vhost.conf", $this->php_ini_file(), $replace_map, "0644", "root");
-	$phppool->script_reload();
-}
 
 // Folder Auth (.htaccess)
 if ($this->folder_auth && !file_exists($this->htpasswd_file()))
@@ -716,16 +727,11 @@ elseif ($this->ssl)
 else
 	$apache_tpl_file = "apache/vhost.conf";
 $account->copy_tpl($apache_tpl_file, $this->apache_conf_file(), $replace_map, "0644", "root");
+filesystem::link($this->apache_conf_file(), APACHE_VHOST_DIR."/$this->name.$domain->name.conf");
 
-if (file_exists(APACHE_VHOST."/$this->name.$domain->name.conf"))
-	exec("rm ".APACHE_VHOST."/$this->name.$domain->name.conf");
-exec("ln -s ".$this->apache_conf_file()." ".APACHE_VHOST."/$this->name.$domain->name.conf");
-
-if ($phppool && ($phpapp=$phppool->phpapp()))
-{
-	$phpapp->script_vhost();
-	$phpapp->script_reload();
-}
+// Awstats
+$account->copy_tpl("awstats/awstats.website.conf", $this->awstats_conf_file(), $replace_map, "644", "root");
+filesystem::link($this->awstats_conf_file(), AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf");
 
 // Reload webserver
 $this->script_reload();
@@ -762,14 +768,14 @@ if ($name || $domain_id)
 function script_reload()
 {
 
-$this->script_webserver_reload();
+static::script_webserver_reload();
 
 }
-function script_webserver_reload()
+static function script_webserver_reload()
 {
 
 // Reload apache
-exec(SITEADM_EXEC_DIR."/apache.sh reload > /dev/null &");
+script_exec("apache.sh reload");
 
 }
 

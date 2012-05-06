@@ -29,6 +29,7 @@ static public $_f = array
 	"account_id" => array("type"=>"object", "otype"=>"account"),
 	"username" => array("type"=>"string"),
 	"password" => array("type"=>"string"),
+	"type" => array("type"=>"select", "list"=>array("public", "private"), "default"=>"public"),
 	"folder" => array("type"=>"string"),
 );
 

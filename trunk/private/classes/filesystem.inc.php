@@ -1,12 +1,8 @@
 <?php
 
 /**
-  * $Id: filesystem.inc.php 65 2011-03-20 12:43:50Z lemathoufou $
+  * Copyright 2008-2012 Mathieu Moulin - lemathou@free.fr
   * 
-  * Copyright 2008-2011 Mathieu Moulin - lemathou@free.fr
-  * 
-  * This file is part of PHP FAD Framework.
-  * http://sourceforge.net/projects/phpfadframework/
   * Licence : http://www.gnu.org/copyleft/gpl.html  GNU General Public License
   * 
   */
@@ -14,28 +10,55 @@
 /**
  * Filesystem management
  * 
- * @package fadframework
+ * @package siteadm
  */
 
 class filesystem
 {
 
 /**
- * Display a file using its mime type
- * @param string $file
+ * Change file owner
+ * @param string $filename
+ * @param string $usergroup
+ * @param bool $recursive
  */
-static function display($file, $opt=array())
+static function chown($filename, $usergroup, $recursive=false)
 {
 
-if (!@file_exists($file))
-	return;
+$options = "";
+if ($recursive)
+	$options .= " -R";
 
-session_cache_limiter("no-cache");
-header("Content-Length: ".filesize($file));
-$finfo = new finfo(FILEINFO_MIME_TYPE);
-header("Content-type: ".$finfo->file($file));
-header("Content-Disposition: inline; filename=\"".addslashes(array_pop(explode("/", $file))))."\"";
-readfile($file);
+exec("chown$options $usergroup \"$filename\"");
+
+}
+
+/**
+ * Change file mode
+ * @param string $filename
+ * @param string $mode
+ */
+static function chmod($filename, $mode)
+{
+
+if (file_exists($filename))
+	exec("chmod $mode \"$filename\"");
+
+}
+
+/**
+ * Write data in a file
+ * @param string $filename
+ * @param string $contents
+ */
+static function write($filename, $contents="")
+{
+
+if (!file_exists($filename) || !is_dir($filename) && ($fp_to=fopen($filename, "w")))
+{
+	fwrite($fp_to, $contents);
+	fclose($fp_to);
+}
 
 }
 
@@ -54,6 +77,21 @@ return @mkdir($file);
 }
 
 /**
+ * 
+ * @param string $filename_from
+ * @param string $filename_to
+ */
+static function link($filename_from, $filename_to)
+{
+
+if (!file_exists($filename_from) || (file_exists($filename_to) && !is_link($filename_to)))
+	return;
+
+return @symlink($filename_from, $filename_to);
+
+}
+
+/**
  * Delete a single file or empty folder
  * @param string $file
  */
@@ -67,6 +105,12 @@ if (is_dir($file))
 	return @rmdir($file);
 else
 	return @unlink($file);
+
+}
+static function rm($file)
+{
+
+static::unlink($file);
 
 }
 
@@ -159,6 +203,68 @@ if (!function_exists("system") || !$ok)
 }
 
 return true;
+
+}
+
+/* DISPLAY */
+
+/**
+ *
+ * @param mixed $folder
+ */
+static function foldersize($folder)
+{
+
+	$s = 0;
+	$nb = 0;
+	if (is_array($folder))
+	{
+		foreach($folder as $f) if (file_exists($f))
+		{
+			$j = exec("sudo du -sc $f");
+			$nb += substr($j, 0, strpos($j, "\t"));
+		}
+	}
+	elseif (file_exists($folder))
+	{
+		$j = exec("sudo du -sc $folder");
+		$nb += substr($j, 0, strpos($j, "\t"));
+	}
+
+	while ($nb > 1024)
+	{
+		$s++;
+		$nb = $nb/1024;
+	}
+
+	$nb = round($nb, 2);
+	if ($s == 0)
+		return "$nb KO";
+	elseif ($s == 1)
+		return "$nb MO";
+	elseif ($s == 2)
+		return "$nb GO";
+	else
+		return "$nb TO";
+
+}
+
+/**
+ * Display a file using its mime type
+ * @param string $file
+ */
+static function display($file, $opt=array())
+{
+
+	if (!@file_exists($file))
+		return;
+
+	session_cache_limiter("no-cache");
+	header("Content-Length: ".filesize($file));
+	$finfo = new finfo(FILEINFO_MIME_TYPE);
+	header("Content-type: ".$finfo->file($file));
+	header("Content-Disposition: inline; filename=\"".addslashes(array_pop(explode("/", $file))))."\"";
+	readfile($file);
 
 }
 

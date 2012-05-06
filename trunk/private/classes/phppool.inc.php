@@ -145,7 +145,8 @@ return $list;
 public function log_folder()
 {
 
-return $this->account()->log_folder()."/php";
+if ($account=$this->account())
+	return $account->log_folder()."/php";
 
 }
 /**
@@ -154,7 +155,8 @@ return $this->account()->log_folder()."/php";
 public function conf_folder()
 {
 
-return $this->account()->conf_folder()."/php/pool";
+if ($account=$this->account())
+	return $account->conf_folder()."/php/pool";
 
 }
 /**
@@ -163,7 +165,8 @@ return $this->account()->conf_folder()."/php/pool";
 public function socket_folder()
 {
 
-return $this->account()->socket_folder();
+if ($account=$this->account())
+	return $account->socket_folder();
 
 }
 /**
@@ -172,7 +175,8 @@ return $this->account()->socket_folder();
 public function app_pool_folder()
 {
 
-return $this->phpapp()->pool_folder();
+if ($phpapp=$this->phpapp())
+	return $phpapp->pool_folder();
 
 }
 /**
@@ -181,7 +185,8 @@ return $this->phpapp()->pool_folder();
 public function apache_conf_folder()
 {
 
-return $this->account()->conf_folder()."/apache";
+if ($account=$this->account())
+	return $account->conf_folder()."/apache";
 
 }
 
@@ -558,15 +563,11 @@ $account = $this->account();
 $replace_map = $this->replace_map();
 
 copy_tpl("php/php-fpm-app.conf", $this->config_file(), $replace_map, "0644");
-if (file_exists($this->app_pool_file()))
-	exec("rm ".$this->app_pool_file());
-exec("ln -s ".$this->config_file()." ".$this->app_pool_file());
+filesystem::link($this->config_file(), $this->app_pool_file());
 
 // Webserver handler
-$account->copy_tpl("apache/php.conf", $this->apache_file(), $replace_map, "0644" );
-if (file_exists($filename=APACHE_VHOST."/php-".$account->name."-".$this->name.".conf"))
-	exec("rm ".$filename);
-exec("ln -s ".$this->apache_file()." ".$filename);
+$account->copy_tpl("apache/php.conf", $this->apache_file(), $replace_map, "0644");
+filesystem::link($this->apache_file(), APACHE_VHOST_DIR."/php-".$account->name."-".$this->name.".conf");
 
 $phpapp->script_vhost();
 
@@ -581,15 +582,7 @@ public function script_reload()
 {
 
 $this->phpapp()->script_reload();
-$this->script_webserver_reload();
-
-}
-
-function script_webserver_reload()
-{
-	
-// Reload apache
-exec(SITEADM_EXEC_DIR."/apache.sh reload > /dev/null &");
+website::script_webserver_reload();
 
 }
 

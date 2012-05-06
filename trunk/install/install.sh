@@ -14,15 +14,18 @@ chmod 755 /home/siteadm_admin
 # Siteadm user, common user group and sudo
 echo "Users ans groups..."
 groupadd -g 502 siteadm
+groupadd -g 503 siteadm_account
 useradd -g 502 -u 502 -d /home/siteadm_admin siteadm
-groupadd -g 2000 siteadm_user
+groupadd -g 2000 siteadm_common
 useradd -g 2000 -u 2000 -d /home/siteadm/common siteadm_common
 useradd -g 2000 -u 3000 -d /home/siteadm/common php_common
 
 # MySQL user
 echo "MySQL..."
 apt-get install mysql-server
-mysql -uroot -p siteadm < mysql/siteadm.sql
+mysql -uroot -p siteadm < ../template/mysql/siteadm_tables.sql
+mysql -uroot -p siteadm < ../template/mysql/siteadm_views.sql
+mysql -uroot -p siteadm < ../template/mysql/siteadm_data.sql
 
 # PHP5 & PHP-FPM
 echo "PHP..."
@@ -74,6 +77,11 @@ apt-get install proftpd-mod-mysql
 # Postfix
 echo "Postfix..."
 apt-get install postfix-mysql
+mkdir /etc/postfix/virtual
+
+# DKIM
+echo "DKIM..."
+# @todo : http://viralblog.fr/animation/ubuntu-configurer-domainkey-dkim-sur-postfix/
 
 # Postgrey
 echo "Postgrey..."
@@ -102,4 +110,7 @@ apt-get install zip unrar-free cabextract ripole
 ###
 
 cd /home/siteadm_admin/scripts/
-php db_object.psh account 1 insert
+./install.psh postfix
+./install.psh dovecot
+./install.psh common
+./db_object.psh account 1 insert

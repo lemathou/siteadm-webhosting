@@ -114,40 +114,7 @@ else // User
  * Folders
  */
 
-function foldersize($folder)
-{
-
-$j = exec("sudo du -sc $folder");
-$nb = substr($j, 0, strpos($j, "\t"));
-$s = 0;
-while ($nb > 1024)
-{
-	$s++;
-	$nb = $nb/1024;
-}
-$nb = round($nb, 2);
-if ($s == 0)
-	return "$nb KO";
-elseif ($s == 1)
-	return "$nb MO";
-elseif ($s == 2)
-	return "$nb GO";
-else
-	return "$nb TO";
-
-}
-
 $config_folders = array("apache", "cron", "nginx", "cgi-bin", "php", "fetchmail");
-
-function mkdir2($folder, $mode="700", $user=SITEADM_SYSTEM_USER, $group=SITEADM_SYSTEM_GROUP)
-{
-
-exec("mkdir -m $mode $folder");
-if (is_numeric($user))
-	$user=(SITEADM_ACCOUNT_UID_MIN+$user);
-exec("chown $user.$group $folder");
-
-}
 
 /*
  * Template Files
@@ -160,9 +127,31 @@ function replace_map()
 return array
 (
 	"{CGI_SPAWN_EXEC}" => CGI_SPAWN_EXEC,
-	"{EXEC_DIR}" => SITEADM_EXEC_DIR,
+	"{SITEADM_SCRIPT_DIR}" => SITEADM_SCRIPT_DIR,
 	"{INIT_SCRIPT_DIR}" => INIT_SCRIPT_DIR,
+	"{ROOT_EMAIL}" => ROOT_EMAIL,
+	"{POSTMASTER_EMAIL}" => POSTMASTER_EMAIL,
+	"{WEBMASTER_EMAIL}" => WEBMASTER_EMAIL,
 );
+
+}
+
+/**
+ * Merge 2 maps, replacing in first map only if we have not null values in second map
+ * @param array $map_1
+ * @param array $map_2
+ */
+function replace_map_merge(&$map, $map_merge)
+{
+
+if (!is_array($map) || !is_array($map_merge))
+	return;
+
+foreach($map_merge as $key=>$value)
+{
+	if (!isset($map[$key]) || ($value !== null))
+		$map[$key] = $value;
+}
 
 }
 
@@ -192,169 +181,15 @@ if (is_array($replace_map)) foreach($replace_map as $i=>$j)
 $filecontents_from = file_get_contents(SITEADM_TEMPLATE_DIR."/$file_from");
 $filecontents_to = str_replace($replace_from, $replace_to, $filecontents_from);
 
-$fp_to = fopen($file_to, "w");
-fwrite($fp_to, $filecontents_to);
-fclose($fp_to);
+// Write
+filesystem::write($file_to, $filecontents_to);
 
 // CHOWN
 if (!is_null($usergroup))
-	file_chown($file_to, $usergroup);
+	filesystem::chown($file_to, $usergroup);
+
 // CHMOD
-file_chmod($file_to, $mode);
-
-}
-
-/*
- * Security
- */
-
-/**
- * Change file owner
- * @param string $filename
- * @param string $usergroup
- * @param bool $recursive
- */
-function file_chown($filename, $usergroup, $recursive=false)
-{
-
-$options = "";
-if ($recursive)
-	$options .= " -R";
-
-exec("chown$options $usergroup \"$filename\""); 
-
-}
-
-/**
- * Change file mode
- * @param string $filename
- * @param string $mode
- */
-function file_chmod($filename, $mode)
-{
-
-if (file_exists($filename))
-	exec("chmod $mode \"$filename\"");
-
-}
-
-/*
- * APACHE
- */
-
-function apache_reload()
-{
-	passthru("sudo ".APACHE_EXEC_RELOAD);
-}
-function apache_stop()
-{
-	passthru("sudo ".APACHE_EXEC_STOP);
-}
-function apache_start()
-{
-	passthru("sudo ".APACHE_EXEC_START);
-}
-function apache_restart()
-{
-	passthru("sudo ".APACHE_EXEC_RESTART);
-}
-
-
-/**
- * ALIAS
- **/
-function website_alias_create($domain_id, $alias_name, $website_id=0, $website_redirect=0, $redirect_url="")
-{
-
-$query = mysql_query("INSERT INTO `website_alias` (`domain_id`, `alias_name`, `website_id`, `website_redirect`, `redirect_url`) VALUES ( '$domain_id', '$alias_name', '$website_id', '$website_redirect', '$redirect_url' )");
-if ($error=mysql_error())
-{
-	echo $error;
-	return false;
-}
-elseif (mysql_affected_rows($query))
-	return true;
-
-}
-
-/*
- * BOITES EMAIL
- */
-
-// POSTFIX
-function postfix_reload()
-{
-	passthru("sudo ".POSTFIX_EXEC_RELOAD);
-}
-function postfix_stop()
-{
-	passthru("sudo ".POSTFIX_EXEC_STOP);
-}
-function postfix_start()
-{
-	passthru("sudo ".POSTFIX_EXEC_START);
-}
-function postfix_restart()
-{
-	passthru("sudo ".POSTFIX_EXEC_RESTART);
-}
-// DOVECOT
-function devecot_reload()
-{
-	passthru("sudo ".DOVECOT_EXEC_RELOAD);
-}
-function devecot_stop()
-{
-	passthru("sudo ".DOVECOT_EXEC_STOP);
-}
-function devecot_start()
-{
-	passthru("sudo ".DOVECOT_EXEC_START);
-}
-function devecot_restart()
-{
-	passthru("sudo ".DOVECOT_EXEC_RESTART);
-}
-
-// MySQL
-
-function mysql_del($id)
-{
-
-$query=mysql_query("SELECT * FROM `mysql` WHERE `id`='$id'");
-if (mysql_num_rows($query))
-{
-	$mysql=mysql_fetch_assoc($query);
-	mysql_query("DROP DATABASE `$mysql[name]`");
-	mysql_query("DROP USER '$mysql[name]'@'localhost'");
-	return true;
-}
-else
-	return false;
-
-}
-
-
-function db_mysql_del($id)
-{
-
-$query=mysql_query("SELECT `name` FROM `mysql` WHERE `id`='$id'");
-if (list($name)=mysql_fetch_row($query))
-{
-	exec("sudo ../scripts/mysql_del.psh $id");
-	mysql_query("DELETE FROM `mysql` WHERE `id`='$id'");
-}
-
-}
-
-function db_mysql_update($id, $password)
-{
-
-mysql_query("UPDATE `mysql` SET `password`='$password' WHERE `id`='$id'");
-if (mysql_affected_rows($query))
-{
-	exec("sudo ../scripts/mysql_update.psh $id");
-}
+filesystem::chmod($file_to, $mode);
 
 }
 
@@ -393,6 +228,24 @@ while (!$ok)
 }
 
 return $passwd;
+
+}
+
+/**
+ * Execute a script in the background
+ * @param string $command
+ * @param string $params
+ */
+function script_exec($command, $params="")
+{
+
+if (!$command || is_numeric(strpos($command, "/")))
+	return;
+
+if (file_exists(SITEADM_SCRIPT_DIR."/".$command))
+	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
+elseif (file_exists(INIT_SCRIPT_DIR."/".$command))
+	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
 
 }
 

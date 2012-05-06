@@ -10,7 +10,8 @@ class common
 
 public $id = 0;
 public $name = "common";
-public $email = "webmaster";
+public $email = SHARED_EMAIL;
+public $folder = "common";
 
 function __toString()
 {
@@ -22,7 +23,7 @@ return $this->name;
 function system_id()
 {
 
-return SITEADM_ACCOUNT_UID_MIN; // User nobody/nogroup
+return ACCOUNT_UID_MIN; // User nobody/nogroup
 
 }
 function system_name()
@@ -106,18 +107,59 @@ return $list;
 
 }
 
+/**
+ * Update usergroup relative to account
+ * @param string $usergroup
+ */
+function usergroup(&$usergroup)
+{
+
+if (is_null($usergroup))
+	$usergroup = $this->system_name().".".$this->system_group();
+elseif (!is_numeric($pos=strpos($usergroup, ".")))
+	$usergroup = $usergroup.".".$this->system_group();
+elseif ($pos == 0)
+	$usergroup = $this->system_name().".".$usergroup;
+
+}
+
 /* FOLDERS */
 
 function folder()
 {
 
-return $this->public_folder();
+return SITEADM_USER_DIR."/$this->folder";
 
 }
+/**
+ * Update folder relative to account
+ * @param string $folder
+ * @return string
+ */
+function subfolder(&$folder)
+{
+
+if (substr($folder, 0, 1) != "/")
+	$folder = $this->folder()."/".$folder;
+
+}
+
+/**
+ * Public folder for FTP ans Websites
+ */
 function public_folder()
 {
 
-return SITEADM_USER_DIR."/common";
+return $this->folder()."/public";
+
+}
+/**
+ * Private folder for FTP ans Websites
+ */
+function private_folder()
+{
+
+return $this->folder()."/private";
 
 }
 
@@ -171,28 +213,57 @@ return $this->folder()."/tmp";
 function mkdir($folder, $mode="750", $usergroup=null)
 {
 
-if (substr($folder, 0, 1) != "/")
-	$folder = $this->folder()."/".$folder;
-exec("mkdir -m $mode \"".$folder."\"");
+$this->subfolder($folder);
+$this->usergroup($usergroup);
 
+filesystem::mkdir($folder);
+$this->chmod($folder, $mode);
 $this->chown($folder, $usergroup);
 
 }
 
-function chown($file, $usergroup=null)
+/**
+ * Delete a folder and all subfolders
+ *
+ * @param string $folder
+ */
+function rmdir($folder)
 {
 
-if (is_null($usergroup))
-	$usergroup = $this->system_name().".".$this->system_group();
-elseif (!is_numeric($pos=strpos($usergroup, ".")))
-	$usergroup = $usergroup.".".$this->system_group();
-elseif ($pos == 0)
-	$usergroup = $this->system_name().".".$usergroup;
+$this->subfolder($folder);
 
-if (substr($file, 0, 1) != "/")
-	$file = $this->folder()."/".$file;
+if ($folder && $folder!= "/")
+	filesystem::rmdir($folder);
 
-file_chown($file, $usergroup);
+}
+
+/**
+ * Delete a folder and all subfolders
+ *
+ * @param string $folder
+ */
+function rm($file)
+{
+
+$this->subfolder($file);
+
+filesystem::unlink($file);
+
+}
+
+/**
+ * Chown a file in the account root
+ *
+ * @param string $file
+ * @param string $usergroup
+ */
+function chown($file, $usergroup=null, $recursive=false)
+{
+
+$this->subfolder($file);
+$this->usergroup($usergroup);
+
+filesystem::chown($file, $usergroup, $recursive);
 
 }
 
@@ -201,20 +272,20 @@ function replace_map()
 
 $map = array
 (
-	"{ACCOUNT_ID}" => "0",
+	"{ACCOUNT_ID}" => $this->id,
 	"{ACCOUNT_NAME}" => $this->name,
 	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
 	"{ACCOUNT_SYSTEM_NAME}" => $this->system_name(),
 	"{ACCOUNT_SYSTEM_GROUP}" => $this->system_group(),
-	"{ACCOUNT_EMAIL}" => SHARED_EMAIL,
+	"{ACCOUNT_EMAIL}" => $this->email,
 	"{ACCOUNT_ROOT}" => $this->folder(),
-	"{ACCOUNT_PUBLIC}" => $this->folder()."/public",
+	"{ACCOUNT_PUBLIC}" => $this->public_folder(),
 	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
 	"{ACCOUNT_SYSTEM_NAME}" => $this->system_name(),
-	"{ACCOUNT_TMP_DIR}" => $this->folder()."/tmp",
+	"{ACCOUNT_TMP_DIR}" => $this->tmp_folder(),
 	"{CGI_ROOT}" => $this->folder()."/cgi-bin",
-	"{PHP_TMP_DIR}" => $this->folder()."/tmp",
-	"{PHP_BASEDIR}" => $this->folder()."/public",
+	"{PHP_TMP_DIR}" => $this->tmp_folder(),
+	"{PHP_BASEDIR}" => $this->public_folder(),
 );
 
 return array_merge(replace_map(), $map);
@@ -224,11 +295,10 @@ return array_merge(replace_map(), $map);
 function copy_tpl($file_from, $file_to, $replace_map=array(), $mode="0644", $usergroup=null)
 {
 
-if (substr($file_to, 0, 1) != "/")
-	$file_to = $this->folder()."/".$file_to;
+$this->subfolder($file_to);
+$this->usergroup($usergroup);
 
 copy_tpl($file_from, $file_to, $replace_map, $mode, $usergroup);
-$this->chown($file_to, $usergroup);
 
 }
 
@@ -256,13 +326,12 @@ $this->mkdir("conf/cron", "755", "root");
 $this->mkdir("cgi-bin", "750", "root");
 // Backup
 $this->mkdir("backup", "750", "root");
-// Backup
 $this->mkdir("backup/mysql", "755", "root");
 // Logs
 $this->mkdir("log", "750", "root");
-$this->mkdir("log/apache", "1750", "root");
-$this->mkdir("log/php", "1750", "root");
-$this->mkdir("log/awstats", "1750", "root");
+$this->mkdir("log/apache", "1755", "root");
+$this->mkdir("log/php", "1775", "root");
+$this->mkdir("log/awstats", "1755", "root");
 // Temp (PHP)
 $this->mkdir("tmp", "1770", "root");
 // Cookies (PHP)
@@ -272,14 +341,17 @@ $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");
 $this->mkdir("private/scripts", "750");
 $this->mkdir("private/data", "750");
+$this->mkdir("private/ftp", "750");
 // Public websites
 $this->mkdir("public", "750", "root");
-exec("setfacl -m u:www-data rx ".$this->folder());
-exec("setfacl -m u:www-data rx ".$this->public_folder());
-$this->mkdir("public/config", "755");
-$this->mkdir("public/scripts", "755");
-$this->mkdir("public/data", "755");
-$this->mkdir("public/ftp", "755");
+exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->folder());
+exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->public_folder());
+$this->mkdir("public/config", "750");
+$this->mkdir("public/scripts", "750");
+$this->mkdir("public/data", "750");
+$this->mkdir("public/ftp", "750");
+// eMail
+$this->mkdir("mail", "700");
 
 }
 
@@ -288,7 +360,19 @@ $this->mkdir("public/ftp", "755");
  */
 function script_insert()
 {
-	
+
+// Add system group
+exec("groupadd -g ".$this->system_id()." ".$this->system_group());
+// Add system user
+exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->public_folder()." -s /bin/bash ".$this->system_name());
+
+// Add user in siteadm_account group,
+// so that sshd_config section authorize only internal-sftp for users matching group siteadm_user
+exec("addgroup ".$this->system_name()." ".ACCOUNT_SYSTEM_GROUP);
+
+// Root folder with private subfolder
+$this->mkdir("", "750", "root");
+
 $this->script_structure();
 
 }

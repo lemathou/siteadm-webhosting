@@ -10,38 +10,24 @@
 <tr>
 	<td valign="top">Espace disque</td>
 	<td><table width="100%" cellspacing="0" cellpadding="0">
-	<tr><td>Stockage publique (sites, FTP, etc.) :</td> <td align="right"><?php echo foldersize($account->folder()."/public"); ?></td></tr>
-	<tr><td>Stockage privé sécurisé (clefs, etc.) :</td> <td align="right"><?php echo foldersize($account->folder()."/private"); ?></td></tr>
-	<tr><td>Emails :</td> <td align="right"><?php echo foldersize($account->folder()."/email"); ?></td></tr>
-	<tr><td>Backups :</td> <td align="right"><?php echo foldersize($account->folder()."/backup"); ?></td></tr>
-	<tr><td>Statistiques :</td> <td align="right"><?php echo foldersize($account->folder()."/awstats"); ?></td></tr>
-	<tr><td>Logs :</td> <td align="right"><?php echo foldersize($account->folder()."/log"); ?></td></tr>
+	<tr><td>Stockage publique (sites, FTP, etc.) :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/public"); ?></td></tr>
+	<tr><td>Stockage privé sécurisé (clefs, etc.) :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/private"); ?></td></tr>
+	<tr><td>Emails :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/email"); ?></td></tr>
+	<tr><td>Backups :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/backup"); ?></td></tr>
+	<tr><td>Statistiques :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/awstats"); ?></td></tr>
+	<tr><td>Logs :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/log"); ?></td></tr>
 	<tr><td>Fichiers de configuration :</td> <td align="right"><?php
 	// Config folders
-	$nb = 0;
+	$flist = array();
 	foreach($config_folders as $i)
 	{
-		$j = exec("sudo du -sc ".$account->folder()."/$i");
-		//echo $j;
-		$nb += substr($j, 0, strpos($j, "\t"));
+		$flist[] = $account->folder()."/$i";
 	}
-	$s = 0;
-	while ($nb > 1024)
-	{
-		$s++;
-		$nb = $nb/1024;
-	}
-	echo $nb;
-	if ($s == 2)
-		echo " GO";
-	elseif ($s == 1)
-		echo " MO";
-	else
-		echo " KO";
+	echo filesystem::foldersize($flist);
 	?></td></tr>
-	<tr><td>Cookies :</td> <td align="right"><?php echo foldersize($account->folder()."/cookies"); ?></td></tr>
-	<tr><td>Fichies temporaire :</td> <td align="right"><?php echo foldersize($account->folder()."/temp"); ?></td></tr>
-	<tr><td><b>Utilisation totale / Quota :</b></td> <td><?php echo foldersize($account->folder()); ?></td>
+	<tr><td>Cookies :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/cookies"); ?></td></tr>
+	<tr><td>Fichies temporaire :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/temp"); ?></td></tr>
+	<tr><td><b>Utilisation totale / Quota :</b></td> <td><?php echo filesystem::foldersize($account->folder()); ?></td>
 	<td><?php
 	if ($offer=offer($account->offre_id))
 	{

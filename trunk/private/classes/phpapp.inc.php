@@ -64,7 +64,8 @@ return "php.php?app_id=$this->id";
 function folder()
 {
 
-return $this->account()->conf_folder()."/php/$this->name";
+if ($account=$this->account())
+	return $account->conf_folder()."/php/$this->name";
 
 }
 /**
@@ -73,7 +74,8 @@ return $this->account()->conf_folder()."/php/$this->name";
 function log_folder()
 {
 
-return $this->account()->log_folder()."/php";
+if ($account=$this->account())
+	return $account->log_folder()."/php";
 
 }
 /**
@@ -148,7 +150,8 @@ return $this->folder()."/php-fpm-$this->name.sh";
 public function init_script_file()
 {
 
-return "/etc/init.d/php-fpm-".$this->account()->name."-".$this->name.".sh";
+if ($account=$this->account())
+	return INIT_SCRIPT_DIR."/php-fpm-".$account->name."-".$this->name.".sh";
 
 }
 /**
@@ -202,7 +205,7 @@ public function account()
 if ($account=account($this->account_id))
 	return $account;
 else
-	return new common();
+	return account_common();
 
 }
 
@@ -432,7 +435,9 @@ $map = array(
 	"{PHP_APC_SHM_SIZE}" => $this->apc_shm_size."M",
 );
 
-return array_merge($account->replace_map(), $map);
+replace_map_merge($map, $account->replace_map());
+
+return $map;
 
 }
 
@@ -450,7 +455,7 @@ foreach ($this->website_list() as $website)
 		$vhost .= file_get_contents($filename)."\n";
 	}
 }
-fwrite(fopen($this->vhost_ini_file(), "w"), $vhost);
+filesystem::write($this->vhost_ini_file(), $vhost);
 
 }
 
@@ -484,14 +489,12 @@ $replace_map = $this->replace_map();
 $account->copy_tpl("php/php-fpm.conf", $this->config_file(), $replace_map, "0644", "root");
 $account->copy_tpl("php/php-fpm-init.conf", $this->script_file(), $replace_map, "0755", "root");
 $account->copy_tpl("php/php-".$language_bin->version.".ini", $this->ini_file(), $replace_map, "0644", "root");
-if (file_exists($this->init_script_file()))
-	exec("rm ".$this->init_script_file());
-exec("ln -s ".$this->script_file()." ".$this->init_script_file());
+filesystem::link($this->script_file(), $this->init_script_file());
 
 // PHP ext
 foreach($language_bin->phpext_list() as $ext)
 {
-	exec("ln -s ".$language_bin->extension_dir."/".$ext["name"].".so ".$this->ext_folder()."/");
+	filesystem::link($language_bin->extension_dir."/".$ext["name"].".so", $this->ext_folder()."/");
 }
 
 // VHOSTS
@@ -508,7 +511,6 @@ $this->script_reload();
 public function script_reload()
 {
 
-sleep(2);
 exec($this->init_script_file()." restart > /dev/null &");
 
 }
