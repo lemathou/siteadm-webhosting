@@ -50,7 +50,7 @@ public function account()
 if ($this->account_id)
 	return account($this->account_id);
 else
-	return new common();
+	return account_common();
 
 }
 
@@ -64,7 +64,8 @@ else
 public function apache_log_folder()
 {
 
-return $this->account()->log_folder()."/apache";
+if ($account=$this->account())
+	return $account->log_folder()."/apache";
 
 }
 /**
@@ -75,7 +76,8 @@ return $this->account()->log_folder()."/apache";
 public function awstats_conf_folder()
 {
 
-return $this->account()->conf_folder()."/awstats";
+if ($account=$this->account())
+	return $account->conf_folder()."/awstats";
 
 }
 /**
@@ -86,7 +88,8 @@ return $this->account()->conf_folder()."/awstats";
 public function awstats_log_folder()
 {
 
-return $this->account()->log_folder()."/awstats";
+if ($account=$this->account())
+	return $account->log_folder()."/awstats";
 
 }
 
@@ -235,8 +238,6 @@ $this->website_alias_nb = array_pop(mysql_fetch_row(mysql_query("SELECT COUNT(*)
 function replace_map()
 {
 
-$account = $this->account();
-
 $map = array
 (
 	"{DOMAIN_NAME}" => $this->name,
@@ -245,7 +246,10 @@ $map = array
 	"{AWSTATS_DATA_DIR}" => $this->awstats_log_folder(),
 );
 
-return array_merge($account->replace_map(), $map);
+if ($account=$this->account())
+	replace_map_merge($map, $account->replace_map());
+
+return $map;
 
 }
 
@@ -271,9 +275,7 @@ $replace_map = $this->replace_map();
 
 // Awstats
 $account->copy_tpl("awstats/awstats.domain.conf", $this->awstats_conf_file(), $replace_map, "644", "root");
-if (file_exists($filename=AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
-	exec("rm ".$filename);
-exec("ln -s ".$this->awstats_conf_file()." ".$filename);
+filesystem::link($this->awstats_conf_file(), AWSTATS_CONFIG_DIR."/awstats.$this->name.conf");
 
 }
 
@@ -284,9 +286,8 @@ function script_delete()
 {
 
 $account->rm($this->awstats_conf_file());
-if (file_exists($filename=AWSTATS_CONFIG_DIR."/awstats.$this->name.conf"))
-	exec("rm ".$filename);
-exec("rm -Rf ".SITEADM_DOMAIN_DIR."/".$this->name);
+filesystem::rm(AWSTATS_CONFIG_DIR."/awstats.$this->name.conf");
+filesystem::rmdir(SITEADM_DOMAIN_DIR."/".$this->name);
 
 }
 

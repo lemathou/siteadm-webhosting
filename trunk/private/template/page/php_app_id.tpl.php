@@ -7,7 +7,7 @@
 </div>
 <h3>Processus</h3>
 <div style="border: 1px black solid;padding: 4px;overflow: auto;max-height: 200px;">
-<?php if (file_exists($phpapp->pid())) { $exec = ""; exec("sudo ps -g ".$phpapp->pid(), $exec); echo implode("<br />\n", $exec); } ?>
+<?php $phpapp->root_process_list(); ?>
 </div>
 </div>
 

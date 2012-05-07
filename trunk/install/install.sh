@@ -31,7 +31,7 @@ mysql -uroot -p siteadm < ../template/mysql/siteadm_data.sql
 echo "PHP..."
 apt-get install php5-fpm php5-cli php-apc php5-mcrypt php5-mysql php-pear php5-gd
 rm /etc/init.d/php5-siteadm
-ln -s /home/siteadm_admin/conf/php/php5-siteadm /etc/init.d/
+ln -s /home/siteadm_admin/conf/php/php5-siteadm.sh /etc/init.d/php5-siteadm
 update-rc.d -n php5-siteadm defaults
 service php5-siteadm start
 
@@ -40,7 +40,7 @@ echo "Apache..."
 apt-get install apache2-mpm-worker libapache2-mod-fastcgi
 echo "Apache configuration..."
 rm /etc/apache2/sites-available/siteadm.conf
-ln -s /home/siteadm_admin/apache/siteadm.conf /etc/apache2/sites-available/
+ln -s /home/siteadm_admin/conf/apache/siteadm /etc/apache2/sites-available/
 a2ensite siteadm
 mkdir /etc/apache2/sites-siteadm
 echo "Include sites-siteadm/" >> /etc/apache2/apache2.conf
@@ -48,6 +48,7 @@ a2enmod actions
 a2enmod ssl
 a2enmod fastcgi
 a2enmod rewrite
+a2dismod cgid
 service apache2 restart
 
 echo "Base installation completed"

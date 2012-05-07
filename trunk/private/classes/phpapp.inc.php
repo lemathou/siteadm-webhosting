@@ -404,22 +404,19 @@ return (db_object::db_update($infos) || $return);
 
 }
 
-// ROOT SCRIPTS
+/* REPLACE MAP */
 
 function replace_map()
 {
 
 $account = $this->account();
-
-$account_folder = $account->folder();
-$app_folder = $this->folder();
 $language_bin = $this->language_bin();
 
 $map = array(
 	"{PHP_INSTALL_PREFIX}" => $language_bin->prefix,
-	"{PHP_EXT_DIR}" => "$app_folder/ext", // general
+	"{PHP_EXT_DIR}" => $this->ext_folder(), // general
 	"{PHP_NAME}" => $this->name,
-	"{PHP_ROOT}" => $app_folder,
+	"{PHP_ROOT}" => $this->folder(),
 	"{PHP_INI_DIR}" => $this->ini_folder(),
 	"{PHP_POOL_DIR}" => $this->pool_folder(),
 	"{PHP_PID}" => $this->pid_file(),
@@ -428,11 +425,11 @@ $map = array(
 	"{PHP_ERROR_LOG}" => $this->errorlog_file(),
 	"{PHP_MAIL_LOG}" => $this->maillog_file(),
 	"{PHP_BASEDIR}" => $account->public_folder(),
-	"{PHP_TMP_DIR}" => "$account_folder/tmp",
+	"{PHP_TMP_DIR}" => $account->tmp_folder(),
 	"{PHP_LOG_DIR}" => $this->log_folder(),
-	"{PHP_COOKIE_DIR}" => "$account_folder/cookies",
+	"{PHP_COOKIE_DIR}" => $account->session_folder(),
 	"{PHP_WEBMASTER_EMAIL}" => $this->webmaster_email,
-	"{PHP_APC_SHM_SIZE}" => $this->apc_shm_size."M",
+	"{PHP_APC_SHM_SIZE}" => ($this->apc_shm_size ?$this->apc_shm_size."M" : ""),
 );
 
 replace_map_merge($map, $account->replace_map());
@@ -440,6 +437,27 @@ replace_map_merge($map, $account->replace_map());
 return $map;
 
 }
+
+/* TO EXECUTE AS ROOT */
+
+/**
+ * Script to execute as root
+ * Process list
+ */
+public function root_process_list()
+{
+
+if ($this->id)
+{
+	$exec = "";
+	exec("sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id process_list", $exec);
+	//echo implode("<br />\n", $exec);
+	echo implode("", $exec);
+}
+
+}
+
+/* ROOT SCRIPTS */
 
 /**
  * Regen vhost file
@@ -512,6 +530,21 @@ public function script_reload()
 {
 
 exec($this->init_script_file()." restart > /dev/null &");
+
+}
+
+/**
+ * Display process list
+ */
+public function script_process_list()
+{
+
+if ($pid=$this->pid())
+{
+	$exec = "";
+	exec("ps -g ".$pid, $exec);
+	echo implode("<br />\n", $exec);
+}
 
 }
 

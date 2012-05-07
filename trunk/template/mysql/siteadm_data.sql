@@ -9,6 +9,8 @@
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
+USE `{MYSQL_DB}`;
+
 --
 -- Base de données: `siteadm`
 --

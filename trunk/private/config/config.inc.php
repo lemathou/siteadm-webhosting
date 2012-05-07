@@ -10,6 +10,7 @@ define("MYSQL_ADMIN_USER","siteadm_root");
 define("MYSQL_ADMIN_PASS","siteadm2275");
 
 define("HOSTNAME", "mathieu-portable");
+define("DOMAIN", "lemathou.net");
 
 define("INIT_SCRIPT_DIR", "/etc/init.d");
 
@@ -56,13 +57,10 @@ define("WEBSERVER_GROUP","www-data");
 // Apache
 define("APACHE_VHOST_DIR","/etc/apache2/sites-siteadm");
 define("APACHE_SSL_CERT","server");
-define("APACHE_PUBLIC_WEBMASTER_EMAIL","webmaster@iprospective.fr");
+define("APACHE_PUBLIC_WEBMASTER_EMAIL",WEBMASTER_EMAIL);
 
 // AWSTATS
-define("AWSTATS_CONFIG_DIR","/etc/awstats");
-
-// CGI
-define("CGI_SPAWN_EXEC","/usr/bin/spawn-fcgi");
+define("AWSTATS_CONF_DIR","/etc/awstats");
 
 // PHP Installation
 define("PHP_INSTALL_PREFIX","/opt/php5");
@@ -93,50 +91,58 @@ define("PHP_SHORT_OPEN_TAG",false); // Deprecated
 define("PHP_APC_STAT",true); // On, Off
 define("PHP_APC_LAZY",false); // On, Off
 
+// AppArmor
+define("APPARMOR_CONF_DIR","/etc/apparmor.d");
+
 // MySQL
-define("MYSQL_CONFIG","/etc/mysql");
-define("MYSQL_CONFIGFILE","my.cnf");
+define("MYSQL_CONF_DIR","/etc/mysql");
 define("MYSQL_DUMP","mysqldump");
 define("MYSQL_MAX_QUERIES","1000");
 define("MYSQL_MAX_USER_CONNECTIONS","10");
 define("MYSQL_MAX_CONNECTIONS","1000");
 define("MYSQL_MAX_UPDATES","1000");
 
+// email
+define("EMAIL_UID_MIN", 4000);
+
 // Postfix
 define("POSTFIX_MYSQL_USER","siteadm_postfix");
 define("POSTFIX_MYSQL_PASS","siteadm2275");
+define("POSTFIX_CONF_DIR","/etc/postfix");
 
 // Dovecot
 define("DOVECOT_MYSQL_USER","siteadm_dovecot");
 define("DOVECOT_MYSQL_PASS","siteadm2275");
+define("DOVECOT_CONF_DIR","/etc/dovecot");
 
 // AMAVIS
-define("AMAVIS_CONFIG","/etc/amavis-d/conf");
+define("AMAVIS_CONF_DIR","/etc/amavis-d/conf");
 // ClamAV
-define("CLAMV_CONFIG","/etc/clamav/conf");
+define("CLAMV_CONF_DIR","/etc/clamav/conf");
 // Spamassassin
-define("SPAMASSASSIN_CONFIG","/etc/spamassassin/conf");
+define("SPAMASSASSIN_CONF_DIR","/etc/spamassassin/conf");
 
 // ProFTPd
 define("PROFTPD_MYSQL_USER","siteadm_proftpd");
 define("PROFTPD_MYSQL_PASS","siteadm2275");
-define("PROFTPD_CONFIG","/etc/proftpd.conf/vhost");
+define("PROFTPD_CONF_DIR","/etc/proftpd.conf");
+define("PROFTPD_CONF_FILE","vhost");
 
 // Bind
-define("BIND_CONFIG","/etc/bind9");
+define("BIND_CONF_DIR","/etc/bind9");
 define("BIND_DOMAIN_DIR","/etc/bind9/pri");
 
 // Quota
 define("QUOTA_EXEC","quota");
 
 // Logrotate
-define("LOGROTATE_CONFIG","/etc/logrotate.d");
+define("LOGROTATE_CONF_DIR","/etc/logrotate.d");
 
 // CRON
-define("CRON_CONFIG","/etc/cron.d");
-define("CRON_CONFIG_HOURLY","/etc/cron.hourly");
-define("CRON_CONFIG_DAILY","/etc/cron.daily");
-define("CRON_CONFIG_WEEKLY","/etc/cron.weekly");
-define("CRON_CONFIG_MONTHLY","/etc/cron.monthly");
+define("CRON_CONF_DIR","/etc/cron.d");
+define("CRON_CONF_HOURLY","/etc/cron.hourly");
+define("CRON_CONF_DAILY","/etc/cron.daily");
+define("CRON_CONF_WEEKLY","/etc/cron.weekly");
+define("CRON_CONF_MONTHLY","/etc/cron.monthly");
 
 ?>

@@ -9,12 +9,14 @@
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
+USE `{MYSQL_DB}`;
+
 --
 -- Structure de la vue `dovecot_email`
 --
 DROP TABLE IF EXISTS `dovecot_email`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `dovecot_email` AS select if (`account`.`id` is null, 0, `account`.`id`) AS `account_id`,if (`account`.`name` is null, 'common', `account`.`name`) AS `account_name`,((`account`.`actif` is null OR `account`.`actif`) and `email`.`actif` and `domain`.`email_actif`) AS `actif`,`email`.`name` AS `email_name`,`domain`.`name` AS `domain_name`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,md5(`email`.`password`) AS `password`,(if (`account`.`id` is null, 0, `account`.`id`) + 2000) AS `uid`,(if (`account`.`id` is null, 0, `account`.`id`) + 2000) AS `gid`,concat('/home/siteadm/',if (`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `home`,concat('maildir:/home/siteadm/',if (`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `mail` from `email` join `domain` on `domain`.`id` = `email`.`domain_id` left join `account` on `account`.`id` = `domain`.`account_id`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `dovecot_email` AS select if (`account`.`id` is null, 0, `account`.`id`) AS `account_id`,if (`account`.`name` is null, 'common', `account`.`name`) AS `account_name`,((`account`.`actif` is null OR `account`.`actif`) and `email`.`actif` and `domain`.`email_actif`) AS `actif`,`email`.`name` AS `email_name`,`domain`.`name` AS `domain_name`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,md5(`email`.`password`) AS `password`,(if (`account`.`id` is null, 0, `account`.`id`) + {EMAIL_UID_MIN}) AS `uid`,(if (`account`.`id` is null, 0, `account`.`id`) + {ACCOUNT_UID_MIN}) AS `gid`,concat('/home/siteadm/',if (`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `home`,concat('maildir:/home/siteadm/',if (`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `mail` from `email` join `domain` on `domain`.`id` = `email`.`domain_id` left join `account` on `account`.`id` = `domain`.`account_id`;
 
 -- --------------------------------------------------------
 
@@ -41,7 +43,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `postfix_mbox`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_mbox` AS select if (`account`.`id` is null, 0, `account`.`id`) AS `account_id`, if (`account`.`name` is null, 'common', `account`.`name`) AS `account_name`,(2000 + if (`account`.`id` is null, 0, `account`.`id`)) AS `uid`,(2000 + if (`account`.`id` is null, 0, `account`.`id`)) AS `gid`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,concat(if(`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `maildir`,((`email`.`actif` = '1') and `domain`.`email_actif` and (`account`.`actif` is null OR `account`.`actif`)) AS `actif` from ((`email` join `domain` on((`domain`.`id` = `email`.`domain_id`))) left join `account` on((`account`.`id` = `domain`.`account_id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_mbox` AS select if (`account`.`id` is null, 0, `account`.`id`) AS `account_id`, if (`account`.`name` is null, 'common', `account`.`name`) AS `account_name`,({EMAIL_UID_MIN} + if (`account`.`id` is null, 0, `account`.`id`)) AS `uid`,({ACCOUNT_UID_MIN} + if (`account`.`id` is null, 0, `account`.`id`)) AS `gid`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,concat(if(`account`.`folder` is null, 'common', `account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `maildir`,((`email`.`actif` = '1') and `domain`.`email_actif` and (`account`.`actif` is null OR `account`.`actif`)) AS `actif` from ((`email` join `domain` on((`domain`.`id` = `email`.`domain_id`))) left join `account` on((`account`.`id` = `domain`.`account_id`)));
 
 -- --------------------------------------------------------
 
@@ -59,4 +61,4 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `proftpd_user`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `proftpd_user` AS select `account`.`id` AS `account_id`,(`account`.`actif` and `ftp_user`.`actif`) AS `actif`,`ftp_user`.`id` AS `id`,`ftp_user`.`username` AS `username`,encrypt(`ftp_user`.`password`) AS `password`,(2000 + `account`.`id`) AS `uid`,(2000 + `account`.`id`) AS `gid`,concat('/home/siteadm/',`account`.`folder`,'/public',`ftp_user`.`folder`) AS `folder`,'/bin/bash' AS `/bin/bash` from (`account` join `ftp_user` on((`account`.`id` = `ftp_user`.`account_id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `proftpd_user` AS select if (`account`.`id` IS NULL, 0, `account`.`id`) AS `account_id`,((`account`.`actif` OR `account`.`actif` IS NULL) and `ftp_user`.`actif`) AS `actif`,`ftp_user`.`id` AS `id`,CONCAT(if(`account`.`name` is null, 'common', `account`.`name`), '_', `ftp_user`.`username`) AS `username`,encrypt(`ftp_user`.`password`) AS `password`,({ACCOUNT_UID_MIN} + if(`account`.`id` IS NULL, 0, `account`.`id`)) AS `uid`,({ACCOUNT_UID_MIN} + if(`account`.`id` IS NULL, 0, `account`.`id`)) AS `gid`,concat('/home/siteadm/',if(`account`.`id` IS NULL, 'common', `account`.`folder`),'/',`ftp_user`.`type`,'/',`ftp_user`.`folder`) AS `folder`,'/bin/bash' AS `shell` from (`ftp_user` left join `account`  on((`account`.`id` = `ftp_user`.`account_id`)));

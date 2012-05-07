@@ -48,6 +48,7 @@ static public $_f = array
 	"max_file_upload" => array("type"=>"int", "default"=>PHP_MAX_FILE_UPLOAD),
 	"short_open_tag" => array("type"=>"bool", "default"=>PHP_SHORT_OPEN_TAG),
 	"include_path" => array("type"=>"string", "default"=>PHP_INCLUDE_PATH),
+	"open_basedir" => array("type"=>"string"),
 	"apc_stat" => array("type"=>"bool", "default"=>PHP_APC_STAT),
 	"apc_lazy" => array("type"=>"bool", "default"=>PHP_APC_LAZY),
 	"extension" => array(),
@@ -82,20 +83,19 @@ function system_group()
 	return $this->account()->php_group();
 }
 
-
-// ACCESS
+/* ACCESS */
 
 /**
  * Retrieve managing account
- * @return account|common
+ * @return account
  */
 public function account()
 {
 
-if ($account=account($this->account_id))
-	return $account;
+if ($this->account_id)
+	return account($this->account_id);
 else
-	return new common();
+	return account_common();
 
 }
 
@@ -187,6 +187,16 @@ public function apache_conf_folder()
 
 if ($account=$this->account())
 	return $account->conf_folder()."/apache";
+
+}
+/**
+ * @return string
+ */
+public function session_folder()
+{
+
+if ($account=$this->account())
+	return $account->session_folder();
 
 }
 
@@ -464,7 +474,7 @@ return (db_object::db_update($infos) || $return);
 
 }
 
-// ROOT SCRIPTS
+/* REPLACE MAP */
 
 /**
  * Parameters for template files
@@ -488,6 +498,7 @@ $map = array
 	"{PHP_INI}" => $this->ini_file(),
 	"{PHP_PID}" => $this->pid_file(),
 	"{PHP_TMP_DIR}" => $account->tmp_folder(),
+	"{PHP_SESSION_FOLDER}" => $this->session_folder(),
 	"{WEBSERVER_GROUP}" => WEBSERVER_GROUP,
 	"{PHP_WORKER_NB_MAX}" => $this->worker_nb_max,
 	"{PHP_WORKER_SPARE_NB_MIN}" => 1,
@@ -507,7 +518,8 @@ $map = array
 	"{PHP_FILE_UPLOADS}" => $this->file_uploads,
 	"{PHP_UPLOAD_MAX_FILESIZE}" => $this->upload_max_filesize,
 	"{PHP_MAX_FILE_UPLOAD}" => $this->max_file_upload,
-	"{PHP_INCLUDE_PATH}" => $this->include_path,
+	"{PHP_INCLUDE_PATH}" => ($this->include_path ?$this->include_path : "."),
+	"{PHP_OPEN_BASEDIR}" => ($this->open_basedir ?$this->open_basedir : $account->private_folder().":".$account->public_folder()),
 	"{PHP_APC_STAT}" => $this->apc_stat,
 	"{PHP_APC_LAZY}" => $this->apc_lazy,
 	"{PHP_EXTENSIONS}" => "",
@@ -534,9 +546,13 @@ foreach($this->phpext_list() as $name)
 	$map["{PHP_EXTENSIONS}"] = "extension = $name;\n";
 }
 
-return array_merge($phpapp->replace_map(), $map);
+replace_map_merge($map, $phpapp->replace_map());
+
+return $map;
 
 }
+
+/* ROOT SCRIPTS */
 
 /**
  * @see db_object::script_structure()
@@ -546,8 +562,8 @@ function script_structure()
 
 $account = $this->account();
 
-$account->mkdir($this->conf_folder(), "750");
-$account->mkdir($this->log_folder(), "1750");
+$account->mkdir($this->conf_folder(), "750", "root");
+$account->mkdir($this->log_folder(), "1750", "root");
 
 }
 

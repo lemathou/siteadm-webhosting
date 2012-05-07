@@ -126,12 +126,11 @@ function replace_map()
 
 return array
 (
-	"{CGI_SPAWN_EXEC}" => CGI_SPAWN_EXEC,
 	"{SITEADM_SCRIPT_DIR}" => SITEADM_SCRIPT_DIR,
 	"{INIT_SCRIPT_DIR}" => INIT_SCRIPT_DIR,
 	"{ROOT_EMAIL}" => ROOT_EMAIL,
 	"{POSTMASTER_EMAIL}" => POSTMASTER_EMAIL,
-	"{WEBMASTER_EMAIL}" => WEBMASTER_EMAIL,
+	"{WEBMASTER_EMAIL}" => WEBMASTER_EMAIL
 );
 
 }
@@ -245,7 +244,7 @@ if (!$command || is_numeric(strpos($command, "/")))
 if (file_exists(SITEADM_SCRIPT_DIR."/".$command))
 	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
 elseif (file_exists(INIT_SCRIPT_DIR."/".$command))
-	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
+	exec(INIT_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
 
 }
 

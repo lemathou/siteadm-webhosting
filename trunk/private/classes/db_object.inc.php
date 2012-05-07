@@ -711,7 +711,7 @@ abstract class db_object
 	 * OVERLOAD
 	 * @param int $id
 	 */
-	public function db_retrieve_more($id)
+	protected function db_retrieve_more($id)
 	{
 		// OVERLOAD IF NEEDED
 	}

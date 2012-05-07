@@ -55,6 +55,10 @@ return $this->name();
 
 }
 
+/**
+ * Website complete name
+ * @return string
+ */
 public function name()
 {
 
@@ -106,7 +110,7 @@ if ($this->phppool_id)
 
 /**
  * Returns associated account
- * @return account|common
+ * @return account
  */
 public function account()
 {
@@ -146,7 +150,7 @@ return $list;
 
 }
 
-// FOLDER
+// FOLDERS
 
 /**
  * Returns storage folder name
@@ -263,8 +267,7 @@ if ($account=$this->account())
 
 }
 
-
-// FILE
+// FILES
 
 /**
  * Returns access log filename
@@ -561,7 +564,7 @@ if ($update)
 
 }
 
-// ROOT SCRIPTS
+/* REPLACE MAP */
 
 /**
  * Config files vars replacement map
@@ -639,6 +642,8 @@ if ($phppool=$this->phppool())
 return $map;
 
 }
+
+/* ROOT SCRIPTS */
 
 /**
  * Create SSL certificate

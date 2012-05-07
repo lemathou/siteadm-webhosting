@@ -3,7 +3,7 @@
 folder_source="$1-$2"
 php="$1-$2-$3"
 echo $folder_source;
-cd "/home/workspace/SiteAdm/sources/$folder_source"
+cd "/home/siteadm_admin/sources/$folder_source"
 prefix="/opt/$php"
 
 make clean > ../compile-$php.log
@@ -54,5 +54,3 @@ make clean > ../compile-$php.log
 
 make >> ../compile-$php.log
 make install >> ../compile-$php.log
-
-

@@ -42,7 +42,7 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 <tr>
 	<td><input type="checkbox" name="list_id[]" value="<?=$row["id"]?>" /></td>
 	<td><a href="?id=<?php echo $a->id; ?>"><?php echo $a->name; ?></a></td>
-	<td><?php echo $a->system_name(); ?></td>
+	<td><?php echo $a->system_user(); ?></td>
 	<td><?php
 		if ($a->type=="admin")
 			echo "<b style=\"color:red\">";

@@ -44,6 +44,9 @@ if (isset($_POST["ftp_del"]) && isset($_POST["id"]) && ($ftp=ftp($_POST["id"])))
 include "template/inc/menu.tpl.php";
 
 // Context
+if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && ($ftp->update_perm()))
+	$_GET["account_id"] = $ftp->account_id;
+
 if (login()->perm("manager"))
 {
 	include "template/inc/account_select.tpl.php";
@@ -55,13 +58,18 @@ else
 
 // Submenu
 if (isset($account))
-	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p> <hr />";
+	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p>";
 
-var_dump(ftp($_GET["id"]));
-echo "tt";
-
-if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && ($login->perm("admin") || $ftp->account()->id == login()->id))
+if (isset($_GET["id"]) && ($ftp=ftp($_GET["id"])) && ($ftp->update_perm()))
 {
+	include "template/form/ftp.tpl.php";
+}
+elseif (isset($_GET["add"]) && ftp::insert_perm())
+{
+	if (!isset($account) || !$account)
+		$account = login();
+	$ftp = new ftp();
+	$ftp->account_id = $account->id;
 	include "template/form/ftp.tpl.php";
 }
 else

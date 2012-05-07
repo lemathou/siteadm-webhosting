@@ -33,6 +33,22 @@ static public $_f = array
 	"folder" => array("type"=>"string"),
 );
 
+/**
+ * Retrieve managing account
+ *
+ * @return account
+ */
+public function account()
+{
+
+if ($this->account_id)
+	return account($this->account_id);
+else
+	return account_common();
+
+}
+
+
 }
 
 ?>

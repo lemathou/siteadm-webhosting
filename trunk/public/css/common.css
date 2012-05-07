@@ -1,5 +1,10 @@
 @CHARSET "UTF-8";
 
+body{
+	font-size: 10pt;
+	font-family: Arial;
+}
+
 body, form, table
 {
 	margin : 0;
@@ -7,17 +12,35 @@ body, form, table
 	padding: 0;
 }
 
-body, p, td, li, option
+p, td, th, li, input, textarea, option
 {
-	font-size: 9pt;
+	font-family: inherit;
+	font-size: 1em;
+}
+
+h1{
+	font-size: 1.4em;
+}
+h2{
+	font-size: 1.3em;
+}
+h3{
+	font-size: 1.2em;
+}
+h4{
+	font-size: 1.1em;
 }
 
 /* Générique */
-table .colname
+.edit
 {
-	font-weight: bold;
+	width: auto;
+	margin: 4px;
+	border: 1px gray dashed;
+	padding: 1px;
 }
-table .colname td
+
+table .colname td, table .colname th
 {
 	border: 0px;
 }
@@ -27,8 +50,18 @@ table .noborder
 }
 table .label
 {
+	text-align: left;
 	width: 250px;
 }
+
+form .submit
+{
+	border: 1px gray solid;
+	background-color: #ddd;
+	color: red;
+	font-size: 1.1em;
+}
+
 .info
 {
 	color: orange;

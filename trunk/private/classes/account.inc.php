@@ -101,25 +101,6 @@ return $list;
 
 }
 
-function phpext_list($language_bin_id=null)
-{
-
-$list = array();
-$query_string = "SELECT language_php_ext.*, if(language_php_bin_ext_ref.phpext_id, 1, 0) as `already`, if (account_php_ext_ref.account_id, 1, 0) as `authorized`
-FROM language_php_ext
-LEFT JOIN account_php_ext_ref ON language_php_ext.id=account_php_ext_ref.phpext_id AND account_php_ext_ref.account_id='".$this->id."'
-LEFT JOIN language_php_bin_ext_ref ON language_php_ext.id=language_php_bin_ext_ref.phpext_id AND language_php_bin_ext_ref.language_bin_id='".$language_bin_id."'
-WHERE language_php_ext.type='extension'
-ORDER BY language_php_ext.description";
-$query = mysql_query($query_string);
-while($row=mysql_fetch_assoc($query))
-{
-	$list[$row["id"]] = $row;
-}
-return $list;
-
-}
-
 function phpapp_list()
 {
 
@@ -144,12 +125,42 @@ function phppool_list()
 
 }
 
+function phpext_list($language_bin_id=null)
+{
+
+	$list = array();
+	$query_string = "SELECT language_php_ext.*, if(language_php_bin_ext_ref.phpext_id, 1, 0) as `already`, if (account_php_ext_ref.account_id, 1, 0) as `authorized`
+	FROM language_php_ext
+	LEFT JOIN account_php_ext_ref ON language_php_ext.id=account_php_ext_ref.phpext_id AND account_php_ext_ref.account_id='".$this->id."'
+	LEFT JOIN language_php_bin_ext_ref ON language_php_ext.id=language_php_bin_ext_ref.phpext_id AND language_php_bin_ext_ref.language_bin_id='".$language_bin_id."'
+	WHERE language_php_ext.type='extension'
+	ORDER BY language_php_ext.description";
+	$query = mysql_query($query_string);
+	while($row=mysql_fetch_assoc($query))
+	{
+		$list[$row["id"]] = $row;
+	}
+	return $list;
+
+}
+
+/**
+ * OS (Linux) system user id (uid) and group id (gid)
+ * 
+ * @return int
+ */
+public function system_id()
+{
+
+return (ACCOUNT_UID_MIN+$this->id);
+
+}
 /**
  * OS (Linux) system user name
  * 
  * @return string
  */
-public function system_name()
+public function system_user()
 {
 
 return "$this->name$this->id";
@@ -163,20 +174,13 @@ return "$this->name$this->id";
 public function system_group()
 {
 
-return $this->system_name();
+return $this->system_user();
 
 }
 /**
- * OS (Linux) system user id (uid) and group id (gid)
- * 
+ * PHP user ID
  * @return int
  */
-public function system_id()
-{
-
-return (ACCOUNT_UID_MIN+$this->id);
-
-}
 function php_id()
 {
 
@@ -195,6 +199,28 @@ function php_group()
 return $this->system_group();
 
 }
+/**
+ * Email user ID
+ * @return int
+ */
+function email_id()
+{
+
+return (EMAIL_UID_MIN+$this->id);
+
+}
+function email_user()
+{
+
+return "email_".$this->name;
+
+}
+function email_group()
+{
+
+return $this->system_group();
+
+}
 
 /**
  * Update usergroup relative to account
@@ -204,11 +230,11 @@ function usergroup(&$usergroup)
 {
 
 if (is_null($usergroup))
-	$usergroup = $this->system_name().".".$this->system_group();
-elseif (!is_numeric($pos=strpos($usergroup, ".")))
-	$usergroup = $usergroup.".".$this->system_group();
+	$usergroup = $this->system_user().":".$this->system_group();
+elseif (!is_numeric($pos=strpos($usergroup, ":")))
+	$usergroup = $usergroup.":".$this->system_group();
 elseif ($pos == 0)
-	$usergroup = $this->system_name().".".$usergroup;
+	$usergroup = $this->system_user().":".$usergroup;
 
 }
 
@@ -282,6 +308,17 @@ return $this->folder()."/public";
 
 }
 /**
+ * Private folder
+ *
+ * @return string
+ */
+function private_folder()
+{
+
+return $this->folder()."/private";
+
+}
+/**
  * Temp folder
  *
  * @return string
@@ -290,6 +327,27 @@ function tmp_folder()
 {
 
 return $this->folder()."/tmp";
+
+}
+/**
+ * Sessions folder
+ *
+ * @return string
+ */
+function session_folder()
+{
+
+return $this->folder()."/cookies";
+
+}
+/**
+ * Dossier de stockage des emails associés au compte
+ * @return string
+ */
+function email_folder()
+{
+
+return $this->folder()."/mail";
 
 }
 
@@ -354,7 +412,7 @@ else
  * @param string $name
  * @return boolean
  */
-function perm($name)
+public function perm($name)
 {
 
 if ($name == "manager")
@@ -498,7 +556,39 @@ return (db_object::db_update($infos) || $return);
 
 }
 
-// ROOT SCRIPTS
+/* REPLACE MAP */
+
+/**
+ * Create replacement map for template files
+ *
+ * @return array
+ */
+function replace_map()
+{
+
+$map = array
+(
+	"{ACCOUNT_ID}" => $this->id,
+	"{ACCOUNT_NAME}" => $this->name,
+	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
+	"{ACCOUNT_SYSTEM_USER}" => $this->system_user(),
+	"{ACCOUNT_SYSTEM_GROUP}" => $this->system_group(),
+	"{ACCOUNT_EMAIL}" => $this->email,
+	"{ACCOUNT_ROOT}" => $this->folder(),
+	"{ACCOUNT_PUBLIC}" => $this->public_folder(),
+	"{ACCOUNT_TMP_DIR}" => $this->tmp_folder(),
+	"{ACCOUNT_CGI_DIR}" => $this->cgi_folder(),
+	"{PHP_TMP_DIR}" => $this->tmp_folder(),
+	"{PHP_BASEDIR}" => $this->public_folder(),
+);
+
+replace_map_merge($map, replace_map());
+
+return $map;
+
+}
+
+/* ROOT METHODS */
 
 /**
  * Update OS account password
@@ -506,7 +596,7 @@ return (db_object::db_update($infos) || $return);
  * This method will also save the password in /path/to/account/private
  * @param string $passwd
  */
-function password_update($passwd=null)
+protected function password_update($passwd=null)
 {
 
 $passfile = $this->folder()."/private/passwd";
@@ -535,32 +625,32 @@ $passwd_crypt = str_replace(array("\r\n","\n","\r"), "", $passwd_crypt);
 mysql_query("UPDATE `account` SET `password`='$passwd' WHERE `id`='$this->id'");
 
 // Update system password
-exec("usermod -p $passwd_crypt ".$this->system_name());
+exec("usermod -p $passwd_crypt ".$this->system_user());
 
 }
 
 /**
  * Update quota
  */
-function quota_update()
+protected function quota_update()
 {
 
 // Limitations by offer
 if ($offer=$this->offer())
 {
 	if ($offer->disk_quota_soft)
-		exec("quotatool -u ".$this->system_name()." -b -q ".($offer->disk_quota_soft*1048576)." /");
+		exec("quotatool -u ".$this->system_user()." -b -q ".($offer->disk_quota_soft*1048576)." /");
 	else
-		exec("quotatool -u ".$this->system_name()." -b -q 0 /");
+		exec("quotatool -u ".$this->system_user()." -b -q 0 /");
 	if ($offer->disk_quota_hard)
-		exec("quotatool -u ".$this->system_name()." -b -l ".($offer->disk_quota_soft*1048576)." /");
+		exec("quotatool -u ".$this->system_user()." -b -l ".($offer->disk_quota_soft*1048576)." /");
 	else
-		exec("quotatool -u ".$this->system_name()." -b -l 0 /");
+		exec("quotatool -u ".$this->system_user()." -b -l 0 /");
 }
 // No limitations
 else
 {
-	exec("quotatool -u ".$this->system_name()." -b -q 0 -l 0 /");
+	exec("quotatool -u ".$this->system_user()." -b -q 0 -l 0 /");
 }
 
 }
@@ -645,36 +735,6 @@ filesystem::chmod($file, $mode);
 }
 
 /**
- * Create replacement map for template files
- * 
- * @return array
- */
-function replace_map()
-{
-
-$map = array
-(
-	"{ACCOUNT_ID}" => $this->id,
-	"{ACCOUNT_NAME}" => $this->name,
-	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
-	"{ACCOUNT_SYSTEM_NAME}" => $this->system_name(),
-	"{ACCOUNT_SYSTEM_GROUP}" => $this->system_group(),
-	"{ACCOUNT_EMAIL}" => $this->email,
-	"{ACCOUNT_ROOT}" => $this->folder(),
-	"{ACCOUNT_PUBLIC}" => $this->public_folder(),
-	"{ACCOUNT_SYSTEM_ID}" => $this->system_id(),
-	"{ACCOUNT_SYSTEM_NAME}" => $this->system_name(),
-	"{ACCOUNT_TMP_DIR}" => $this->tmp_folder(),
-	"{CGI_ROOT}" => $this->folder()."/cgi-bin",
-	"{PHP_TMP_DIR}" => $this->tmp_folder(),
-	"{PHP_BASEDIR}" => $this->public_folder(),
-);
-
-return array_merge(replace_map(), $map);
-
-}
-
-/**
  * Copy a template file into the account root
  * 
  * @param string $file_from
@@ -692,6 +752,8 @@ $this->usergroup($usergroup);
 copy_tpl($file_from, $file_to, $replace_map, $mode, $usergroup);
 
 }
+
+/* ROOT SCRIPTS */
 
 /**
  * Update account password
@@ -711,10 +773,11 @@ public function script_structure()
 {
 
 $this->mkdir("", "750", "root");
+$this->mkdir(".ssh", "700");
 
 $this->mkdir("conf", "750", "root");	
 // Awstats
-$this->mkdir("conf/awstats", "1750", "root");
+$this->mkdir("conf/awstats", "755", "root");
 // Apache
 $this->mkdir("conf/apache", "755", "root");
 // PHP
@@ -737,7 +800,7 @@ $this->mkdir("log/apache", "1755", "root");
 $this->mkdir("log/php", "1775", "root");
 $this->mkdir("log/awstats", "1755", "root");
 // Temp (PHP)
-$this->mkdir("tmp", "1770", "root");
+$this->mkdir("tmp", "1777", "root");
 // Cookies (PHP)
 $this->mkdir("cookies", "1770", "root");
 // Private data & config
@@ -745,16 +808,17 @@ $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");
 $this->mkdir("private/scripts", "750");
 $this->mkdir("private/data", "750");
+$this->mkdir("private/ftp", "750");
 // Public websites
 $this->mkdir("public", "750", "root");
-exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->folder());
-exec("setfacl -m u:".WEBSERVER_USER." rx ".$this->public_folder());
+exec("setfacl -m u:".WEBSERVER_USER.":rx ".$this->folder());
+exec("setfacl -m u:".WEBSERVER_USER.":rx ".$this->public_folder());
 $this->mkdir("public/config", "750");
 $this->mkdir("public/scripts", "750");
 $this->mkdir("public/data", "750");
-$this->mkdir("public/ftp", "750");
+$this->mkdir("public/ftp", "755");
 // eMail
-$this->mkdir("mail", "700");
+$this->mkdir("mail", "700", $this->email_user());
 
 }
 
@@ -767,13 +831,19 @@ function script_insert()
 // Add system group
 exec("groupadd -g ".$this->system_id()." ".$this->system_group());
 // Add system user
-exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->public_folder()." -s /bin/bash ".$this->system_name());
+exec("useradd -u ".$this->system_id()." -g ".$this->system_id()." -d ".$this->public_folder()." -s /bin/bash ".$this->system_user());
+
+// Add system php user
+exec("useradd -u ".$this->php_id()." -g ".$this->system_id()." -d ".$this->public_folder()." -s /bin/false ".$this->php_user());
+
+// Add system email user
+exec("useradd -u ".$this->email_id()." -g ".$this->system_id()." -d ".$this->email_folder()." -s /bin/false ".$this->email_user());
 
 // Add user in siteadm_account group,
 // so that sshd_config section authorize only internal-sftp for users matching group ACCOUNT_SYSTEM_GROUP
-exec("addgroup ".$this->system_name()." ".ACCOUNT_SYSTEM_GROUP);
+exec("addgroup ".$this->system_user()." ".ACCOUNT_SYSTEM_GROUP);
 
-// Root folder with private subfolder
+// User Root folder
 $this->mkdir("", "750", "root");
 
 $this->script_structure();
