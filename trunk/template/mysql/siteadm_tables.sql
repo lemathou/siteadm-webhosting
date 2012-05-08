@@ -15,49 +15,6 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE DATABASE IF NOT EXISTS {MYSQL_DB};
 
---
--- Admin User
---
-
-CREATE USER '{MYSQL_ADMIN_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{MYSQL_ADMIN_PASS}';
-GRANT USAGE ON *.* TO '{MYSQL_ADMIN_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{MYSQL_ADMIN_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-GRANT ALL PRIVILEGES ON *.* TO '{MYSQL_ADMIN_USER}'@'{MYSQL_HOST}';
-
---
--- User
---
-
-CREATE USER '{MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{MYSQL_PASS}';
-GRANT USAGE ON `{MYSQL_DB}`.* TO '{MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-GRANT ALL PRIVILEGES ON `{MYSQL_DB}` . * TO '{MYSQL_USER}'@'{MYSQL_HOST}';
-
---
--- Dovecot User
---
-
-CREATE USER '{DOVECOT_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{DOVECOT_MYSQL_PASS}';
-GRANT USAGE ON `{MYSQL_DB}`.* TO '{DOVECOT_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{DOVECOT_MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-GRANT SELECT ON `{MYSQL_DB}`.`dovecot_email` TO '{DOVECOT_MYSQL_USER}'@'{MYSQL_HOST}';
-
---
--- Proftpd User
---
-
-CREATE USER '{PROFTPD_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{PROFTPD_MYSQL_PASS}';
-GRANT USAGE ON `{MYSQL_DB}`.* TO '{PROFTPD_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{PROFTPD_MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-GRANT SELECT ON `{MYSQL_DB}`.`proftpd_user` TO '{PROFTPD_MYSQL_USER}'@'{MYSQL_HOST}';
-
---
--- Postfix User
---
-
-CREATE USER '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{POSTFIX_MYSQL_PASS}';
-GRANT USAGE ON `{MYSQL_DB}`.* TO '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}' IDENTIFIED BY '{POSTFIX_MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-GRANT SELECT ON `{MYSQL_DB}`.`postfix_alias` TO '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}';
-GRANT SELECT ON `{MYSQL_DB}`.`postfix_domain` TO '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}';
-GRANT SELECT ON `{MYSQL_DB}`.`postfix_mbox` TO '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}';
-GRANT SELECT ON `{MYSQL_DB}`.`postfix_redirect` TO '{POSTFIX_MYSQL_USER}'@'{MYSQL_HOST}';
-
 USE `{MYSQL_DB}`;
 
 -- --------------------------------------------------------
@@ -68,7 +25,7 @@ USE `{MYSQL_DB}`;
 
 CREATE TABLE IF NOT EXISTS `account` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `manager_id` int(10) unsigned DEFAULT NULL,
   `type` enum('user','manager','admin') NOT NULL DEFAULT 'user',
@@ -76,8 +33,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   `offre_expire` date DEFAULT NULL,
   `folder` varchar(32) NOT NULL,
   `name` varchar(32) NOT NULL,
-  `password` varchar(64) NOT NULL,
-  `password_md5` varchar(64) NOT NULL,
+  `password` varchar(16) NOT NULL,
   `email` varchar(128) NOT NULL,
   `civilite` enum('m','mme','mlle') DEFAULT NULL,
   `prenom` varchar(64) NOT NULL,
@@ -101,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `account_language_bin_ref` (
   `account_id` int(10) unsigned NOT NULL,
   `language_bin_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`account_id`,`language_bin_id`),
-  KEY `langage_bin_id` (`language_bin_id`)
+  KEY `language_bin_id` (`language_bin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -111,13 +67,15 @@ CREATE TABLE IF NOT EXISTS `account_language_bin_ref` (
 --
 
 CREATE TABLE IF NOT EXISTS `account_log` (
-  `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `account_id` int(10) unsigned DEFAULT NULL,
-  `operation` text NOT NULL,
+  `operation` enum('connect_ok','connect_error') DEFAULT NULL,
   `ip` varchar(16) NOT NULL,
+  `details` text NOT NULL,
   KEY `datetime` (`datetime`),
   KEY `account_id` (`account_id`),
-  KEY `ip` (`ip`)
+  KEY `ip` (`ip`),
+  KEY `operation` (`operation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -164,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `db` (
 
 CREATE TABLE IF NOT EXISTS `domain` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `account_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   `email_actif` tinyint(1) NOT NULL DEFAULT '1',
@@ -193,15 +151,15 @@ CREATE TABLE IF NOT EXISTS `domain_bind` (
 -- Doublure de structure pour la vue `dovecot_email`
 --
 CREATE TABLE IF NOT EXISTS `dovecot_email` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`account_name` varchar(32)
 ,`actif` int(1)
 ,`email_name` varchar(64)
 ,`domain_name` varchar(128)
 ,`email` varchar(193)
-,`password` varbinary(32)
-,`uid` bigint(12) unsigned
-,`gid` bigint(12) unsigned
+,`password` varchar(32)
+,`uid` decimal(11,0)
+,`gid` decimal(11,0)
 ,`home` varchar(246)
 ,`mail` varchar(254)
 );
@@ -213,13 +171,12 @@ CREATE TABLE IF NOT EXISTS `dovecot_email` (
 
 CREATE TABLE IF NOT EXISTS `email` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` enum('0','1') NOT NULL DEFAULT '1',
   `account_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(64) NOT NULL,
   `domain_id` int(10) unsigned NOT NULL,
   `password` varchar(64) NOT NULL,
-  `password_md5` varchar(64) NOT NULL,
   `quota` enum('10','100','1000','10000') NOT NULL DEFAULT '100',
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id` (`domain_id`,`name`),
@@ -234,9 +191,9 @@ CREATE TABLE IF NOT EXISTS `email` (
 
 CREATE TABLE IF NOT EXISTS `email_alias` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `name` varchar(64) NOT NULL,
-  `domain_id` int(10) unsigned NOT NULL,
+  `domain_id` int(10) unsigned DEFAULT NULL,
   `email_id` int(10) unsigned DEFAULT NULL,
   `redirect_email` varchar(128) DEFAULT NULL,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
@@ -288,9 +245,10 @@ CREATE TABLE IF NOT EXISTS `ftp_user` (
   `account_id` int(10) unsigned NOT NULL,
   `username` varchar(64) NOT NULL,
   `password` varchar(64) NOT NULL,
+  `type` enum('private','public') NOT NULL DEFAULT 'public',
   `folder` varchar(128) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `account_id` (`account_id`)
+  UNIQUE KEY `account_id` (`account_id`,`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -350,9 +308,23 @@ CREATE TABLE IF NOT EXISTS `language_bin` (
   `options` varchar(64) NOT NULL,
   `prefix` varchar(64) NOT NULL,
   `exec_bin` varchar(64) NOT NULL,
+  `extension_dir` varchar(256) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `language_id` (`language_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `language_bin_php_ext_ref`
+--
+
+CREATE TABLE IF NOT EXISTS `language_bin_php_ext_ref` (
+  `language_bin_id` int(10) unsigned NOT NULL,
+  `ext_id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`language_bin_id`,`ext_id`),
+  KEY `ext_id` (`ext_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -368,19 +340,6 @@ CREATE TABLE IF NOT EXISTS `language_compile_options` (
   `value` varchar(32) DEFAULT NULL,
   `desc` text NOT NULL,
   PRIMARY KEY (`language_id`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `language_php_bin_ext_ref`
---
-
-CREATE TABLE IF NOT EXISTS `language_php_bin_ext_ref` (
-  `language_bin_id` int(10) unsigned NOT NULL,
-  `ext_id` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`language_bin_id`,`ext_id`),
-  KEY `ext_id` (`ext_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -423,7 +382,7 @@ CREATE TABLE IF NOT EXISTS `language_php_functions` (
 
 CREATE TABLE IF NOT EXISTS `mysql` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `account_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(64) NOT NULL,
   `password` varchar(16) NOT NULL,
@@ -465,7 +424,7 @@ CREATE TABLE IF NOT EXISTS `offre` (
 
 CREATE TABLE IF NOT EXISTS `phpapp` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `account_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -476,6 +435,19 @@ CREATE TABLE IF NOT EXISTS `phpapp` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id_2` (`account_id`,`name`),
   KEY `language_bin_id` (`language_bin_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `phpapp_ext_ref`
+--
+
+CREATE TABLE IF NOT EXISTS `phpapp_ext_ref` (
+  `phpapp_id` int(10) unsigned NOT NULL,
+  `ext_id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`phpapp_id`,`ext_id`),
+  KEY `ext_id` (`ext_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -486,13 +458,13 @@ CREATE TABLE IF NOT EXISTS `phpapp` (
 
 CREATE TABLE IF NOT EXISTS `phppool` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `account_id` int(10) unsigned DEFAULT NULL,
   `system_user` varchar(32) DEFAULT NULL,
   `system_group` varchar(32) DEFAULT NULL,
   `phpapp_id` int(10) unsigned DEFAULT NULL,
-  `language_bin_id` int(10) unsigned NOT NULL,
+  `language_bin_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(32) NOT NULL,
   `description` text NOT NULL,
   `webmaster_email` varchar(128) DEFAULT NULL,
@@ -504,11 +476,12 @@ CREATE TABLE IF NOT EXISTS `phppool` (
   `max_input_time` tinyint(3) unsigned NOT NULL DEFAULT '60',
   `memory_limit` tinyint(3) unsigned NOT NULL DEFAULT '64',
   `post_max_size` tinyint(3) unsigned NOT NULL DEFAULT '8',
-  `file_uploads` enum('On','Off') NOT NULL DEFAULT 'On',
+  `file_uploads` tinyint(1) NOT NULL DEFAULT '1',
   `upload_max_filesize` tinyint(3) unsigned NOT NULL DEFAULT '2',
   `max_file_upload` tinyint(2) unsigned NOT NULL DEFAULT '5',
   `error_reporting` varchar(64) NOT NULL DEFAULT 'E_ALL & ~E_DEPRECATED',
-  `include_path` varchar(256) NOT NULL DEFAULT '.',
+  `include_path` text,
+  `open_basedir` text,
   `short_open_tag` tinyint(1) NOT NULL DEFAULT '0',
   `apc_stat` tinyint(1) NOT NULL,
   `apc_lazy` tinyint(1) NOT NULL,
@@ -516,7 +489,7 @@ CREATE TABLE IF NOT EXISTS `phppool` (
   UNIQUE KEY `domain_id_2` (`account_id`,`name`),
   KEY `language_bin_id` (`language_bin_id`),
   KEY `phpapp_id` (`phpapp_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -550,7 +523,7 @@ CREATE TABLE IF NOT EXISTS `phppool_ext_ref` (
 -- Doublure de structure pour la vue `postfix_alias`
 --
 CREATE TABLE IF NOT EXISTS `postfix_alias` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`account_name` varchar(32)
 ,`destination` varchar(193)
 ,`origine` varchar(193)
@@ -562,7 +535,7 @@ CREATE TABLE IF NOT EXISTS `postfix_alias` (
 -- Doublure de structure pour la vue `postfix_domain`
 --
 CREATE TABLE IF NOT EXISTS `postfix_domain` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`account_name` varchar(32)
 ,`name` varchar(128)
 ,`actif` int(1)
@@ -573,10 +546,10 @@ CREATE TABLE IF NOT EXISTS `postfix_domain` (
 -- Doublure de structure pour la vue `postfix_mbox`
 --
 CREATE TABLE IF NOT EXISTS `postfix_mbox` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`account_name` varchar(32)
-,`uid` bigint(12) unsigned
-,`gid` bigint(12) unsigned
+,`uid` decimal(11,0)
+,`gid` decimal(11,0)
 ,`email` varchar(193)
 ,`maildir` varchar(232)
 ,`actif` int(1)
@@ -587,7 +560,7 @@ CREATE TABLE IF NOT EXISTS `postfix_mbox` (
 -- Doublure de structure pour la vue `postfix_redirect`
 --
 CREATE TABLE IF NOT EXISTS `postfix_redirect` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`account_name` varchar(32)
 ,`destination` varchar(128)
 ,`origine` varchar(193)
@@ -599,15 +572,15 @@ CREATE TABLE IF NOT EXISTS `postfix_redirect` (
 -- Doublure de structure pour la vue `proftpd_user`
 --
 CREATE TABLE IF NOT EXISTS `proftpd_user` (
-`account_id` int(10) unsigned
+`account_id` decimal(10,0)
 ,`actif` int(1)
 ,`id` int(10) unsigned
-,`username` varchar(64)
+,`username` varchar(97)
 ,`password` varbinary(13)
-,`uid` bigint(12) unsigned
-,`gid` bigint(12) unsigned
-,`folder` varchar(181)
-,`/bin/bash` varchar(9)
+,`uid` decimal(11,0)
+,`gid` decimal(11,0)
+,`folder` varchar(183)
+,`shell` varchar(9)
 );
 -- --------------------------------------------------------
 
@@ -637,7 +610,7 @@ CREATE TABLE IF NOT EXISTS `webapp` (
 
 CREATE TABLE IF NOT EXISTS `website` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `account_id` int(10) unsigned DEFAULT NULL,
   `folder` varchar(64) NOT NULL,
@@ -651,20 +624,21 @@ CREATE TABLE IF NOT EXISTS `website` (
   `folder_auth` tinyint(1) NOT NULL DEFAULT '0',
   `ssl` tinyint(1) NOT NULL DEFAULT '1',
   `ssl_force_redirect` tinyint(1) NOT NULL DEFAULT '0',
-  `php_engine` tinyint(1) NOT NULL DEFAULT '1',
-  `php_expose` enum('On','Off') NOT NULL DEFAULT 'Off',
-  `php_max_execution_time` tinyint(3) unsigned NOT NULL DEFAULT '30',
-  `php_max_input_time` tinyint(3) unsigned NOT NULL DEFAULT '60',
-  `php_memory_limit` tinyint(3) unsigned NOT NULL DEFAULT '32',
-  `php_post_max_size` tinyint(3) unsigned NOT NULL DEFAULT '8',
-  `php_file_uploads` enum('On','Off') NOT NULL DEFAULT 'On',
-  `php_upload_max_filesize` tinyint(3) unsigned NOT NULL DEFAULT '2',
-  `php_max_file_upload` tinyint(2) unsigned NOT NULL DEFAULT '5',
-  `php_error_reporting` varchar(64) NOT NULL DEFAULT 'E_ALL & ~E_DEPRECATED',
-  `php_enable_dl` enum('On','Off') NOT NULL DEFAULT 'Off',
+  `php_engine` tinyint(1) DEFAULT '1',
+  `php_expose` enum('On','Off') DEFAULT 'Off',
+  `php_short_open_tag` tinyint(1) DEFAULT NULL,
+  `php_max_execution_time` tinyint(3) unsigned DEFAULT '30',
+  `php_max_input_time` tinyint(3) unsigned DEFAULT '60',
+  `php_memory_limit` tinyint(3) unsigned DEFAULT '32',
+  `php_post_max_size` tinyint(3) unsigned DEFAULT '8',
+  `php_file_uploads` enum('On','Off') DEFAULT 'On',
+  `php_upload_max_filesize` tinyint(3) unsigned DEFAULT '2',
+  `php_max_file_upload` tinyint(2) unsigned DEFAULT '5',
+  `php_error_reporting` varchar(64) DEFAULT 'E_ALL & ~E_DEPRECATED',
+  `php_enable_dl` enum('On','Off') DEFAULT 'Off',
   `php_include_path` varchar(256) DEFAULT NULL,
   `php_open_basedir` varchar(64) DEFAULT NULL,
-  `php_apc_stat` tinyint(1) NOT NULL DEFAULT '0',
+  `php_apc_stat` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id_2` (`domain_id`,`name`),
   KEY `account_id` (`account_id`),
@@ -680,13 +654,13 @@ CREATE TABLE IF NOT EXISTS `website` (
 
 CREATE TABLE IF NOT EXISTS `website_alias` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `alias_name` varchar(64) NOT NULL,
-  `domain_id` int(10) unsigned NOT NULL,
+  `domain_id` int(10) unsigned DEFAULT NULL,
   `website_id` int(10) unsigned DEFAULT NULL,
   `website_redirect` tinyint(1) NOT NULL DEFAULT '0',
-  `redirect_url` varchar(128) NOT NULL,
+  `redirect_url` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_id` (`domain_id`,`alias_name`),
   KEY `website_id` (`website_id`)
@@ -721,6 +695,58 @@ CREATE TABLE IF NOT EXISTS `website_php_disable_functions_ref` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la vue `dovecot_email`
+--
+DROP TABLE IF EXISTS `dovecot_email`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `dovecot_email` AS select if(isnull(`account`.`id`),0,`account`.`id`) AS `account_id`,if(isnull(`account`.`name`),'common',`account`.`name`) AS `account_name`,((isnull(`account`.`actif`) or `account`.`actif`) and `email`.`actif` and `domain`.`email_actif`) AS `actif`,`email`.`name` AS `email_name`,`domain`.`name` AS `domain_name`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,md5(`email`.`password`) AS `password`,(if(isnull(`account`.`id`),0,`account`.`id`) + 4000) AS `uid`,(if(isnull(`account`.`id`),0,`account`.`id`) + 2000) AS `gid`,concat('/home/siteadm/',if(isnull(`account`.`folder`),'common',`account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `home`,concat('maildir:/home/siteadm/',if(isnull(`account`.`folder`),'common',`account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `mail` from ((`email` join `domain` on((`domain`.`id` = `email`.`domain_id`))) left join `account` on((`account`.`id` = `domain`.`account_id`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `postfix_alias`
+--
+DROP TABLE IF EXISTS `postfix_alias`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_alias` AS select if(isnull(`t5`.`id`),0,`t5`.`id`) AS `account_id`,if(isnull(`t5`.`name`),'common',`t5`.`name`) AS `account_name`,concat(`t1`.`name`,'@',`t3`.`name`) AS `destination`,if(isnull(`t4`.`name`),`t2`.`name`,concat(`t2`.`name`,'@',`t4`.`name`)) AS `origine`,((isnull(`t5`.`actif`) or `t5`.`actif`) and `t2`.`actif` and (isnull(`t4`.`email_actif`) or `t4`.`email_actif`)) AS `actif` from ((((`email` `t1` join `email_alias` `t2` on((`t1`.`id` = `t2`.`email_id`))) join `domain` `t3` on((`t1`.`domain_id` = `t3`.`id`))) left join `domain` `t4` on((`t2`.`domain_id` = `t4`.`id`))) left join `account` `t5` on((`t5`.`id` = `t3`.`account_id`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `postfix_domain`
+--
+DROP TABLE IF EXISTS `postfix_domain`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_domain` AS select if(isnull(`t2`.`id`),0,`t2`.`id`) AS `account_id`,if(isnull(`t2`.`name`),'common',`t2`.`name`) AS `account_name`,`t1`.`name` AS `name`,((isnull(`t2`.`actif`) or `t2`.`actif`) and `t1`.`email_actif`) AS `actif` from (`domain` `t1` left join `account` `t2` on((`t2`.`id` = `t1`.`account_id`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `postfix_mbox`
+--
+DROP TABLE IF EXISTS `postfix_mbox`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_mbox` AS select if(isnull(`account`.`id`),0,`account`.`id`) AS `account_id`,if(isnull(`account`.`name`),'common',`account`.`name`) AS `account_name`,(4000 + if(isnull(`account`.`id`),0,`account`.`id`)) AS `uid`,(2000 + if(isnull(`account`.`id`),0,`account`.`id`)) AS `gid`,concat(`email`.`name`,'@',`domain`.`name`) AS `email`,concat(if(isnull(`account`.`folder`),'common',`account`.`folder`),'/mail/',`email`.`name`,'@',`domain`.`name`,'/') AS `maildir`,((`email`.`actif` = '1') and `domain`.`email_actif` and (isnull(`account`.`actif`) or `account`.`actif`)) AS `actif` from ((`email` join `domain` on((`domain`.`id` = `email`.`domain_id`))) left join `account` on((`account`.`id` = `domain`.`account_id`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `postfix_redirect`
+--
+DROP TABLE IF EXISTS `postfix_redirect`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `postfix_redirect` AS select if(isnull(`t5`.`id`),0,`t5`.`id`) AS `account_id`,if(isnull(`t5`.`name`),'common',`t5`.`name`) AS `account_name`,`t2`.`redirect_email` AS `destination`,concat(`t2`.`name`,'@',`t3`.`name`) AS `origine`,(`t2`.`actif` and `t3`.`email_actif` and (isnull(`t5`.`actif`) or `t5`.`actif`)) AS `actif` from ((`email_alias` `t2` join `domain` `t3` on((`t3`.`id` = `t2`.`domain_id`))) left join `account` `t5` on((`t5`.`id` = `t3`.`account_id`))) where ((`t2`.`redirect_email` <> '') and (`t2`.`redirect_email` is not null));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `proftpd_user`
+--
+DROP TABLE IF EXISTS `proftpd_user`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `proftpd_user` AS select if(isnull(`account`.`id`),0,`account`.`id`) AS `account_id`,((`account`.`actif` or isnull(`account`.`actif`)) and `ftp_user`.`actif`) AS `actif`,`ftp_user`.`id` AS `id`,concat(if(isnull(`account`.`name`),'common',`account`.`name`),'_',`ftp_user`.`username`) AS `username`,encrypt(`ftp_user`.`password`) AS `password`,(2000 + if(isnull(`account`.`id`),0,`account`.`id`)) AS `uid`,(2000 + if(isnull(`account`.`id`),0,`account`.`id`)) AS `gid`,concat('/home/siteadm/',if(isnull(`account`.`id`),'common',`account`.`folder`),'/',`ftp_user`.`type`,'/',`ftp_user`.`folder`) AS `folder`,'/bin/bash' AS `shell` from (`ftp_user` left join `account` on((`account`.`id` = `ftp_user`.`account_id`)));
+
+--
 -- Contraintes pour les tables exportées
 --
 
@@ -735,7 +761,8 @@ ALTER TABLE `account`
 -- Contraintes pour la table `account_language_bin_ref`
 --
 ALTER TABLE `account_language_bin_ref`
-  ADD CONSTRAINT `account_language_bin_ref_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `account_language_bin_ref_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `account_language_bin_ref_ibfk_2` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `account_log`
@@ -793,7 +820,7 @@ ALTER TABLE `email_sync`
 -- Contraintes pour la table `ftp_user`
 --
 ALTER TABLE `ftp_user`
-  ADD CONSTRAINT `ftp_user_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `ftp_user_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`);
 
 --
 -- Contraintes pour la table `install_bin`
@@ -808,17 +835,17 @@ ALTER TABLE `language_bin`
   ADD CONSTRAINT `language_bin_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE;
 
 --
+-- Contraintes pour la table `language_bin_php_ext_ref`
+--
+ALTER TABLE `language_bin_php_ext_ref`
+  ADD CONSTRAINT `language_bin_php_ext_ref_ibfk_3` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `language_bin_php_ext_ref_ibfk_4` FOREIGN KEY (`ext_id`) REFERENCES `language_php_ext` (`id`);
+
+--
 -- Contraintes pour la table `language_compile_options`
 --
 ALTER TABLE `language_compile_options`
   ADD CONSTRAINT `language_compile_options_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `language_php_bin_ext_ref`
---
-ALTER TABLE `language_php_bin_ext_ref`
-  ADD CONSTRAINT `language_php_bin_ext_ref_ibfk_2` FOREIGN KEY (`ext_id`) REFERENCES `language_php_ext` (`id`),
-  ADD CONSTRAINT `language_php_bin_ext_ref_ibfk_3` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `mysql`
@@ -834,12 +861,19 @@ ALTER TABLE `phpapp`
   ADD CONSTRAINT `phpapp_ibfk_2` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`);
 
 --
+-- Contraintes pour la table `phpapp_ext_ref`
+--
+ALTER TABLE `phpapp_ext_ref`
+  ADD CONSTRAINT `phpapp_ext_ref_ibfk_1` FOREIGN KEY (`phpapp_id`) REFERENCES `phpapp` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `phpapp_ext_ref_ibfk_2` FOREIGN KEY (`ext_id`) REFERENCES `language_php_ext` (`id`);
+
+--
 -- Contraintes pour la table `phppool`
 --
 ALTER TABLE `phppool`
   ADD CONSTRAINT `phppool_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `phppool_ibfk_2` FOREIGN KEY (`phpapp_id`) REFERENCES `phpapp` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `phppool_ibfk_3` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`);
+  ADD CONSTRAINT `phppool_ibfk_3` FOREIGN KEY (`language_bin_id`) REFERENCES `language_bin` (`id`),
+  ADD CONSTRAINT `phppool_ibfk_4` FOREIGN KEY (`phpapp_id`) REFERENCES `phpapp` (`id`);
 
 --
 -- Contraintes pour la table `phppool_disable_functions_ref`

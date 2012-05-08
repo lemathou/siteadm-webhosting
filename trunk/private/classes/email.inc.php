@@ -39,6 +39,15 @@ static public $_f = array
 function __toString()
 {
 
+return $this->name();
+
+}
+/**
+ * @return string;
+ */
+function name()
+{
+
 return $this->name."@".$this->domain()->name;
 
 }
@@ -71,6 +80,18 @@ if ($this->account_id && ($account=account($this->account_id)))
 	return $account;
 elseif ($domain=$this->domain())
 	return $domain->account();
+
+}
+
+/* FOLDERS */
+
+/**
+ * @return string
+ */
+function folder()
+{
+
+return $this->account()->email_folder()."/".$this->name();
 
 }
 
@@ -177,6 +198,18 @@ if (isset($infos["name"]))
 	unset($infos["name"]);
 	
 return db_object::update($infos);
+
+}
+
+/* ROOT SCRIPTS */
+
+/**
+ * @see db_object::script_update()
+ */
+function script_update()
+{
+
+filesystem::link($this->folder(), SITEADM_EMAIL_DIR."/".$this->name());
 
 }
 

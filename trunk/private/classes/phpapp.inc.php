@@ -404,6 +404,26 @@ return (db_object::db_update($infos) || $return);
 
 }
 
+/* SCRIPTS */
+
+/**
+ * Regen vhost file
+ */
+protected function regen_vhost()
+{
+
+$vhost = "";
+foreach ($this->website_list() as $website)
+{
+	if (file_exists($filename=$website->php_ini_file()))
+	{
+		$vhost .= file_get_contents($filename)."\n";
+	}
+}
+filesystem::write($this->vhost_ini_file(), $vhost);
+
+}
+
 /* REPLACE MAP */
 
 function replace_map()
@@ -413,9 +433,9 @@ $account = $this->account();
 $language_bin = $this->language_bin();
 
 $map = array(
+	"{PHP_APP_NAME}" => $this->name,
 	"{PHP_INSTALL_PREFIX}" => $language_bin->prefix,
 	"{PHP_EXT_DIR}" => $this->ext_folder(), // general
-	"{PHP_NAME}" => $this->name,
 	"{PHP_ROOT}" => $this->folder(),
 	"{PHP_INI_DIR}" => $this->ini_folder(),
 	"{PHP_POOL_DIR}" => $this->pool_folder(),
@@ -460,24 +480,6 @@ if ($this->id)
 /* ROOT SCRIPTS */
 
 /**
- * Regen vhost file
- */
-function script_vhost()
-{
-
-$vhost = "";
-foreach ($this->website_list() as $website)
-{
-	if (file_exists($filename=$website->php_ini_file()))
-	{
-		$vhost .= file_get_contents($filename)."\n";
-	}
-}
-filesystem::write($this->vhost_ini_file(), $vhost);
-
-}
-
-/**
  * @see db_object::script_structure()
  */
 function script_structure()
@@ -485,10 +487,10 @@ function script_structure()
 
 $account = $this->account();
 
-$account->mkdir($this->folder(), "750", "root");
-$account->mkdir($this->ext_folder(), "750", "root");
-$account->mkdir($this->pool_folder(), "750", "root");
-$account->mkdir($this->vhost_folder(), "750", "root");
+$account->mkdir($this->folder(), "755", "root");
+$account->mkdir($this->ext_folder(), "755", "root");
+$account->mkdir($this->ini_folder(), "755", "root");
+$account->mkdir($this->pool_folder(), "755", "root");
 
 }
 
@@ -516,7 +518,7 @@ foreach($language_bin->phpext_list() as $ext)
 }
 
 // VHOSTS
-$this->script_vhost();
+$this->regen_vhost();
 
 // Reload process
 $this->script_reload();
@@ -529,7 +531,7 @@ $this->script_reload();
 public function script_reload()
 {
 
-exec($this->init_script_file()." restart > /dev/null &");
+exec($this->script_file()." restart > /dev/null &");
 
 }
 

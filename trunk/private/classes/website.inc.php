@@ -38,11 +38,18 @@ static public $_f = array
 	"folder_auth" => array("type"=>"bool"),
 	"webapp_id" => array("type"=>"object", "otype"=>"webapp"),
 	"phppool_id" => array("type"=>"object", "otype"=>"phppool"),
-	//"php_short_open_tag" => array("type"=>"bool"),
+	"php_error_reporting" => array("type"=>"string", "default"=>PHP_ERROR_REPORTING),
 	"php_open_basedir" => array("type"=>"string"),
-	"php_short_open_tag" => array("type"=>"bool"),
 	"php_include_path" => array("type"=>"string"),
 	"php_apc_stat" => array("type"=>"bool"),
+	"php_short_open_tag" => array("type"=>"bool"),
+	"php_max_execution_time" => array("type"=>"int"),
+	"php_max_input_time" => array("type"=>"int"),
+	"php_memory_limit" => array("type"=>"int"),
+	"php_post_max_size" => array("type"=>"int"),
+	"php_file_uploads" => array("type"=>"bool"),
+	"php_upload_max_filesize" => array("type"=>"int"),
+	"php_max_file_upload" => array("type"=>"int"),
 );
 
 /**
@@ -165,7 +172,7 @@ return $this->public_folder();
 public function public_folder()
 {
 
-if ($account=$this->account() && $this->folder)
+if (($account=$this->account()) && $this->folder)
 	return $account->public_folder()."/".$this->folder;
 
 }
@@ -315,7 +322,7 @@ return $this->apache_conf_folder()."/".$this->name().".htpasswd";
 function awstats_conf_file()
 {
 
-return $this->awstats_conf_folder()."/$this->name.$domain->name.conf";
+return $this->awstats_conf_folder()."/".$this->name.".".$this->domain()->name.".conf";
 
 }
 /**
@@ -675,6 +682,7 @@ function script_structure()
 
 $domain = $this->domain();
 $account = $this->account();
+$phppool = $this->phppool();
 
 $account->mkdir($this->apache_conf_folder(), "750", "root");
 $account->mkdir($this->awstats_conf_folder(), "750", "root");
@@ -690,7 +698,7 @@ filesystem::link($this->public_folder(), SITEADM_WEBSITE_DIR."/".$this->name());
 $replace_map = $this->replace_map();
 
 // Default public files
-if (!file_exists($this->folder()."/index.html"))
+if (!file_exists($this->public_folder()."/index.html"))
 	$account->copy_tpl("website/index.html", $this->public_folder()."/index.html", $replace_map, "0644");
 if ($phppool && !file_exists($this->folder()."/phpinfo.php"))
 	$account->copy_tpl("website/phpinfo.php", $this->public_folder()."/phpinfo.php", $replace_map, "0644");
@@ -736,7 +744,7 @@ filesystem::link($this->apache_conf_file(), APACHE_VHOST_DIR."/$this->name.$doma
 
 // Awstats
 $account->copy_tpl("awstats/awstats.website.conf", $this->awstats_conf_file(), $replace_map, "644", "root");
-filesystem::link($this->awstats_conf_file(), AWSTATS_CONFIG_DIR."/awstats.$this->name.$domain->name.conf");
+filesystem::link($this->awstats_conf_file(), AWSTATS_CONF_DIR."/awstats.$this->name.$domain->name.conf");
 
 // Reload webserver
 $this->script_reload();
@@ -780,7 +788,7 @@ static function script_webserver_reload()
 {
 
 // Reload apache
-script_exec("apache.sh reload");
+script_exec("apache.sh", "reload");
 
 }
 

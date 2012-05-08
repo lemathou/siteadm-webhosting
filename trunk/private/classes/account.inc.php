@@ -29,7 +29,7 @@ public $language_bin_list = array();
 
 static public $_f = array
 (
-	"type" => array("type"=>"select", "list"=>array("user", "manager", "admin"), "nonempty"=>true),
+	"type" => array("type"=>"select", "list"=>array("user", "manager", "admin", 'shared'), "nonempty"=>true),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"folder" => array("type"=>"string"),
 	"actif" => array("type"=>"bool"),
@@ -316,6 +316,17 @@ function private_folder()
 {
 
 return $this->folder()."/private";
+
+}
+/**
+ * CGI-BIN folder
+ *
+ * @return string
+ */
+function cgi_folder()
+{
+
+return $this->folder()."/cgi-bin";
 
 }
 /**
@@ -802,7 +813,9 @@ $this->mkdir("log/awstats", "1755", "root");
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
 // Cookies (PHP)
-$this->mkdir("cookies", "1770", "root");
+$this->mkdir("tmp", "1777", "root");
+// Socket (PHP)
+$this->mkdir("socket", "750", "root");
 // Private data & config
 $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");

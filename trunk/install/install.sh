@@ -30,6 +30,7 @@ mysql -uroot -p siteadm < ../template/mysql/siteadm_data.sql
 # PHP5 & PHP-FPM
 echo "PHP..."
 apt-get install php5-fpm php5-cli php-apc php5-mcrypt php5-mysql php-pear php5-gd
+ln -s /usr/sbin/php5-fpm /usr/sbin/php-fpm
 rm /etc/init.d/php5-siteadm
 ln -s /home/siteadm_admin/conf/php/php5-siteadm.sh /etc/init.d/php5-siteadm
 update-rc.d -n php5-siteadm defaults
@@ -52,6 +53,11 @@ a2dismod cgid
 service apache2 restart
 
 echo "Base installation completed"
+
+# Awstats
+echo "Awstats..."
+apt-get install awstats libgeo-ipfree-perl
+cp /home/siteadm_admin/template/awstats/awstats.common /etc/awstats/awstats.common
 
 # Passwords
 apt-get install makepasswd

@@ -22,11 +22,11 @@
 <table>
 <tr>
 	<th class="label">Compte :</th>
-	<td><?php echo $account->name; ?></td>
+	<td><?php echo $account; ?></td>
 </tr>
 <tr>
 	<th class="label">Nom d'utilisateur :</th>
-	<td><input name="username" value="<?php echo $ftp->username; ?>" /></td>
+	<td><?php echo $account->name; ?>_<input name="username" value="<?php echo $ftp->username; ?>" /></td>
 </tr>
 <?php if (!$ftp->id) { ?>
 <tr>
@@ -40,7 +40,7 @@
 <?php } ?>
 <tr>
 	<th class="label">Dossier :</th>
-	<td><?php echo $account->folder(); ?> / <select name="type"><?php
+	<td><select name="type"><?php
 	foreach($ftp::$_f["type"]["list"] as $i)
 		if ($ftp->type == $i)
 			echo "<option value=\"$i\" selected>$i</option>";

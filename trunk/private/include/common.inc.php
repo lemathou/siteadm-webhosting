@@ -137,8 +137,8 @@ return array
 
 /**
  * Merge 2 maps, replacing in first map only if we have not null values in second map
- * @param array $map_1
- * @param array $map_2
+ * @param array $map
+ * @param array $map_merge
  */
 function replace_map_merge(&$map, $map_merge)
 {

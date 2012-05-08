@@ -1,5 +1,5 @@
 user = {POSTFIX_MYSQL_USER}
 password = {POSTFIX_MYSQL_PASS}
-hosts = 127.0.0.1
+hosts = {MYSQL_HOST}
 dbname = {MYSQL_DB}
 query = SELECT destination FROM postfix_alias WHERE origine='%s' AND actif='1'

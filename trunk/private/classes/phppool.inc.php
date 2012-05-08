@@ -238,7 +238,7 @@ return $this->log_folder()."/pool-".$this->name."_slow.log";
 function socket_file()
 {
 
-return $this->socket_folder()."/".$this->name.".sock";
+return $this->socket_folder()."/pool-".$this->name.".sock";
 
 }
 /**
@@ -488,7 +488,7 @@ $account = $this->account();
 
 $map = array
 (
-	"{PHP_NAME}" => $this->name,
+	"{PHP_POOL_NAME}" => $this->name,
 	"{PHP_WRAPPER}" => $account->folder()."/cgi-bin/php-".$this->name, // Only for apache fastcgi config compatibility
 	"{PHP_SYSTEM_USER}" => $this->system_user(),
 	"{PHP_SYSTEM_GROUP}" => $this->system_group(),

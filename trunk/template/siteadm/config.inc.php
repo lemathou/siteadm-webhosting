@@ -1,16 +1,16 @@
 <?php
 
 // Siteadm MySQL Account
-define("MYSQL_HOST","localhost");
-define("MYSQL_USER","siteadm");
-define("MYSQL_PASS","siteadm2275");
+define("MYSQL_HOST","{MYSQL_HOST}");
+define("MYSQL_USER","{MYSQL_USER}");
+define("MYSQL_PASS","{MYSQL_PASS}");
 define("MYSQL_DB","siteadm");
 // Superutilisateur pour opérations de maintenance
-define("MYSQL_ADMIN_USER","siteadm_root");
-define("MYSQL_ADMIN_PASS","siteadm2275");
+define("MYSQL_ADMIN_USER","{MYSQL_ADMIN_USER}");
+define("MYSQL_ADMIN_PASS","{MYSQL_ADMIN_PASS}");
 
-define("HOSTNAME", "mathieu-portable");
-define("DOMAIN", "lemathou.net");
+define("HOSTNAME", "{HOSTNAME}");
+define("DOMAIN", "{DOMAIN}");
 
 define("INIT_SCRIPT_DIR", "/etc/init.d");
 
@@ -38,7 +38,7 @@ define("SITEADM_DOMAIN_DIR","/home/siteadm_domain");
 define("SITEADM_USER_DIR","/home/siteadm");
 
 // Common/Shared email
-define("SHARED_EMAIL","webmaster@iprospective.fr");
+define("SHARED_EMAIL",WEBMASTER_EMAIL);
 
 // System
 define("SITEADM_SYSTEM_USER","siteadm");
@@ -94,7 +94,7 @@ define("PHP_APC_LAZY",false); // On, Off
 // AppArmor
 define("APPARMOR_CONF_DIR","/etc/apparmor.d");
 
-// MySQL
+// MySQL accounts
 define("MYSQL_CONF_DIR","/etc/mysql");
 define("MYSQL_DUMP","mysqldump");
 define("MYSQL_MAX_QUERIES","1000");
@@ -107,13 +107,13 @@ define("EMAIL_UID_MIN", 4000);
 define("SMTP_RELAY_HOST", "smtp.free.fr");
 
 // Postfix
-define("POSTFIX_MYSQL_USER","siteadm_postfix");
-define("POSTFIX_MYSQL_PASS","siteadm2275");
+define("POSTFIX_MYSQL_USER","{POSTFIX_MYSQL_USER}");
+define("POSTFIX_MYSQL_PASS","{POSTFIX_MYSQL_PASS}");
 define("POSTFIX_CONF_DIR","/etc/postfix");
 
 // Dovecot
-define("DOVECOT_MYSQL_USER","siteadm_dovecot");
-define("DOVECOT_MYSQL_PASS","siteadm2275");
+define("DOVECOT_MYSQL_USER","{DOVECOT_MYSQL_USER}");
+define("DOVECOT_MYSQL_PASS","{DOVECOT_MYSQL_PASS}");
 define("DOVECOT_CONF_DIR","/etc/dovecot");
 
 // AMAVIS
@@ -124,8 +124,8 @@ define("CLAMV_CONF_DIR","/etc/clamav/conf");
 define("SPAMASSASSIN_CONF_DIR","/etc/spamassassin/conf");
 
 // ProFTPd
-define("PROFTPD_MYSQL_USER","siteadm_proftpd");
-define("PROFTPD_MYSQL_PASS","siteadm2275");
+define("PROFTPD_MYSQL_USER","{PROFTPD_MYSQL_USER}");
+define("PROFTPD_MYSQL_PASS","{PROFTPD_MYSQL_PASS}");
 define("PROFTPD_CONF_DIR","/etc/proftpd.conf");
 define("PROFTPD_CONF_FILE","vhost");
 

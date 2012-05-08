@@ -54,7 +54,7 @@ if (file_exists($filename))
 static function write($filename, $contents="")
 {
 
-if (!file_exists($filename) || !is_dir($filename) && ($fp_to=fopen($filename, "w")))
+if ((!file_exists($filename) || !is_dir($filename)) && ($fp_to=fopen($filename, "w")))
 {
 	fwrite($fp_to, $contents);
 	fclose($fp_to);

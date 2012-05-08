@@ -16,6 +16,43 @@ USE `{MYSQL_DB}`;
 --
 
 --
+-- Contenu de la table `install_packages`
+--
+
+INSERT INTO `install_packages` (`id`, `name`, `script`) VALUES
+(1, 'makepasswd', NULL),
+(2, 'quotatools', NULL),
+(3, 'quota', NULL),
+(4, 'apache2-mpm-worker', NULL),
+(5, 'libapache2-mod-fastcgi', 'a2enmod fastcgi'),
+(6, 'php5-cgi', NULL),
+(7, 'php5-cli', NULL),
+(8, 'php5-fpm', NULL),
+(9, 'dovecot-imapd', NULL),
+(10, 'dovecot-mysql', NULL),
+(11, 'dovecot-pop3d', NULL),
+(12, 'dovecot-sieve', NULL),
+(13, 'awstats', NULL),
+(14, 'mailgraph', NULL),
+(15, 'bindgraph', NULL),
+(16, 'libapache2-mod-auth-mysql', NULL),
+(17, 'amavisd-new', NULL),
+(18, 'clamd', NULL),
+(19, 'apache2-suexec-custom', 'a2enmod suexec'),
+(20, 'spamassassin', NULL),
+(21, 'bind9', NULL);
+
+--
+-- Contenu de la table `install_bin`
+--
+
+INSERT INTO `install_bin` (`id`, `package_id`, `name`) VALUES
+(1, 1, 'makepasswd'),
+(2, 2, 'quotaon'),
+(3, NULL, 'quotacheck'),
+(4, NULL, 'quotastats');
+
+--
 -- Contenu de la table `language`
 --
 
@@ -29,16 +66,17 @@ INSERT INTO `language` (`id`, `name`, `content_type`, `extension_list`) VALUES
 -- Contenu de la table `language_bin`
 --
 
-INSERT INTO `language_bin` (`id`, `language_id`, `app_compatible`, `version`, `CGI_type`, `options`, `prefix`, `exec_bin`) VALUES
-(1, 1, 0, '4.3.9', 'Spawn FCGI', 'Webstudiosi specific', '/opt/php-4.3.9-webstudiosi', '/opt/php-4.3.9-webstudiosi/bin/php'),
-(2, 1, 0, '4.4.9', 'Spawn FCGI', '', '/opt/php-4.4.9', '/opt/php-4.4.9/bin/php'),
-(3, 1, 0, '5.2.17', 'Spawn FCGI', '', '/opt/php-5.2.17', '/opt/php-5.2.17/bin/php'),
-(4, 1, 1, '5.3.3', 'FPM', '', '/opt/php-5.3.3', '/opt/php-5.3.3/bin/php'),
-(5, 1, 1, '5.3.6', 'FPM', 'Full options', '/opt/php-5.3.6-full', '/opt/php-5.3.6-full/bin/php'),
-(6, 3, 0, '5.14.0', '', '', '', ''),
-(7, 2, 0, '3.2.1final', '', '', '', ''),
-(8, 2, 0, '2.6.7rc1', '', '', '', ''),
-(9, 4, 0, '1.9.1', '', '', '', '');
+INSERT INTO `language_bin` (`id`, `language_id`, `app_compatible`, `version`, `CGI_type`, `options`, `prefix`, `exec_bin`, `extension_dir`) VALUES
+(1, 1, 0, '4.3.9', 'Spawn FCGI', 'Webstudiosi specific', '/opt/php-4.3.9-webstudiosi', '/opt/php-4.3.9-webstudiosi/bin/php', ''),
+(2, 1, 0, '4.4.9', 'Spawn FCGI', '', '/opt/php-4.4.9', '/opt/php-4.4.9/bin/php', ''),
+(3, 1, 0, '5.2.17', 'Spawn FCGI', '', '/opt/php-5.2.17', '/opt/php-5.2.17/bin/php', ''),
+(4, 1, 1, '5.3.3', 'FPM', '', '/opt/php-5.3.3', '/opt/php-5.3.3/bin/php', ''),
+(5, 1, 1, '5.3.6', 'FPM', 'Full options', '/opt/php-5.3.6-full', '/opt/php-5.3.6-full/bin/php', ''),
+(6, 3, 0, '5.14.0', '', '', '', '', ''),
+(7, 2, 0, '3.2.1final', '', '', '', '', ''),
+(8, 2, 0, '2.6.7rc1', '', '', '', '', ''),
+(9, 4, 0, '1.9.1', '', '', '', '', ''),
+(10, 1, 1, '5.3.6', 'FPM', 'System default', '/usr', '/usr/bin/php', '/usr/lib/php5/20090626');
 
 --
 -- Contenu de la table `language_compile_options`

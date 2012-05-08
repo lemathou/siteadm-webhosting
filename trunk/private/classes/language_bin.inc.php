@@ -70,7 +70,7 @@ public function phpext_list()
 {
 
 $list = array();
-if (is_array($this->extension))
+if (is_array($this->extension) && count($this->extension))
 {
 	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
 	$query = mysql_query($query_string);

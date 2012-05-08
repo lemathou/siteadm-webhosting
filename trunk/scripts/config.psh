@@ -1,0 +1,16 @@
+#!/usr/bin/php -c /home/siteadm_admin/conf/php/php.ini
+<?php
+
+ini_set("include_path","/home/siteadm_admin/private:/home/siteadm_admin/public");
+
+require_once "config/config.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
+
+if (isset($argv[1]))
+	$action = $argv[1];
+else
+	$action = "";
+
+include install.inc.php;
+
+?>

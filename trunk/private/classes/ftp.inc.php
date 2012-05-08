@@ -33,6 +33,24 @@ static public $_f = array
 	"folder" => array("type"=>"string"),
 );
 
+protected $password;
+
+/**
+ * @see db_object::__toString()
+ */
+public function __toString()
+{
+
+return $this->username();
+	
+}
+public function username()
+{
+
+return $this->account()->name."_".$this->username;
+
+}
+
 /**
  * Retrieve managing account
  *
@@ -47,7 +65,6 @@ else
 	return account_common();
 
 }
-
 
 }
 
