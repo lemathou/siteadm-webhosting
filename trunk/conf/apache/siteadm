@@ -2,15 +2,15 @@ FastCgiExternalServer /home/siteadm_admin/cgi-bin/php-siteadm -socket /home/site
 
 <Virtualhost *:80>
 DocumentRoot "/home/siteadm_admin/public"
-ServerName admin.{DOMAIN}
+ServerName siteadm
 ServerAlias admin.*
 ServerAdmin {WEBMASTER_EMAIL}
-RedirectPermanent / https://admin.{DOMAIN}/
+RedirectPermanent / https://siteadm/
 </VirtualHost>
 
 <Virtualhost *:443>
 DocumentRoot "/home/siteadm_admin/public"
-ServerName admin.{DOMAIN}
+ServerName siteadm
 ServerAlias admin.*
 ServerAdmin {WEBMASTER_EMAIL}
 SSLEngine on
