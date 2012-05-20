@@ -13,6 +13,12 @@ abstract class db_object_manager
 	 * @var string
 	 */
 	static protected $name;
+	
+	/*
+	 * Database main table
+	* @var string
+	*/
+	static protected $_db_table = "";
 
 	/*
 	 * Use cache for objects
@@ -46,10 +52,15 @@ abstract class db_object_manager
 	public function db_retrieve($params=null)
 	{
 
-		// A surcharger
 
 	}
 	
+	/* ACTIONS */
+	
+	/**
+	 * Insert an object
+	 * @param array $infos
+	 */
 	public function insert($infos)
 	{
 		$classname = static::name;
@@ -61,6 +72,11 @@ abstract class db_object_manager
 		}
 	}
 	
+	/**
+	 * Returns an object
+	 * @param int $params
+	 * @return db_object
+	 */
 	public function get($params)
 	{
 		if (is_numeric($params) && isset($this->list[(int)$params]))
@@ -83,6 +99,26 @@ abstract class db_object_manager
 		}
 	}
 	
+	/**
+	 * Returns all objects
+	 * @return array
+	 */
+	public function get_all()
+	{
+		$list = array();
+		$q = "SELECT `id` FROM `".static::$_db_table."`";
+		$query = mysql_query($q);
+		while(list($id)=mysql_fetch_assoc($query))
+		{
+			$list[$id] = $this->get($id);
+		}
+		return $list;
+	}
+	
+	/**
+	 * Delete an object
+	 * @param int $id
+	 */
 	public function delete($id)
 	{
 		if (is_numeric($id))
@@ -93,10 +129,13 @@ abstract class db_object_manager
 		}
 	}
 	
+	/* CACHE */
+	
 	/**
 	 * Cache an object
 	 * 
 	 * @param int $id
+	 * @return db_object
 	 */
 	public function cache_get($id)
 	{
@@ -123,6 +162,7 @@ abstract class db_object_manager
 	 * Cache an object
 	 * 
 	 * @param mixed $param
+	 * @return bool
 	 */
 	public function cache_delete($param)
 	{
@@ -851,12 +891,12 @@ abstract class db_object
 
 	// ROOT ACCESS SCRIPTS
 	
-	protected function root_script($action, $var1=null, $var2=null, $var3=null)
+	protected function root_script($action, $var1=null, $var2=null, $var3=null, $var4=null)
 	{
 	
 		// To be extended
 		if ($this->id)
-			exec("(nohup sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3) &");
+			exec("(nohup sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3 $var4) &", $exec);
 	
 	}
 

@@ -17,6 +17,7 @@ $GLOBALS["object_list"] = array
 	"website_alias" => array(),
 	"email" => array(),
 	"email_alias" => array(),
+	"email_sync" => array(),
 	"db" => array(),
 	"ftp" => array()
 );
