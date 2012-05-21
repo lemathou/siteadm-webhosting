@@ -30,7 +30,7 @@ if ($action == "mysql")
 $fp = opendir(SITEADM_TEMPLATE_DIR."/mysql");
 while($filename=readdir($fp)) if (substr($filename, 0, 1) != ".")
 {
-	copy_tpl("mysql/$filename", "/home/siteadm_admin/install/$filename", $replace_map, "0600", "root:root");
+	copy_tpl("mysql/$filename", "/home/siteadm_admin/install/sql/$filename", $replace_map, "0600", "root:root");
 }
 
 }

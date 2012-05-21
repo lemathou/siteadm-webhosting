@@ -23,9 +23,6 @@ useradd -g 2000 -u 3000 -d /home/siteadm/common php_common
 # MySQL user
 echo "MySQL..."
 apt-get install mysql-server
-mysql -uroot -p siteadm < ../template/mysql/siteadm_tables.sql
-mysql -uroot -p siteadm < ../template/mysql/siteadm_views.sql
-mysql -uroot -p siteadm < ../template/mysql/siteadm_data.sql
 
 # PHP5 & PHP-FPM
 echo "PHP..."
@@ -62,24 +59,23 @@ cp /home/siteadm_admin/template/awstats/awstats.common /etc/awstats/awstats.comm
 # Passwords
 apt-get install makepasswd
 
+# ACL
+echo "ACL..."
+apt-get install acl
 # Quota
-echo "Quota : please update /etc/fstab !"
-# @todo : update fstab avec SED : ,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,acl
+echo "Quota..."
 apt-get install quota quotatool
 touch /home/aquota.user
 touch /home/aquota.group
 chmod 600 /home/aquota.*
 quotaoff -a
 quotacheck -vgumc /home
+# @todo : update fstab avec SED : ,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,acl
 quotaon -avug
-
-# ACL
-echo "ACL : please update /etc/fstab !"
-apt-get install acl
 
 # ProftpD
 echo "ProftpD..."
-apt-get install proftpd-mod-mysql
+apt-get install proftpd proftpd-mod-mysql
 
 # Postfix
 echo "Postfix..."
@@ -116,8 +112,4 @@ apt-get install zip unrar-free cabextract ripole
 # Initialisation Script
 ###
 
-cd /home/siteadm_admin/scripts/
-./install.psh postfix
-./install.psh dovecot
-./install.psh common
-./db_object.psh account 1 insert
+echo "Rendez-vous sur https://siteadm/install.php pour finir l'installation...";
