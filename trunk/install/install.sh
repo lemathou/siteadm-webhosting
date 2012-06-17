@@ -26,7 +26,7 @@ apt-get install mysql-server
 
 # PHP5 & PHP-FPM
 echo "PHP..."
-apt-get install php5-fpm php5-cli php-apc php5-mcrypt php5-mysql php-pear php5-gd
+apt-get install php5-fpm php5-cli php-apc php5-mcrypt php5-mysql php-pear php5-gd php5-intl
 ln -s /usr/sbin/php5-fpm /usr/sbin/php-fpm
 rm /etc/init.d/php5-siteadm
 ln -s /home/siteadm_admin/conf/php/php5-siteadm.sh /etc/init.d/php5-siteadm

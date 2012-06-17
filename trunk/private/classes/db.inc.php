@@ -26,7 +26,8 @@ static protected $_db_table = "db";
 static public $_f = array
 (
 	"account_id" => array("type"=>"object", "otype"=>"account", "nonempty"=>true),
-	"name" => array("type"=>"string", "nonempty"=>true),
+	"dbname" => array("type"=>"string", "nonempty"=>true),
+	"username" => array("type"=>"string", "nonempty"=>true),
 	"password" => array("type"=>"string"),
 	"quota" => array("type"=>"select", "list"=>array("10", "100", "1000", "10000")),
 	"max_queries" => array("type"=>"numeric", "default"=>MYSQL_MAX_QUERIES),
@@ -150,13 +151,13 @@ function script_insert()
 {
 
 // Création user
-mysql_query("CREATE USER '$this->name'@'localhost' IDENTIFIED BY '$this->password'");
+mysql_query("CREATE USER '$this->username'@'localhost' IDENTIFIED BY '$this->password'");
 // Création table
-mysql_query("CREATE DATABASE `$this->name`");
+mysql_query("CREATE DATABASE `$this->dbname`");
 // Droits de base pour user
-mysql_query("GRANT USAGE ON *.* TO '$this->name'@'localhost' IDENTIFIED BY '$this->password' WITH MAX_QUERIES_PER_HOUR $this->max_queries MAX_CONNECTIONS_PER_HOUR $this->max_connections MAX_UPDATES_PER_HOUR $this->max_updates MAX_USER_CONNECTIONS $this->max_user_connections; ");
+mysql_query("GRANT USAGE ON *.* TO '$this->username'@'localhost' IDENTIFIED BY '$this->password' WITH MAX_QUERIES_PER_HOUR $this->max_queries MAX_CONNECTIONS_PER_HOUR $this->max_connections MAX_UPDATES_PER_HOUR $this->max_updates MAX_USER_CONNECTIONS $this->max_user_connections; ");
 // Droits spécifiques pour user
-mysql_query("GRANT ALL PRIVILEGES ON `$this->name`. * TO '$this->name'@'localhost'");
+mysql_query("GRANT ALL PRIVILEGES ON `$this->dbname`. * TO '$this->username'@'localhost'");
 
 return true;
 
@@ -165,7 +166,7 @@ return true;
 function script_update()
 {
 
-mysql_query("SET PASSWORD FOR '$this->name'@'localhost' = PASSWORD('$this->password')");
+mysql_query("SET PASSWORD FOR '$this->username'@'localhost' = PASSWORD('$this->password')");
 
 return true;
 
@@ -175,13 +176,13 @@ function script_delete()
 {
 
 // Suppression privilèges
-$query_string = "REVOKE ALL PRIVILEGES, GRANT OPTION FROM '$this->name'@'localhost'";
+$query_string = "REVOKE ALL PRIVILEGES, GRANT OPTION FROM '$this->username'@'localhost'";
 mysql_query($query_string);
 // Suppression user
-$query_string = "DROP USER '$this->name'@'localhost'";
+$query_string = "DROP USER '$this->username'@'localhost'";
 mysql_query($query_string);
 // Suppression table
-$query_string = "DROP DATABASE `$this->name`";
+$query_string = "DROP DATABASE `$this->dbname`";
 mysql_query($query_string);
 
 return true;

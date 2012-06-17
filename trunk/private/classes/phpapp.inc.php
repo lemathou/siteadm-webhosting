@@ -514,7 +514,8 @@ filesystem::link($this->script_file(), $this->init_script_file());
 // PHP ext
 foreach($language_bin->phpext_list() as $ext)
 {
-	filesystem::link($language_bin->extension_dir."/".$ext["name"].".so", $this->ext_folder()."/");
+	filesystem::link($language_bin->extension_dir."/".$ext["name"].".so", $this->ext_folder()."/".$ext["name"].".so");
+	//echo "LINK ".$language_bin->extension_dir."/".$ext["name"].".so => ".$this->ext_folder()."/".$ext["name"].".so\n";
 }
 
 // VHOSTS
@@ -531,7 +532,7 @@ $this->script_reload();
 public function script_reload()
 {
 
-exec($this->script_file()." restart > /dev/null &");
+exec("nohup ".$this->script_file()." restart > /dev/null &");
 
 }
 

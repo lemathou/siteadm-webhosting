@@ -523,6 +523,7 @@ $map = array
 	"{PHP_APC_STAT}" => $this->apc_stat,
 	"{PHP_APC_LAZY}" => $this->apc_lazy,
 	"{PHP_EXTENSIONS}" => "",
+	"{PHP_POOL_EXTENSIONS}" => "",
 );
 
 if ($this->worker_nb_max > 2)
@@ -541,9 +542,10 @@ if (isset($this->system_group) && !is_null($this->system_group))
 	$map["{PHP_SYSTEM_GROUP}"] = $this->system_group;
 	$map["{PHP_SOCK_SYSTEM_GROUP}"] = $this->system_group;
 }
-foreach($this->phpext_list() as $name)
+foreach($this->phpext_list() as $ext)
 {
-	$map["{PHP_EXTENSIONS}"] = "extension = $name;\n";
+	$map["{PHP_EXTENSIONS}"] .= "extension = ".$ext["name"].";\n";
+	$map["{PHP_POOL_EXTENSIONS}"] .= "php_admin_value[extension] = ".$ext["name"].".so\n";
 }
 
 replace_map_merge($map, $phpapp->replace_map());
@@ -585,9 +587,9 @@ filesystem::link($this->config_file(), $this->app_pool_file());
 $account->copy_tpl("apache/php.conf", $this->apache_file(), $replace_map, "0644");
 filesystem::link($this->apache_file(), APACHE_VHOST_DIR."/php-".$account->name."-".$this->name.".conf");
 
-$phpapp->script_vhost();
-
-$this->script_reload();
+$phpapp->script_update();
+website::script_webserver_reload();
+//$this->script_reload();
 
 }
 
