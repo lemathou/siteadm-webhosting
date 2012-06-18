@@ -29,11 +29,19 @@
 <div style="width: 600px;" class="cadre">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
-	<td class="label" width="250">Nom (user &amp; db) :</td>
+	<td class="label" width="250">Nom de la base :</td>
 	<?php if ($db->id) { ?>
-	<td class="field"><?php echo $db->name; ?></td>
+	<td class="field"><?php echo $db->dbname; ?></td>
 	<?php } else { ?>
-	<td class="field"><input name="name" value="<?php echo $db->name; ?>" /></td>
+	<td class="field"><input name="dbname" value="<?php echo $db->dbname; ?>" /></td>
+	<?php } ?>
+</tr>
+<tr>
+	<td class="label" width="250">Nom d'utilisateur :</td>
+	<?php if ($db->id) { ?>
+	<td class="field"><?php echo $db->username; ?></td>
+	<?php } else { ?>
+	<td class="field"><input name="username" value="<?php echo $db->username; ?>" /></td>
 	<?php } ?>
 </tr>
 <tr>

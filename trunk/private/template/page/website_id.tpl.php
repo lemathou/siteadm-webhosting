@@ -19,15 +19,15 @@ if ($account->id) { ?>
 <div style="float: right;width: 320px;" class="cadre">
 <h3>Website acces log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->accesslog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; //exec("sudo /usr/bin/tail ".$website->accesslog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 <h3>Website Error log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->errorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; //exec("sudo /usr/bin/tail ".$website->errorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 <h3> Website PHP Error log</h3>
 <div style="border: 1px black solid;padding: 4px;max-height:200px; overflow: auto;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$website->phperrorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php $exec = ""; //exec("sudo /usr/bin/tail ".$website->phperrorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
 </div>
 </div>
 

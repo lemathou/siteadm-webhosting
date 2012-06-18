@@ -377,27 +377,6 @@ CREATE TABLE IF NOT EXISTS `language_php_functions` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `mysql`
---
-
-CREATE TABLE IF NOT EXISTS `mysql` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `account_id` int(10) unsigned DEFAULT NULL,
-  `name` varchar(64) NOT NULL,
-  `password` varchar(16) NOT NULL,
-  `max_user_connections` int(10) unsigned DEFAULT '10',
-  `max_queries` int(10) unsigned DEFAULT '1000',
-  `max_connections` int(10) unsigned DEFAULT '1000',
-  `max_updates` int(10) unsigned DEFAULT '1000',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  KEY `account_id` (`account_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `offre`
 --
 
@@ -846,12 +825,6 @@ ALTER TABLE `language_bin_php_ext_ref`
 --
 ALTER TABLE `language_compile_options`
   ADD CONSTRAINT `language_compile_options_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `mysql`
---
-ALTER TABLE `mysql`
-  ADD CONSTRAINT `mysql_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`) ON DELETE SET NULL;
 
 --
 -- Contraintes pour la table `phpapp`

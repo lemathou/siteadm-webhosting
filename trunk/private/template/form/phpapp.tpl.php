@@ -83,6 +83,34 @@
 	<td class="label">APC : mémoire partagée (shm_size) :</td>
 	<td class="field"><input name="apc_shm_size" value="<?php echo $phpapp->apc_shm_size; ?>" size="3" maxlength="3" /> MO</td>
 </tr>
+<tr>
+	<td class="label">Extensions disponibles pour les pools :</td>
+	<td><input type="hidden" name="extension" /><select name="extension[]" multiple><?php
+	if ($language_bin=$phpapp->language_bin())
+	{
+		$phpext_list = $phpapp->phpext_list();
+		foreach($language_bin->phpext_list() as $ext)
+			if (isset($phpext_list[$ext["id"]]))
+				echo "<option value=\"".$ext["id"]."\" selected>".$ext["name"]."</option>";
+			else
+				echo "<option value=\"".$ext["id"]."\">".$ext["name"]."</option>";
+	}
+	?></select></td>
+</tr>
+<tr>
+	<td class="label">Extensions chargée par défaut pour l'ensemble des pools :</td>
+	<td><input type="hidden" name="extension_loaded" /><select name="extension_loaded[]" multiple><?php
+	if ($language_bin=$phpapp->language_bin())
+	{
+		$phpext_loaded_list = $phpapp->phpext_loaded_list();
+		foreach($language_bin->phpext_list() as $ext)
+			if (isset($phpext_loaded_list[$ext["id"]]))
+				echo "<option value=\"".$ext["id"]."\" selected>".$ext["name"]."</option>";
+			else
+				echo "<option value=\"".$ext["id"]."\">".$ext["name"]."</option>";
+	}
+	?></select></td>
+</tr>
 </table>
 </div>
 

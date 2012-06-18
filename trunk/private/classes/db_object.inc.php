@@ -896,7 +896,10 @@ abstract class db_object
 	
 		// To be extended
 		if ($this->id)
-			exec("(nohup sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3 $var4) &", $exec);
+		{
+			$command = "(sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3 $var4) > /dev/null 2> /dev/null &";
+			exec($command);
+		}
 	
 	}
 

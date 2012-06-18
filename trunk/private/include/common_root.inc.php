@@ -1,48 +1,7 @@
 <?php
 
 include SITEADM_PRIVATE_DIR."/include/autoload.inc.php";
-include SITEADM_PRIVATE_DIR."/include/db.inc.php";
-include SITEADM_PRIVATE_DIR."/include/login.inc.php";
-
-/*
- * Menu
- */
-
-if (login()->perm("admin"))
-{
-	$menu_list = array(
-		"offer" => "Offres",
-		"webapp" => "Web apps",
-		"language" => "Langages",
-		"account" => "Compte(s)",
-		"domain" => "Domaines",
-		"php" => "PHP",
-		"website" => "Sites web",
-		"email" => "Messagerie",
-		"mysql" => "Bases de donnée",
-		"backup" => "Backups",
-		"cron" => "Tâches CRON",
-		"folder" => "Dossiers",
-		"ftp" => "FTP",
-	);
-}
-else
-{
-	$menu_list = array(
-		"account" => "Compte(s)",
-		"domain" => "Domaines",
-		"php" => "PHP",
-		"website" => "Sites web",
-		"email" => "Messagerie",
-		"mysql" => "Bases de donnée",
-		"backup" => "Backups",
-		"cron" => "Tâches CRON",
-		"folder" => "Dossiers",
-		"ftp" => "FTP",
-	);
-}
-
-$menu = "";
+include SITEADM_PRIVATE_DIR."/include/db_root.inc.php";
 
 /*
  * INFOS UTILES
@@ -65,50 +24,6 @@ $account_type_list = array
 	"manager"=>"Manager",
 	"admin"=>"Administrateur"
 );
-
-/*
- * LISTE DES OFFRES
- */
-
-$offre_list = array();
-$query = mysql_query("SELECT * FROM offre");
-while($row=mysql_fetch_assoc($query))
-{
-	$offre_list[$row["id"]] = $row;
-}
-
-/* Liste des comptes gérables */
-// @todo : faire autrement mauvaise idée de tout charger ici pour rien...
-if (login()->perm("admin"))
-{
-	$account_list = array();
-	$manager_list = array();
-	$query = mysql_query("SELECT t1.*, t2.`name` as `manager_name` FROM `account` as t1 LEFT JOIN `account` as t2 ON t1.`manager_id`=t2.`id` ORDER BY t1.`name`");
-	while($row=mysql_fetch_assoc($query))
-	{
-		$account_list[$row["id"]] = $row;
-		if ($row["type"]=="manager")
-			$manager_list[$row["id"]] = $row["name"];
-	}
-}
-elseif (login()->perm("manager"))
-{
-	$account_list = array();
-	$query = mysql_query("SELECT * FROM `account` WHERE `manager_id`='".login()->id."' OR `id`='".login()->id."' ORDER BY `name`");
-	while($row=mysql_fetch_assoc($query))
-	{
-		$account_list[$row["id"]] = $row;
-	}
-}
-else // User
-{
-	$account_list = array();
-	$query = mysql_query("SELECT * FROM `account` WHERE id='".login()->id."'");
-	while($row=mysql_fetch_assoc($query))
-	{
-		$account_list[$row["id"]] = $row;
-	}
-}
 
 /*
  * Folders
@@ -148,7 +63,7 @@ if (!is_array($map) || !is_array($map_merge))
 
 foreach($map_merge as $key=>$value)
 {
-	if (!isset($map[$key]) || ($value !== null))
+	if (!isset($map[$key]) || ($map[$key] === null))
 		$map[$key] = $value;
 }
 
@@ -194,11 +109,6 @@ filesystem::chmod($file_to, $mode);
 
 // Divers
 
-/**
- * Returns a password
- * @param int $length
- * @return string
- */
 function password_create($length=8)
 {
 
@@ -247,9 +157,9 @@ if (!$command || is_numeric(strpos($command, "/")))
 	return;
 
 if (file_exists(SITEADM_SCRIPT_DIR."/".$command))
-	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null 2>/dev/null &");
+	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
 elseif (file_exists(INIT_SCRIPT_DIR."/".$command))
-	exec(INIT_SCRIPT_DIR."/".$command." ".$params." > /dev/null 2>/dev/null &");
+	exec(INIT_SCRIPT_DIR."/".$command." ".$params." > /dev/null &");
 
 }
 

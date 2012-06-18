@@ -108,6 +108,16 @@ apt-get install amavisd-new
 # More decoders
 apt-get install zip unrar-free cabextract ripole
 
+# ejabberd
+echo "Ejabberd..."
+apt-get install ejabberd
+
+# Outils
+echo "Imagemagick... pour la manipulation d'images"
+apt-get install imagemagick
+echo "adodb... pour torrentflux"
+apt-get install php5-adodb
+
 ###
 # Initialisation Script
 ###

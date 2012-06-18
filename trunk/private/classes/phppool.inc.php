@@ -522,7 +522,6 @@ $map = array
 	"{PHP_OPEN_BASEDIR}" => ($this->open_basedir ?$this->open_basedir : $account->private_folder().":".$account->public_folder()),
 	"{PHP_APC_STAT}" => $this->apc_stat,
 	"{PHP_APC_LAZY}" => $this->apc_lazy,
-	"{PHP_EXTENSIONS}" => "",
 	"{PHP_POOL_EXTENSIONS}" => "",
 );
 
@@ -542,10 +541,13 @@ if (isset($this->system_group) && !is_null($this->system_group))
 	$map["{PHP_SYSTEM_GROUP}"] = $this->system_group;
 	$map["{PHP_SOCK_SYSTEM_GROUP}"] = $this->system_group;
 }
+$phpapp_ext_list = $phpapp->phpext_loaded_list();
 foreach($this->phpext_list() as $ext)
 {
-	$map["{PHP_EXTENSIONS}"] .= "extension = ".$ext["name"].";\n";
-	$map["{PHP_POOL_EXTENSIONS}"] .= "php_admin_value[extension] = ".$ext["name"].".so\n";
+	if (!isset($phpapp_ext_list[$ext["id"]]))
+	{
+		$map["{PHP_POOL_EXTENSIONS}"] .= "php_admin_value[extension] = ".$ext["name"].".so\n";
+	}
 }
 
 replace_map_merge($map, $phpapp->replace_map());

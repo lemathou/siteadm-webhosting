@@ -34,6 +34,7 @@ static public $_f = array
 	"webmaster_email" => array("type"=>"string"),
 	"apc_shm_size" => array("type"=>"numeric"),
 	"extension" => array(),
+	"extension_loaded" => array(),
 );
 
 /**
@@ -257,6 +258,22 @@ return $list;
 
 }
 
+public function phpext_loaded_list()
+{
+
+$list = array();
+if (is_array($this->extension_loaded))
+{
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension_loaded).")";
+	$query = mysql_query($query_string);
+	while($row=mysql_fetch_assoc($query))
+		$list[$row["id"]] = $row;
+}
+return $list;
+
+}
+
+
 // PERM
 
 /**
@@ -365,11 +382,16 @@ function db_retrieve($id)
 
 if (db_object::db_retrieve($id))
 {
-	// Extensions
+	// Extensions dispo
 	$this->extension = array();
 	$query = mysql_query("SELECT ext_id FROM phpapp_ext_ref WHERE phpapp_id='$this->id'");
 	while(list($ext_id)=mysql_fetch_row($query))
 		$this->extension[] = $ext_id;
+	// Extensions chargées
+	$this->extension_loaded = array();
+	$query = mysql_query("SELECT ext_id FROM phpapp_ext_loaded_ref WHERE phpapp_id='$this->id'");
+	while(list($ext_id)=mysql_fetch_row($query))
+		$this->extension_loaded[] = $ext_id;
 }
 
 }
@@ -385,7 +407,7 @@ function db_update($infos)
 $return = false;
 if (isset($infos["extension"]))
 {
-	mysql_query("DELETE FROM phpapp_ext_ref WHERE phppool_id='$this->id'");
+	mysql_query("DELETE FROM phpapp_ext_ref WHERE phpapp_id='$this->id'");
 	if (is_array($infos["extension"]))
 	{
 		$query_list = array();
@@ -394,6 +416,22 @@ if (isset($infos["extension"]))
 		if (count($query_list))
 		{
 			$query_string = "INSERT INTO phpapp_ext_ref (phpapp_id, ext_id) VALUES ".implode(" , ",$query_list);
+			mysql_query($query_string);
+		}
+	}
+	$return = true;
+}
+if (isset($infos["extension_loaded"]))
+{
+	mysql_query("DELETE FROM phpapp_ext_loaded_ref WHERE phpapp_id='$this->id'");
+	if (is_array($infos["extension_loaded"]))
+	{
+		$query_list = array();
+		foreach($infos["extension_loaded"] as $ext_id)
+			$query_list[] = "('$this->id', '$ext_id')";
+		if (count($query_list))
+		{
+			$query_string = "INSERT INTO phpapp_ext_loaded_ref (phpapp_id, ext_id) VALUES ".implode(" , ",$query_list);
 			mysql_query($query_string);
 		}
 	}
@@ -450,7 +488,11 @@ $map = array(
 	"{PHP_COOKIE_DIR}" => $account->session_folder(),
 	"{PHP_WEBMASTER_EMAIL}" => $this->webmaster_email,
 	"{PHP_APC_SHM_SIZE}" => ($this->apc_shm_size ?$this->apc_shm_size."M" : ""),
+	"{PHP_APP_EXTENSIONS}" => "",
 );
+
+foreach($this->phpext_loaded_list() as $ext)
+	$map["{PHP_APP_EXTENSIONS}"] .= "extension=".$ext["name"].".so\n";
 
 replace_map_merge($map, $account->replace_map());
 
@@ -532,7 +574,7 @@ $this->script_reload();
 public function script_reload()
 {
 
-exec("nohup ".$this->script_file()." restart > /dev/null &");
+exec($this->script_file()." restart");
 
 }
 

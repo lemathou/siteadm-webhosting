@@ -185,6 +185,7 @@ if ($account=$this->account())
 }
 /**
  * Returns config folder name
+ * @warning This is a global account config folder
  * @return string
  */
 function config_folder()
@@ -566,8 +567,18 @@ else
 
 if ($update)
 {
-	exec("sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id preupdate '$name' '$domain_id' '$account_id'");
+	$this->root_update("preupdate", $name, $domain_id, $account_id);
 }
+
+}
+
+/**
+ * Returns access log
+ */
+public function root_accesslog()
+{
+
+return $this->root_script("accesslog");
 
 }
 
@@ -605,7 +616,7 @@ $map = array
 	"{WEBSITE_FOLDER_AUTH}" => "",
 	"{PHP_SHORT_OPEN_TAG}" => $this->php_short_open_tag,
 	"{PHP_OPEN_BASEDIR}" => ($this->php_open_basedir!==null) ?$this->php_open_basedir :$this->public_folder().":".$this->private_folder(),
-	"{PHP_INCLUDE_PATH}" => $this->php_include_path,
+	"{PHP_INCLUDE_PATH}" => ($this->php_include_path) ?$this->php_include_path :$this->private_folder().":.",
 	"{PHP_APC_STAT}" => $this->php_apc_stat,
 );
 
@@ -619,7 +630,7 @@ if ($webapp=$this->webapp())
 	if ($webapp->php_open_basedir !== null)
 		$map["{PHP_OPEN_BASEDIR}"] .= ":$webapp->php_open_basedir";
 	if ($webapp->php_include_folder !== null)
-		$map["{PHP_INCLUDE_FOLDER}"] .= ":$webapp->php_include_folder";
+		$map["{PHP_INCLUDE_PATH}"] .= ":$webapp->php_include_folder";
 	if ($webapp->php_short_open_tag !== null)
 		$map["{PHP_SHORT_OPEN_TAG}"] = $webapp->php_short_open_tag;
 	if ($webapp->folder_alias !== null)
@@ -720,8 +731,9 @@ $replace_map = $this->replace_map();
 if (($phppool=$this->phppool()) && ($phpapp=$phppool->phpapp()))
 {
 	$account->copy_tpl("php/vhost.conf", $this->php_ini_file(), $replace_map, "0644", "root");
-	$phpapp->script_vhost();
-	$phpapp->script_reload();
+	$phpapp->script_update();
+	//$phpapp->script_vhost();
+	//$phpapp->script_reload();
 }
 
 // SSL
@@ -767,7 +779,7 @@ if ($account_id)
 {
 	
 }
-// Cahanger le nom de domaine
+// Changer le nom de domaine
 if ($name || $domain_id)
 {
 	

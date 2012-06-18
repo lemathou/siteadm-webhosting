@@ -126,11 +126,11 @@
 	<td><h4>Performance</h4></td>
 </tr>
 <tr>
-	<td class="label"><a href="http://www.php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">Max execution time</a> :</td>
-	<td class="field"><input name="max_execution_time" value="<?php echo $phppool->max_execution_time; ?>" size="2" maxlength="3" />s (temps processeur)</td>
+	<td class="label"><a href="http://www.php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">Max execution time</a> :<br /><i>temps processeu</i></td>
+	<td class="field"><input name="max_execution_time" value="<?php echo $phppool->max_execution_time; ?>" size="2" maxlength="3" />s</td>
 </tr>
 <tr>
-	<td class="label"><a href="http://www.php.net/manual/en/info.configuration.php#ini.max-input-time" target="_blank">Max input time</a> :</td>
+	<td class="label"><a href="http://www.php.net/manual/en/info.configuration.php#ini.max-input-time" target="_blank">Max input time</a> :<br /><i>Temps de traitement</i></td>
 	<td class="field"><input name="max_input_time" value="<?php echo $phppool->max_input_time; ?>" size="2" maxlength="3" />s</td>
 </tr>
 <tr>
@@ -185,9 +185,16 @@
 	<td class="label"><a href="http://www.php.net/manual/en/ini.core.php#ini.extension" target="_blank">Extensions dynamique chargées</a> :<br />(Parmis la liste des modules disponibles à l'utilisateur - certains modules sont aussi intégrés à PHP à la compilation)</td>
 	<td class="field"><input type="hidden" name="extension" /><select name="extension[]" multiple size="5">
 	<?php
+	$phpapp_ext_loaded_list = $phpapp->phpext_loaded_list();
+	foreach($phpapp_ext_loaded_list as $ext)
+	{
+		echo "<option value=\"".$ext["id"]."\" disabled><i>".$ext["description"]."</i> (déjà chargée)</option>\n";
+	}
 	foreach($phpapp->phpext_list() as $ext)
 	{
-		if (in_array($ext["id"], $phppool->extension))
+		if (isset($phpapp_ext_loaded_list[$ext["id"]]))
+			echo "";
+		elseif (in_array($ext["id"], $phppool->extension))
 			echo "<option value=\"".$ext["id"]."\" selected>".$ext["description"]."</option>\n";
 		else
 			echo "<option value=\"".$ext["id"]."\">".$ext["description"]."</option>\n";

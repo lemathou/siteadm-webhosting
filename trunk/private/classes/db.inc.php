@@ -152,6 +152,7 @@ function script_insert()
 
 // Création user
 mysql_query("CREATE USER '$this->username'@'localhost' IDENTIFIED BY '$this->password'");
+echo mysql_error();
 // Création table
 mysql_query("CREATE DATABASE `$this->dbname`");
 // Droits de base pour user

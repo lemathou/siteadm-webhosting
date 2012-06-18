@@ -34,9 +34,9 @@
 <tr>
 	<td class="label">Default charset</td>
 	<td class="field">
-		<input name="default_charset" type="radio" value=""<?php if (!$website->charset_default) echo " checked"; ?> /> AUCUN
-		<input name="default_charset" type="radio" value="utf-8"<?php if ($website->charset_default=="utf-8") echo " checked"; ?> /> UTF-8
-		<input name="default_charset" type="radio" value="iso-8859-1"<?php if ($website->charset_default=="iso-8859-1") echo " checked"; ?> /> ISO-8859-1
+		<input name="charset_default" type="radio" value=""<?php if (!$website->charset_default) echo " checked"; ?> /> AUCUN
+		<input name="charset_default" type="radio" value="utf-8"<?php if ($website->charset_default=="utf-8") echo " checked"; ?> /> UTF-8
+		<input name="charset_default" type="radio" value="iso-8859-1"<?php if ($website->charset_default=="iso-8859-1") echo " checked"; ?> /> ISO-8859-1
 	</td>
 </tr>
 <tr>
@@ -92,15 +92,17 @@
 	?></select> <input type="button" value="" class="phppool_edit" style="display: none;" /></td>
 </tr>
 <tr>
-	<td><h4>Paramètres PHP (forcé)</h4></td>
+	<td><h4>Protection des pages</h4></td>
 </tr>
 <tr>
-	<td class="label">Short open tag</td>
+	<td class="label">Limiter l'accès<br />(à l'aide d'un fichier .htaccess)</td>
 	<td class="field">
-		<input name="php_short_open_tag" type="radio" value=""<?php if (!in_array($website->php_short_open_tag, array("0", "1"), true)) echo " checked"; ?> /> DEFAUT
-		<input name="php_short_open_tag" type="radio" value="1"<?php if ($website->php_short_open_tag === "1") echo " checked"; ?> /> OUI
-		<input name="php_short_open_tag" type="radio" value="0"<?php if ($website->php_short_open_tag === "0") echo " checked"; ?> /> NON
+		<input name="folder_auth" type="radio" value="1"<?php if ($website->folder_auth) echo " checked"; ?> /> OUI
+		<input name="folder_auth" type="radio" value="0"<?php if (!$website->folder_auth) echo " checked"; ?> /> NON
 	</td>
+</tr>
+<tr>
+	<td><h4>Paramètres PHP (forcé)</h4></td>
 </tr>
 <tr>
 	<td class="label">Open Basedir</td>
@@ -111,6 +113,30 @@
 	<td class="field"><input name="php_include_path" value="<?php echo $website->php_include_path; ?>" /></td>
 </tr>
 <tr>
+	<td class="label">Error reporting</td>
+	<td class="field"><input name="php_error_reporting" value="<?php echo $website->php_error_reporting; ?>" /></td>
+</tr>
+<tr>
+	<td class="label">Max execution time<br /><i>Temps processeur</i></td>
+	<td class="field"><input name="php_max_execution_time" value="<?php echo $website->php_max_execution_time; ?>" /> s</td>
+</tr>
+<tr>
+	<td class="label">Max input time<br /><i>Temps de traitement</i></td>
+	<td class="field"><input name="php_max_input_time" value="<?php echo $website->php_max_input_time; ?>" /> s</td>
+</tr>
+<tr>
+	<td class="label">Max memory limit</td>
+	<td class="field"><input name="php_max_memory_limit" value="<?php echo $website->php_max_memory_limit; ?>" /> MO</td>
+</tr>
+<tr>
+	<td class="label">Short open tag</td>
+	<td class="field">
+		<input name="php_short_open_tag" type="radio" value=""<?php if (!in_array($website->php_short_open_tag, array("0", "1"), true)) echo " checked"; ?> /> DEFAUT
+		<input name="php_short_open_tag" type="radio" value="1"<?php if ($website->php_short_open_tag === "1") echo " checked"; ?> /> OUI
+		<input name="php_short_open_tag" type="radio" value="0"<?php if ($website->php_short_open_tag === "0") echo " checked"; ?> /> NON
+	</td>
+</tr>
+<tr>
 	<td class="label">APC Stat</td>
 	<td class="field">
 		<input name="php_apc_stat" type="radio" value=""<?php if (!in_array($website->php_apc_stat, array("0", "1"), true)) echo " checked"; ?> /> DEFAUT
@@ -119,13 +145,11 @@
 	</td>
 </tr>
 <tr>
-	<td><h4>Protection des pages</h4></td>
-</tr>
-<tr>
-	<td class="label">Limiter l'accès<br />(à l'aide d'un fichier .htaccess)</td>
+	<td class="label">Enable dl()</td>
 	<td class="field">
-		<input name="folder_auth" type="radio" value="1"<?php if ($website->folder_auth) echo " checked"; ?> /> OUI
-		<input name="folder_auth" type="radio" value="0"<?php if (!$website->folder_auth) echo " checked"; ?> /> NON
+		<input name="php_enable_dl" type="radio" value=""<?php if (!in_array($website->php_enable_dl, array("0", "1"), true)) echo " checked"; ?> /> DEFAUT
+		<input name="php_enable_dl" type="radio" value="1"<?php if ($website->php_enable_dl === "1") echo " checked"; ?> /> OUI
+		<input name="php_enable_dl" type="radio" value="0"<?php if ($website->php_enable_dl === "0") echo " checked"; ?> /> NON
 	</td>
 </tr>
 </table>
