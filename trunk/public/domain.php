@@ -19,6 +19,8 @@ if (isset($_POST["_domain_add"]))
 {
 	$domain = new domain();
 	$domain->insert($_POST);
+	if ($domain->id)
+		$_GET["id"] = $domain->id;
 }
 if (isset($_POST["_domain_update"]) && isset($_POST["id"]) && ($domain=domain($_POST["id"])))
 {
@@ -88,13 +90,13 @@ else
 	echo "<p><a href=\"?list\">Liste</a> | <a href=\"?add\">Ajouter</a></p> <hr />\n";
 
 // tindin
-if (isset($_GET["add"]) && domain::insert_perm())
-{
-	include "template/page/domain_add.tpl.php";
-}
-elseif (isset($_GET["id"]) && ($domain=domain($id=$_GET["id"])) && $domain->update_perm())
+if (isset($_GET["id"]) && ($domain=domain($id=$_GET["id"])) && $domain->update_perm())
 {
 	include "template/page/domain_id.tpl.php";
+}
+elseif (isset($_GET["add"]) && domain::insert_perm())
+{
+	include "template/page/domain_add.tpl.php";
 }
 else
 {

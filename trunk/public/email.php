@@ -22,6 +22,8 @@ if (isset($_POST["_email_add"]))
 {
 	$object = new email();
 	$object->insert($_POST);
+	if ($object->id)
+		$_GET["id"] = $object->id;
 }
 if (isset($_POST["_email_update"]) && isset($_POST["id"]) && ($object=email($_POST["id"])))
 {
@@ -56,6 +58,8 @@ if (isset($_POST["_email_alias_add"]))
 {
 	$object = new email_alias();
 	$object->insert($_POST);
+	if ($object->id)
+		$_GET["alias_id"] = $object->id;
 }
 if (isset($_POST["_email_alias_update"]) && isset($_POST["id"]) && ($object=email_alias($_POST["id"])))
 {
@@ -125,21 +129,21 @@ if ($domain)
 }
 
 // Contenu de page
-if (isset($_GET["add"]) && $domain && email::insert_perm())
-{
-	include "template/page/email_add.tpl.php";
-}
-elseif (isset($_GET["alias_add"]) && $domain && email_alias::insert_perm())
-{
-	include "template/page/email_alias_add.tpl.php";
-}
-elseif (isset($_GET["id"]) && ($email=email($_GET["id"])) && $email->update_perm())
+if (isset($_GET["id"]) && ($email=email($_GET["id"])) && $email->update_perm())
 {
 	include "template/page/email_id.tpl.php";
+}
+elseif (isset($_GET["add"]) && $domain && email::insert_perm())
+{
+	include "template/page/email_add.tpl.php";
 }
 elseif (isset($_GET["alias_id"]) && ($email_alias=email_alias($_GET["alias_id"])) && $email_alias->update_perm())
 {
 	include "template/page/email_alias_id.tpl.php";
+}
+elseif (isset($_GET["alias_add"]) && $domain && email_alias::insert_perm())
+{
+	include "template/page/email_alias_add.tpl.php";
 }
 elseif (isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && $domain->update_perm())
 {

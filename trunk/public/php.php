@@ -20,6 +20,8 @@ if (isset($_POST["_phpapp_add"]))
 {
 	$phpapp = new phpapp();
 	$phpapp->insert($_POST);
+	if ($phpapp->id)
+		$_GET["app_id"] = $phpapp->id;
 }
 if (isset($_POST["_phpapp_update"]) && isset($_POST["id"]) && ($phpapp=phpapp($_POST["id"])))
 {
@@ -30,6 +32,8 @@ if (isset($_POST["_phppool_add"]))
 {
 	$phppool = new phppool();
 	$phppool->insert($_POST);
+	if ($phppool->id)
+		$_GET["pool_id"] = $phppool->id;
 }
 if (isset($_POST["_phppool_update"]) && isset($_POST["id"]) && ($phppool=phppool($_POST["id"])))
 {
@@ -89,28 +93,28 @@ else
 if (isset($account))
 	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&app_add\">Ajouter un processus parent</a> | <a href=\"?account_id=$account->id&pool_add\">Ajouter un pool</a></p>";
 else
-	echo "<p><a href=\"?list\">Liste</a> | <a href=\"?app_add\">Ajouter un processus parent</a></p>";
+	echo "<p><a href=\"?list\">Liste</a> | <a href=\"?app_add\">Ajouter un processus parent</a> | <a href=\"?pool_add\">Ajouter un pool</a></p>";
 ?>
 <hr />
 <?php
 
-if (isset($_GET["app_add"]) && phpapp::insert_perm())
+if (isset($_GET["pool_id"]) && ($phppool=phppool($_GET["pool_id"])) && $phppool->update_perm())
 {
-	$phpapp = new phpapp();
-	include "template/page/php_app_add.tpl.php";
+	include "template/page/php_pool_id.tpl.php";
 }
 elseif (isset($_GET["pool_add"]) && phppool::insert_perm())
 {
 	$phpool = new phppool();
 	include "template/page/php_pool_add.tpl.php";
 }
-elseif (isset($_GET["pool_id"]) && ($phppool=phppool($_GET["pool_id"])) && $phppool->update_perm())
-{
-	include "template/page/php_pool_id.tpl.php";
-}
 elseif (isset($_GET["app_id"]) && ($phpapp=phpapp($_GET["app_id"])) && $phpapp->update_perm())
 {
 	include "template/page/php_app_id.tpl.php";
+}
+elseif (isset($_GET["app_add"]) && phpapp::insert_perm())
+{
+	$phpapp = new phpapp();
+	include "template/page/php_app_add.tpl.php";
 }
 else
 {

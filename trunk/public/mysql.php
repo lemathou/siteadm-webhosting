@@ -19,6 +19,8 @@ if (isset($_POST["_db_add"]))
 {
 	$db = new db();
 	$db->insert($_POST);
+	if ($db->id)
+		$_GET["id"] = $db->id;
 }
 if (isset($_POST["_db_update"]) && isset($_POST["id"]) && ($db=db($_POST["id"])))
 {
@@ -61,13 +63,13 @@ else
 if (isset($account))
 	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p> <hr />";
 	
-if (isset($_GET["add"]) && db::insert_perm())
-{
-	include "template/page/db_add.tpl.php";
-}
-elseif (isset($_GET["id"]) && ($db=db($_GET["id"])) && $db->update_perm())
+if (isset($_GET["id"]) && ($db=db($_GET["id"])) && $db->update_perm())
 {
 	include "template/page/db_id.tpl.php";
+}
+elseif (isset($_GET["add"]) && db::insert_perm())
+{
+	include "template/page/db_add.tpl.php";
 }
 elseif (isset($_GET["account_id"]) && ($account=account($_GET["account_id"])) && $account->update_perm())
 {

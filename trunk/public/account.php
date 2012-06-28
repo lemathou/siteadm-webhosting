@@ -19,6 +19,8 @@ if (isset($_POST["_account_add"]))
 {
 	$account = new account();
 	$account->insert($_POST);
+	if ($account->id)
+		$_GET["id"] = $account->id;
 }
 if (isset($_POST["_account_update"]) && isset($_POST["id"]) && ($account=account($id=$_POST["id"])))
 {
@@ -48,10 +50,10 @@ if (login()->perm("admin") && isset($manager))
 elseif (login()->perm("manager"))
 	echo "<p><a href=\"?list\">Liste</a> | <a href=\"?add\">Ajouter</a></p> <hr />";
 
-if (isset($_GET["add"]) && account::insert_perm())
-	include "template/page/account_add.tpl.php";
-elseif (isset($_GET["id"]) && ($account=account($id=$_GET["id"])) && $account->update_perm())
+if (isset($_GET["id"]) && ($account=account($id=$_GET["id"])) && $account->update_perm())
 	include "template/page/account_id.tpl.php";
+elseif (isset($_GET["add"]) && account::insert_perm())
+	include "template/page/account_add.tpl.php";
 elseif (login()->perm("admin"))
 	include "template/page/account_admin.tpl.php";
 elseif (login()->perm("manager"))

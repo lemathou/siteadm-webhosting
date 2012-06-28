@@ -22,6 +22,8 @@ if (isset($_POST["_website_add"]))
 {
 	$object = new website();
 	$object->insert($_POST);
+	if ($object->id)
+		$_GET["id"] = $object->id;
 }
 if (isset($_POST["_website_update"]) && isset($_POST["id"]) && ($object=website($_POST["id"])))
 {
@@ -56,6 +58,8 @@ if (isset($_POST["_website_alias_add"]))
 {
 	$object = new website_alias();
 	$object->insert($_POST);
+	if ($object->id)
+		$_GET["alias_id"] = $object->id;
 }
 if (isset($_POST["_website_alias_update"]) && isset($_POST["id"]) && ($object=website_alias($_POST["id"])))
 {

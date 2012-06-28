@@ -1,4 +1,4 @@
-<form method="post" class="edit">
+<form method="post" class="edit" action="<?php if ($website->id) echo "?id=".$website->id; ?>">
 <input type="hidden" name="domain_id" value="<?php echo $website->domain_id; ?>" />
 <div style="width: 600px;" class="cadre">
 <table cellspacing="0" cellpadding="0" border="0" width="100%">

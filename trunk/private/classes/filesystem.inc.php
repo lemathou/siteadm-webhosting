@@ -47,6 +47,20 @@ if (file_exists($filename))
 }
 
 /**
+ * Update ACL for a file or an folder
+ * @param string $filename
+ * @param string $user
+ * @param string $mode
+ */
+static function setacl($filename, $user, $mode="rx")
+{
+
+if (file_exists($filename))
+	exec("setfacl -m u:".$user.":".$mode." ".$filename);
+
+}
+
+/**
  * Write data in a file
  * @param string $filename
  * @param string $contents

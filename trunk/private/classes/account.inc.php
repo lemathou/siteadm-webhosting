@@ -784,8 +784,12 @@ public function script_structure()
 {
 
 $this->mkdir("", "750", "root");
+filesystem::setacl($this->folder(), WEBSERVER_USER);
+
+// SSH
 $this->mkdir(".ssh", "700");
 
+// Config files
 $this->mkdir("conf", "750", "root");	
 // Awstats
 $this->mkdir("conf/awstats", "755", "root");
@@ -799,37 +803,41 @@ $this->mkdir("conf/php/vhost", "755", "root");
 // Fetchmail
 $this->mkdir("conf/fetchmail", "755", "root");
 // CRON
-$this->mkdir("conf/cron", "755", "root");
+$this->mkdir("conf/cron", "750", "root");
+
 // CGI-BIN
-$this->mkdir("cgi-bin", "750", "root");
+$this->mkdir("cgi-bin", "755", "root");
+
 // Backup
 $this->mkdir("backup", "750", "root");
 $this->mkdir("backup/mysql", "755", "root");
+
 // Logs
 $this->mkdir("log", "750", "root");
 $this->mkdir("log/apache", "1755", "root");
 $this->mkdir("log/php", "1775", "root");
 $this->mkdir("log/awstats", "1755", "root");
+
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
 // Cookies (PHP)
-$this->mkdir("tmp", "1777", "root");
+$this->mkdir("cookies", "1770", "root");
 // Socket (PHP)
 $this->mkdir("socket", "750", "root");
+
 // Private data & config
 $this->mkdir("private", "750", "root");
 $this->mkdir("private/config", "750");
 $this->mkdir("private/scripts", "750");
 $this->mkdir("private/data", "750");
 $this->mkdir("private/ftp", "750");
+
 // Public websites
 $this->mkdir("public", "750", "root");
-exec("setfacl -m u:".WEBSERVER_USER.":rx ".$this->folder());
-exec("setfacl -m u:".WEBSERVER_USER.":rx ".$this->public_folder());
-$this->mkdir("public/config", "750");
-$this->mkdir("public/scripts", "750");
+filesystem::setacl($this->public_folder(), WEBSERVER_USER);
 $this->mkdir("public/data", "750");
 $this->mkdir("public/ftp", "755");
+
 // eMail
 $this->mkdir("mail", "700", $this->email_user());
 

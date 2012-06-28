@@ -19,6 +19,8 @@ if (isset($_POST["_ftp_add"]) && isset($_POST["name"]))
 {
 	$ftp = new ftp();
 	$ftp->db_insert($_POST);
+	if ($ftp->id)
+		$_GET["id"] = $ftp->id;
 }
 if (isset($_POST["_ftp_update"]) && isset($_POST["id"]) && ($ftp=ftp($_POST["id"])))
 {

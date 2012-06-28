@@ -112,6 +112,10 @@ apt-get install zip unrar-free cabextract ripole
 echo "Ejabberd..."
 apt-get install ejabberd
 
+# ASterisk
+echo "Asterisk..."
+apt-get install asterisk
+
 # Outils
 echo "Imagemagick... pour la manipulation d'images"
 apt-get install imagemagick
