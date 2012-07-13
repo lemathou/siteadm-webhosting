@@ -147,8 +147,10 @@ if ($this->id)
 	$query = mysql_query($query_string);
 	while(list($alias_name, $domain_name)=mysql_fetch_row($query))
 	{
-		if ($domain_name)
+		if ($domain_name && $alias_name)
 			$list[] = "$alias_name.$domain_name";
+		elseif ($domain_name)
+			$list[] = "$domain_name";
 		else
 			$list[] = "$alias_name.*";
 	}
@@ -333,42 +335,6 @@ function apache_conf_file()
 {
 
 return $this->apache_conf_folder()."/".$this->name().".conf";
-
-}
-/**
- * @return string
- */
-function ssl_cert_file()
-{
-
-return $this->apache_conf_folder()."/".$this->name().".crt";
-
-}
-/**
- * @return string
- */
-function ssl_key_file()
-{
-
-return $this->apache_conf_folder()."/".$this->name().".key";
-
-}
-/**
- * @return string
- */
-function ssl_csr_file()
-{
-
-return $this->apache_conf_folder()."/".$this->name().".csr";
-
-}
-/**
- * @return string
- */
-function ssl_info_file()
-{
-
-return $this->apache_conf_folder()."/".$this->name().".sslinfo";
 
 }
 
@@ -609,8 +575,6 @@ $map = array
 	"{WEBSITE_PRIVATE_DIR}" => $this->private_folder(),
 	"{WEBSITE_CONFIG_DIR}" => $this->config_folder(),
 	"{WEBSITE_CHARSET}" => $this->charset_default,
-	"{WEBSITE_SSL_CERT}" => $this->ssl_cert_file(),
-	"{WEBSITE_SSL_KEY}" => $this->ssl_key_file(),
 	"{WEBSITE_PHP_ERROR_LOG}" => $this->phperrorlog_file(),
 	"{WEBSITE_FOLDER_ALIAS}" => "",
 	"{WEBSITE_FOLDER_AUTH}" => "",
@@ -664,28 +628,6 @@ return $map;
 /* ROOT SCRIPTS */
 
 /**
- * Create SSL certificate
- */
-function script_ssl_create()
-{
-
-$domain = $this->domain();
-$account = $this->account();
-
-$replace_map = $this->replace_map();
-
-exec("rm ".$this->ssl_csr_file());
-exec("rm ".$this->ssl_cert_file());
-exec("rm ".$this->ssl_key_file());
-$account->copy_tpl("ssl-info", $this->ssl_info_file(), $replace_map);
-exec("openssl genrsa -out ".$this->ssl_key_file()." 1024");
-exec("cat ".$this->ssl_info_file()." | openssl req -new -key ".$this->ssl_key_file()." -out ".$this->ssl_csr_file());
-exec("openssl x509 -req -days 365 -in ".$this->ssl_csr_file()." -signkey ".$this->ssl_key_file()." -out ".$this->ssl_cert_file());
-exec("rm ".$this->ssl_info_file());
-
-}
-
-/**
  * @see db_object::script_structure()
  */
 function script_structure()
@@ -737,8 +679,8 @@ if (($phppool=$this->phppool()) && ($phpapp=$phppool->phpapp()))
 }
 
 // SSL
-if ($this->ssl && !file_exists($this->ssl_key_file()))
-	$this->script_ssl_create();
+if ($this->ssl && !file_exists($domain->ssl_key_file()))
+	$domain->script_ssl_create();
 
 // Folder Auth (.htaccess)
 if ($this->folder_auth && !file_exists($this->htpasswd_file()))

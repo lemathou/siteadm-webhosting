@@ -60,7 +60,7 @@ else
 }
 
 // Submenu
-if (isset($account))
+if (isset($account) || login()->perm("admin"))
 	echo "<p><a href=\"?account_id=$account->id&list\">Liste</a> | <a href=\"?account_id=$account->id&add\">Ajouter</a></p> <hr />";
 	
 if (isset($_GET["id"]) && ($db=db($_GET["id"])) && $db->update_perm())
@@ -74,6 +74,10 @@ elseif (isset($_GET["add"]) && db::insert_perm())
 elseif (isset($_GET["account_id"]) && ($account=account($_GET["account_id"])) && $account->update_perm())
 {
 	include "template/page/db_account.tpl.php";
+}
+elseif (login()->perm("admin"))
+{
+	include "template/page/db_admin.tpl.php";
 }
 
 // Admin

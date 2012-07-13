@@ -15,12 +15,15 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="PHP5 FastCGI Process Manager for Siteadm"
 NAME=php5-siteadm
 DAEMON=/usr/sbin/php5-fpm
-DAEMON_ARGS="--fpm-config /home/siteadm_admin/conf/php/php-fpm-siteadm.conf"
-PIDFILE=/home/siteadm_admin/conf/php/php-siteadm.pid
-TIMEOUT=30
+CONFIG_PATH=/home/siteadm_admin/conf/php
+PHP_FPM_INI="$CONFIG_PATH/php-siteadm.ini"
+PHP_FPM_CONF="$CONFIG_PATH/php-fpm-siteadm.conf"
+PIDFILE="$CONFIG_PATH/php-siteadm.pid"
+DAEMON_ARGS="--fpm-config $PHP_FPM_CONF -c $PHP_FPM_INI"
+TIMEOUT=5
 SCRIPTNAME=/etc/init.d/$NAME
 
-PHP_INI_SCAN_DIR="/home/siteadm_admin/conf/php/ext"
+PHP_INI_SCAN_DIR="$CONFIG_PATH/ext"
 export PHP_INI_SCAN_DIR;
 
 # Exit if the package is not installed

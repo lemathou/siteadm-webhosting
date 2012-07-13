@@ -11,11 +11,11 @@ RedirectPermanent / https://siteadm/
 <Virtualhost *:443>
 DocumentRoot "/home/siteadm_admin/public"
 ServerName siteadm
-ServerAlias admin.*
+ServerAlias admin.* ubuntu.home
 ServerAdmin {WEBMASTER_EMAIL}
 SSLEngine on
-SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
-SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+SSLCertificateFile    /etc/ssl/certs/server.crt
+SSLCertificateKeyFile /etc/ssl/private/server.key
 CustomLog /home/siteadm_admin/log/apache/access.log combined
 ErrorLog /home/siteadm_admin/log/apache/error.log
 ScriptAlias /cgi-bin/ /home/siteadm_admin/cgi-bin/

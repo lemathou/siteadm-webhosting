@@ -51,6 +51,10 @@ define("ACCOUNT_SYSTEM_GROUP","siteadm_account");
 define("ACCOUNT_SYSTEM_GID",503);
 define("ACCOUNT_UID_MIN",2000);
 
+// SSL CA
+define("SSL_CA_CRT", SITEADM_ADMIN_DIR."/ssl_cert/ca.crt");
+define("SSL_CA_KEY", SITEADM_ADMIN_DIR."/ssl_cert/ca.key.nopass");
+
 // Webserver
 define("WEBSERVER_USER","www-data");
 define("WEBSERVER_GROUP","www-data");

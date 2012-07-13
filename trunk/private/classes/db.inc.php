@@ -25,7 +25,7 @@ static protected $_db_table = "db";
 
 static public $_f = array
 (
-	"account_id" => array("type"=>"object", "otype"=>"account", "nonempty"=>true),
+	"account_id" => array("type"=>"object", "otype"=>"account"),
 	"dbname" => array("type"=>"string", "nonempty"=>true),
 	"username" => array("type"=>"string", "nonempty"=>true),
 	"password" => array("type"=>"string"),

@@ -92,7 +92,7 @@ apt-get install postgrey
 
 # Dovecot
 echo "Dovecot..."
-apt-get install dovecot-mysql dovecot-imapd dovecot-pop3d dovecot-postfix dovecot-sieve dovecot-antispam
+apt-get install dovecot-lmtpd dovecot-mysql dovecot-imapd dovecot-pop3d dovecot-postfix dovecot-sieve dovecot-antispam
 
 # Spamassassin
 echo "Spamassassin..."

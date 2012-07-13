@@ -54,11 +54,21 @@ else
 
 }
 
-// FOLDERS
+/* FOLDERS */
 
 /**
- * Returns websites log folder
- *
+ * Returns apache config folder name
+ * @return string
+ */
+function apache_conf_folder()
+{
+
+if ($account=$this->account())
+	return $account->conf_folder()."/apache";
+
+}
+/**
+ * Returns websites log folder name
  * @return string
  */
 public function apache_log_folder()
@@ -68,9 +78,9 @@ if ($account=$this->account())
 	return $account->log_folder()."/apache";
 
 }
+
 /**
- * Returns awstats conf folder
- *
+ * Returns awstats conf folder name
  * @return string
  */
 public function awstats_conf_folder()
@@ -81,8 +91,7 @@ if ($account=$this->account())
 
 }
 /**
- * Returns awstats log folder
- *
+ * Returns awstats log folder name
  * @return string
  */
 public function awstats_log_folder()
@@ -115,6 +124,43 @@ public function awstats_conf_file()
 {
 
 return $this->awstats_conf_folder()."/$this->name.conf";
+
+}
+
+/**
+ * @return string
+ */
+function ssl_cert_file()
+{
+
+	return $this->apache_conf_folder()."/".$this->name.".crt";
+
+}
+/**
+ * @return string
+ */
+function ssl_key_file()
+{
+
+	return $this->apache_conf_folder()."/".$this->name.".key";
+
+}
+/**
+ * @return string
+ */
+function ssl_csr_file()
+{
+
+	return $this->apache_conf_folder()."/".$this->name.".csr";
+
+}
+/**
+ * @return string
+ */
+function ssl_info_file()
+{
+
+	return $this->apache_conf_folder()."/".$this->name.".sslinfo";
 
 }
 
@@ -217,7 +263,7 @@ return db_object::update($infos);
 
 }
 
-// DB
+/* DB */
 
 /**
  * @see db_object::db_retrieve_more()
@@ -233,7 +279,7 @@ $this->website_alias_nb = array_pop(mysql_fetch_row(mysql_query("SELECT COUNT(*)
 
 }
 
-// ROOT SCRIPTS
+/* REPLACE MAP */
 
 function replace_map()
 {
@@ -244,6 +290,8 @@ $map = array
 	"{DOMAIN_NAME_REGEX}" => str_replace(".", "\\.", $this->name),
 	"{DOMAIN_LOG_ACCESS}" => $this->logaccess_file(),
 	"{AWSTATS_DATA_DIR}" => $this->awstats_log_folder(),
+	"{DOMAIN_SSL_CERT}" => $this->ssl_cert_file(),
+	"{DOMAIN_SSL_KEY}" => $this->ssl_key_file(),
 );
 
 if ($account=$this->account())
@@ -253,13 +301,51 @@ return $map;
 
 }
 
+/* ROOT SCRIPTS */
+
+/**
+ * Create SSL certificate
+ */
+function script_ssl_create()
+{
+
+$account = $this->account();
+
+$replace_map = $this->replace_map();
+
+$account->rm($this->ssl_csr_file());
+$account->rm($this->ssl_cert_file());
+$account->rm($this->ssl_key_file());
+$account->copy_tpl("ssl/ssl-info", $this->ssl_info_file(), $replace_map);
+exec("openssl genrsa -out ".$this->ssl_key_file()." 1024");
+exec("cat ".$this->ssl_info_file()." | openssl req -new -key ".$this->ssl_key_file()." -out ".$this->ssl_csr_file());
+exec("openssl x509 -req -days 3650 -in ".$this->ssl_csr_file()." -CA ".SSL_CA_CRT." -CAkey ".SSL_CA_KEY." -CAcreateserial -out ".$this->ssl_cert_file());
+$account->rm($this->ssl_info_file());
+filesystem::chmod($this->ssl_csr_file(), "640");
+filesystem::chmod($this->ssl_cert_file(), "640");
+filesystem::chmod($this->ssl_key_file(), "640");
+
+}
+
 /**
  * @see db_object::script_structure()
  */
 function script_structure()
 {
 
-exec("mkdir ".SITEADM_DOMAIN_DIR."/".$this->name);
+$this->account()->mkdir(SITEADM_DOMAIN_DIR."/".$this->name, "750", "root");
+
+}
+
+/**
+ * @see db_object::script_insert()
+ */
+function script_insert()
+{
+
+$this->script_ssl_create();
+
+db_object::script_insert();
 
 }
 
