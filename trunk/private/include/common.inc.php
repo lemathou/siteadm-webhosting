@@ -111,12 +111,6 @@ else // User
 }
 
 /*
- * Folders
- */
-
-$config_folders = array("apache", "cron", "nginx", "cgi-bin", "php", "fetchmail");
-
-/*
  * Template Files
  */
 

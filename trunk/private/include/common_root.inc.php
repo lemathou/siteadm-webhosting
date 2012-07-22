@@ -26,12 +26,6 @@ $account_type_list = array
 );
 
 /*
- * Folders
- */
-
-$config_folders = array("apache", "cron", "nginx", "cgi-bin", "php", "fetchmail");
-
-/*
  * Template Files
  */
 

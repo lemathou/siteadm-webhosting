@@ -53,7 +53,7 @@ echo "Base installation completed"
 
 # Awstats
 echo "Awstats..."
-apt-get install awstats libgeo-ipfree-perl
+apt-get install awstats libgeo-ipfree-perl libgeo-ip-perl
 cp /home/siteadm_admin/template/awstats/awstats.common /etc/awstats/awstats.common
 
 # Passwords

@@ -28,15 +28,7 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	list($row["email_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM email as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["website_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM website as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["mysql_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM db as t1 WHERE t1.account_id=$row[id]"));
-	exec("sudo du -s ".$a->folder(), $row["disk_usage"]);
-	$row["disk_usage"] = array_shift(explode("\t", $row["disk_usage"][0]));
-	$row["disk_usage_h"] = $row["disk_usage"];
-	$row["disk_usage_u"] = 1;
-	while ($row["disk_usage_h"]>1024)
-	{
-		$row["disk_usage_h"] = $row["disk_usage_h"]/1024;
-		$row["disk_usage_u"]++;
-	}
+	$row["disk_usage"] = $a->root_foldersize($a->folder());
 	$offer = $a->offer();
 ?>
 <tr>
@@ -60,15 +52,12 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	<td><?php echo $a->societe; ?></td>
 	<td><?php if ($offer) echo $offer; ?></td>
 	<td align="right"><?php
-		if (isset($row["disk_usage_h"]) && $row["disk_usage_h"] > 0) 
-			echo round($row["disk_usage_h"], 2)." ".$s_list[$row["disk_usage_u"]];
-		else
-			echo "<i>0</i>";
-		echo " / ";
+		echo round($row["disk_usage"], 2)."&nbsp;GO";
+		echo "<br />Max&nbsp;";
 		if ($offer)
-			echo $offer->disk_quota_soft." GO (".round($row["disk_usage"]/1024/1024*100/$offer->disk_quota_soft, 2)." %)";
+			echo $offer->disk_quota_soft." GO (".round($row["disk_usage"]/$offer->disk_quota_soft, 2)."&nbsp;%)";
 		elseif ($a->disk_quota_soft)
-			echo $a->disk_quota_soft." GO (".round($row["disk_usage"]/1024/1024*100/$a->disk_quota_soft, 2)." %)";
+			echo $a->disk_quota_soft." GO (".round($row["disk_usage"]/$a->disk_quota_soft, 2)."&nbsp;%)";
 		else
 			echo "&infin;";
 	?></td>

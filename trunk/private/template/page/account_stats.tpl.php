@@ -10,24 +10,15 @@
 <tr>
 	<td valign="top">Espace disque</td>
 	<td><table width="100%" cellspacing="0" cellpadding="0">
-	<tr><td>Stockage publique (sites, FTP, etc.) :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/public"); ?></td></tr>
-	<tr><td>Stockage privé sécurisé (clefs, etc.) :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/private"); ?></td></tr>
-	<tr><td>Emails :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/email"); ?></td></tr>
-	<tr><td>Backups :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/backup"); ?></td></tr>
-	<tr><td>Statistiques :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/awstats"); ?></td></tr>
-	<tr><td>Logs :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/log"); ?></td></tr>
-	<tr><td>Fichiers de configuration :</td> <td align="right"><?php
-	// Config folders
-	$flist = array();
-	foreach($config_folders as $i)
-	{
-		$flist[] = $account->folder()."/$i";
-	}
-	echo filesystem::foldersize($flist);
-	?></td></tr>
-	<tr><td>Cookies :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/cookies"); ?></td></tr>
-	<tr><td>Fichies temporaire :</td> <td align="right"><?php echo filesystem::foldersize($account->folder()."/temp"); ?></td></tr>
-	<tr><td><b>Utilisation totale / Quota :</b></td> <td><?php echo filesystem::foldersize($account->folder()); ?></td>
+	<tr><td>Stockage publique (sites, FTP, etc.) :</td> <td align="right"><?php echo $account->root_foldersize($account->public_folder()); ?></td></tr>
+	<tr><td>Stockage privé sécurisé (clefs, etc.) :</td> <td align="right"><?php echo $account->root_foldersize($account->private_folder()); ?></td></tr>
+	<tr><td>Emails :</td> <td align="right"><?php echo $account->root_foldersize($account->email_folder()); ?></td></tr>
+	<tr><td>Backups :</td> <td align="right"><?php echo $account->root_foldersize($account->backup_folder()); ?></td></tr>
+	<tr><td>Logs & stats :</td> <td align="right"><?php echo $account->root_foldersize($account->log_folder()); ?></td></tr>
+	<tr><td>Fichiers de configuration :</td> <td align="right"><?php echo $account->root_foldersize($account->conf_folder()); ?></td></tr>
+	<tr><td>Cookies :</td> <td align="right"><?php echo $account->root_foldersize($account->session_folder()); ?></td></tr>
+	<tr><td>Fichies temporaire :</td> <td align="right"><?php echo $account->root_foldersize($account->tmp_folder()); ?></td></tr>
+	<tr><td><b>Utilisation totale / Quota :</b></td> <td><?php echo $account->root_foldersize($account->folder()); ?></td>
 	<td><?php
 	if ($offer=offer($account->offre_id))
 	{

@@ -544,7 +544,8 @@ if ($update)
 public function root_accesslog()
 {
 
-return $this->root_script("accesslog");
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id accesslog";
+return shell_exec($command);
 
 }
 

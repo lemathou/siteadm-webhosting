@@ -139,6 +139,7 @@ define("BIND_DOMAIN_DIR","/etc/bind9/pri");
 
 // Quota
 define("QUOTA_EXEC","quota");
+define("QUOTA_DISK", "/dev/md2");
 
 // Logrotate
 define("LOGROTATE_CONF_DIR","/etc/logrotate.d");

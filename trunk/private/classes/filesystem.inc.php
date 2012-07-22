@@ -101,6 +101,9 @@ static function link($filename_from, $filename_to)
 if (!file_exists($filename_from) || (file_exists($filename_to) && !is_link($filename_to)))
 	return;
 
+if (is_link($filename_to))
+	self::unlink($filename_to);
+
 return @symlink($filename_from, $filename_to);
 
 }
@@ -260,6 +263,16 @@ static function foldersize($folder)
 		return "$nb GO";
 	else
 		return "$nb TO";
+
+}
+
+static function tail($filename)
+{
+
+if (!@file_exists($filename))
+	return;
+
+return shell_exec("tail $filename");
 
 }
 

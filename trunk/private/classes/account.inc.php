@@ -362,6 +362,17 @@ return $this->folder()."/mail";
 
 }
 
+/**
+ * Dossier de stockage des backup
+ * @return string
+ */
+function backup_folder()
+{
+
+return $this->folder()."/backup";
+
+}
+
 // PERM
 
 /**
@@ -650,11 +661,11 @@ protected function quota_update()
 if ($offer=$this->offer())
 {
 	if ($offer->disk_quota_soft)
-		exec("quotatool -u ".$this->system_user()." -b -q ".($offer->disk_quota_soft*1048576)." /");
+		exec("quotatool -u ".$this->system_user()." -b -q ".($offer->disk_quota_soft*1024)."MB /");
 	else
 		exec("quotatool -u ".$this->system_user()." -b -q 0 /");
 	if ($offer->disk_quota_hard)
-		exec("quotatool -u ".$this->system_user()." -b -l ".($offer->disk_quota_soft*1048576)." /");
+		exec("quotatool -u ".$this->system_user()." -b -l ".($offer->disk_quota_soft*1024)."MB /");
 	else
 		exec("quotatool -u ".$this->system_user()." -b -l 0 /");
 }
@@ -764,6 +775,28 @@ copy_tpl($file_from, $file_to, $replace_map, $mode, $usergroup);
 
 }
 
+/* ROOT ACCESS SCRIPTS */
+
+function root_foldersize($folder)
+{
+
+$this->subfolder($folder);
+
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id foldersize $folder";
+return shell_exec($command);
+
+}
+
+function root_tail($filename)
+{
+
+$this->subfolder($filename);
+
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id tail $filename";
+return shell_exec($command);
+
+}
+
 /* ROOT SCRIPTS */
 
 /**
@@ -818,15 +851,16 @@ $this->mkdir("backup/mysql", "755", "root");
 // Logs
 $this->mkdir("log", "750", "root");
 $this->mkdir("log/apache", "1755", "root");
-$this->mkdir("log/php", "1775", "root");
+$this->mkdir("log/php", "1755", $this->php_user());
 $this->mkdir("log/awstats", "1755", "root");
 
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
 // Cookies (PHP)
-$this->mkdir("cookies", "1770", "root");
+$this->mkdir("cookies", "700", $this->php_user());
 // Socket (PHP)
-$this->mkdir("socket", "750", "root");
+$this->mkdir("socket", "750", "root:root");
+filesystem::setacl($this->socket_folder(), $this->php_user());
 filesystem::setacl($this->socket_folder(), WEBSERVER_USER);
 
 // Private data & config
@@ -842,6 +876,21 @@ $this->mkdir("public/ftp", "755");
 
 // eMail
 $this->mkdir("mail", "700", $this->email_user());
+
+}
+
+/**
+ * @see db_object::script_update()
+ */
+function script_update()
+{
+
+// gestion de quota
+if ($offer=$this->offer)
+{
+	exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$offer->disk_quota_soft)."MB ".QUOTA_DISK);
+	exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$offer->disk_quota_hard)."MB ".QUOTA_DISK);
+}
 
 }
 
@@ -870,8 +919,30 @@ exec("addgroup ".$this->system_user()." ".ACCOUNT_SYSTEM_GROUP);
 $this->mkdir("", "750", "root");
 
 $this->script_structure();
-$this->script_update();
 $this->script_password_update();
+$this->script_update();
+
+}
+
+/**
+ * Returns the size of a folder
+ * @param string $folder
+ */
+function script_foldersize($folder)
+{
+
+echo filesystem::foldersize($folder);
+
+}
+
+/**
+ * Returns the size of a folder
+ * @param string $folder
+ */
+function script_tail($filename)
+{
+
+echo filesystem::tail($filename);
 
 }
 
