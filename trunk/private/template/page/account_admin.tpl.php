@@ -28,7 +28,56 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	list($row["email_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM email as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["website_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM website as t1, domain as t2 WHERE t1.domain_id=t2.id AND t2.account_id=$row[id]"));
 	list($row["mysql_nb"]) = mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM db as t1 WHERE t1.account_id=$row[id]"));
-	$row["disk_usage"] = $a->root_foldersize($a->folder());
+	$row["quota"] = $a->root_quota();
+	preg_match("/".str_replace("/", "\/", QUOTA_DISK)."[ ]*([0-9A-Z]+)[ ]*([0-9A-Z]+)[ ]*/", $row["quota"], $matches);
+	if (substr($matches[1], -1, 1) == "M" && substr($matches[1], 0, -1) >= 1024)
+	{
+		$row["quota1_k"] = substr($matches[1], 0, -1)*1024;
+		$row["quota1"] = substr($matches[1], 0, -1)/1024;
+		$row["quota1_u"] = "G";
+	}
+	elseif (substr($matches[1], -1, 1) == "M")
+	{
+		$row["quota1_k"] = substr($matches[1], 0, -1)*1024;
+		$row["quota1"] = substr($matches[1], 0, -1);
+		$row["quota1_u"] = "M";
+	}
+	elseif (substr($matches[1], -1, 1) == "K" && substr($matches[1], 0, -1) >= 1024)
+	{
+		$row["quota1_k"] = substr($matches[1], 0, -1);
+		$row["quota1"] = substr($matches[1], 0, -1)/1024;
+		$row["quota1_u"] = "M";
+	}
+	elseif (substr($matches[1], -1, 1) == "K")
+	{
+		$row["quota1_k"] = substr($matches[1], 0, -1);
+		$row["quota1"] = substr($matches[1], 0, -1);
+		$row["quota1_u"] = "K";
+	}
+	if (substr($matches[2], -1, 1) == "M" && substr($matches[2], 0, -1) >= 1024)
+	{
+		$row["quota2_k"] = substr($matches[2], 0, -1)*1024;
+		$row["quota2"] = substr($matches[2], 0, -1)/1024;
+		$row["quota2_u"] = "G";
+	}
+	elseif (substr($matches[2], -1, 1) == "M")
+	{
+		$row["quota2_k"] = substr($matches[2], 0, -1)*1024;
+		$row["quota2"] = substr($matches[2], 0, -1);
+		$row["quota2_u"] = "M";
+	}
+	elseif (substr($matches[2], -1, 1) == "K" && substr($matches[2], 0, -1) >= 1024)
+	{
+		$row["quota2_k"] = substr($matches[2], 0, -1);
+		$row["quota2"] = substr($matches[2], 0, -1)/1024;
+		$row["quota2_u"] = "M";
+	}
+	elseif (substr($matches[2], -1, 1) == "K")
+	{
+		$row["quota2_k"] = substr($matches[2], 0, -1);
+		$row["quota2"] = substr($matches[2], 0, -1);
+		$row["quota2_u"] = "K";
+	}
 	$offer = $a->offer();
 ?>
 <tr>
@@ -52,14 +101,18 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	<td><?php echo $a->societe; ?></td>
 	<td><?php if ($offer) echo $offer; ?></td>
 	<td align="right"><?php
-		echo round($row["disk_usage"], 2)."&nbsp;GO";
-		echo "<br />Max&nbsp;";
+		//echo $row["quota"];
+		//var_dump($matches);
+		echo round($row["quota1"], 2).$row["quota1_u"]." / ".($row["quota2"]?(round($row["quota2"], 2).$row["quota2_u"]):"&infin;");
+		if ($row["quota2_k"])
+			echo "<br />".round(100*$row["quota1_k"]/$row["quota2_k"], 2)."&nbsp;%";
+		/*echo "<br />Théorique&nbsp;Max&nbsp;";
 		if ($offer)
-			echo $offer->disk_quota_soft." GO (".round($row["disk_usage"]/$offer->disk_quota_soft, 2)."&nbsp;%)";
+			echo $offer->disk_quota_soft." GO";
 		elseif ($a->disk_quota_soft)
-			echo $a->disk_quota_soft." GO (".round($row["disk_usage"]/$a->disk_quota_soft, 2)."&nbsp;%)";
+			echo $a->disk_quota_soft." GO";
 		else
-			echo "&infin;";
+			echo "&infin;";*/
 	?></td>
 	<td align="right"><a href="domain.php?account_id=<?=$row["id"]?>"><?=$row["domain_nb"]?></a></td>
 	<td align="right"><a href="php.php?account_id=<?=$row["id"]?>"><?=$row["php_nb"]?></a></td>

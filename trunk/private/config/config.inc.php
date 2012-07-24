@@ -64,6 +64,7 @@ define("APACHE_SSL_CERT","server");
 define("APACHE_PUBLIC_WEBMASTER_EMAIL",WEBMASTER_EMAIL);
 
 // AWSTATS
+define("AWSTATS_USER","www-data");
 define("AWSTATS_CONF_DIR","/etc/awstats");
 
 // PHP Installation

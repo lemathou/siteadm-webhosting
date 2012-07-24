@@ -4,6 +4,9 @@
 # Application requirements
 ###
 
+# Subversion & hg
+apt-get install hg subversion
+
 # Directories
 echo "Directory structure..."
 mkdir /home/siteadm_admin
@@ -111,6 +114,7 @@ apt-get install zip unrar-free cabextract ripole
 # ejabberd
 echo "Ejabberd..."
 apt-get install ejabberd
+echo "Penser à télécharger et compiler le module MySQL"
 
 # ASterisk
 echo "Asterisk..."

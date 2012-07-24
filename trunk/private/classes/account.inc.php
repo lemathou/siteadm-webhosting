@@ -797,6 +797,14 @@ return shell_exec($command);
 
 }
 
+function root_quota()
+{
+
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id quota";
+return shell_exec($command);
+
+}
+
 /* ROOT SCRIPTS */
 
 /**
@@ -823,10 +831,12 @@ filesystem::setacl($this->folder(), WEBSERVER_USER);
 $this->mkdir(".ssh", "700");
 
 // Config files
-$this->mkdir("conf", "750", "root");	
-filesystem::setacl($this->folder()."/conf", WEBSERVER_USER);
+$this->mkdir("conf", "750", "root");
+filesystem::setacl($this->conf_folder(), WEBSERVER_USER);
+filesystem::setacl($this->conf_folder(), AWSTATS_USER);
 // Awstats
 $this->mkdir("conf/awstats", "750", "root");
+filesystem::setacl($this->conf_folder()."/awstats", AWSTATS_USER);
 // Apache
 $this->mkdir("conf/apache", "750", "root");
 filesystem::setacl($this->folder()."/conf/apache", WEBSERVER_USER);
@@ -850,9 +860,13 @@ $this->mkdir("backup/mysql", "755", "root");
 
 // Logs
 $this->mkdir("log", "750", "root");
-$this->mkdir("log/apache", "1755", "root");
-$this->mkdir("log/php", "1755", $this->php_user());
-$this->mkdir("log/awstats", "1755", "root");
+filesystem::setacl($this->log_folder(), WEBSERVER_USER);
+filesystem::setacl($this->log_folder(), AWSTATS_USER);
+$this->mkdir("log/apache", "1750", "root");
+filesystem::setacl($this->log_folder()."apache", WEBSERVER_USER);
+$this->mkdir("log/php", "1750", $this->php_user());
+$this->mkdir("log/awstats", "1770", "root");
+filesystem::setacl($this->log_folder()."/awstats", AWSTATS_USER, "rwx");
 
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
@@ -921,6 +935,16 @@ $this->mkdir("", "750", "root");
 $this->script_structure();
 $this->script_password_update();
 $this->script_update();
+
+}
+
+/**
+ * Returns the quota used by the user's group
+ */
+function script_quota()
+{
+
+echo shell_exec("quota -vlws -g ".$this->system_group());
 
 }
 
