@@ -101,18 +101,9 @@ foreach($account_list as $row) if (!isset($manager) || $row["manager_id"] == $ma
 	<td><?php echo $a->societe; ?></td>
 	<td><?php if ($offer) echo $offer; ?></td>
 	<td align="right"><?php
-		//echo $row["quota"];
-		//var_dump($matches);
-		echo round($row["quota1"], 2).$row["quota1_u"]." / ".($row["quota2"]?(round($row["quota2"], 2).$row["quota2_u"]):"&infin;");
-		if ($row["quota2_k"])
+		echo round($row["quota1"], 2).$row["quota1_u"]." / ".((isset($row["quota2"]) && $row["quota2"])?(round($row["quota2"], 2).$row["quota2_u"]):"&infin;");
+		if (isset($row["quota2_k"]) && $row["quota2_k"])
 			echo "<br />".round(100*$row["quota1_k"]/$row["quota2_k"], 2)."&nbsp;%";
-		/*echo "<br />Théorique&nbsp;Max&nbsp;";
-		if ($offer)
-			echo $offer->disk_quota_soft." GO";
-		elseif ($a->disk_quota_soft)
-			echo $a->disk_quota_soft." GO";
-		else
-			echo "&infin;";*/
 	?></td>
 	<td align="right"><a href="domain.php?account_id=<?=$row["id"]?>"><?=$row["domain_nb"]?></a></td>
 	<td align="right"><a href="php.php?account_id=<?=$row["id"]?>"><?=$row["php_nb"]?></a></td>

@@ -31,7 +31,7 @@
 <?php if (!$domain->id) { ?>
 <tr>
 	<td class="label">Nom</td>
-	<td class="field"><input name="name" value="<?php echo $db->name; ?>" /></td>
+	<td class="field"><input name="name" value="<?php echo $domain->name; ?>" /></td>
 </tr>
 <?php } ?>
 <tr>

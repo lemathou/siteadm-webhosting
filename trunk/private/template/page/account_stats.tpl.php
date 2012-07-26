@@ -20,12 +20,12 @@
 	<tr><td>Fichies temporaire :</td> <td align="right"><?php echo $account->root_foldersize($account->tmp_folder()); ?></td></tr>
 	<tr><td><b>Utilisation totale / Quota :</b></td> <td><?php echo $account->root_foldersize($account->folder()); ?></td>
 	<td><?php
-	if ($offer=offer($account->offre_id))
+	if ($offer=$account->offer())
 	{
-		if ($offer->disk_quota)
-			echo " / $offer->disk_quota GO";
+		if ($offer->disk_quota_soft)
+			echo " / $offer->disk_quota_soft GO";
 		else
-			echo " / illimité";
+			echo " / &infin;";
 	}
 	?></td></tr>
 	</table></td>
@@ -64,7 +64,7 @@
 <tr>
 	<td>Bases de donnée :</td>
 	<td><?php
-	echo array_pop(mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM `mysql` as t1 WHERE t1.`account_id`='$account->id'")));
+	echo array_pop(mysql_fetch_row(mysql_query("SELECT COUNT(*) FROM `db` as t1 WHERE t1.`account_id`='$account->id'")));
 	/*
 	$query_string = "SELECT SUM(t1.data_length+t1.index_length) as db_size FROM information_schema.tables as t1, siteadm_dev.mysql as t2, siteadm_dev.account as t3 WHERE t1.table_schema = t2.name AND t2.account_id = t3.id AND t3.id=$account->id GROUP BY t3.id";
 	$query = mysql_query($query_string);

@@ -92,8 +92,8 @@ function system_group()
 public function account()
 {
 
-if ($this->account_id)
-	return account($this->account_id);
+if ($account=account()->get($this->account_id))
+	return $account;
 else
 	return account_common();
 
@@ -106,8 +106,7 @@ else
 public function phpapp()
 {
 
-if ($this->phpapp_id)
-	return phpapp($this->phpapp_id);
+return phpapp()->get($this->phpapp_id);
 
 }
 

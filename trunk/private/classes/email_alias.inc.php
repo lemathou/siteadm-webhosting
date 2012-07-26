@@ -63,8 +63,7 @@ return "email.php?alias_id=$this->id";
 public function domain()
 {
 
-if ($this->domain_id)
-	return domain($this->domain_id);
+return domain()->get($this->domain_id);
 
 }
 
@@ -76,8 +75,7 @@ if ($this->domain_id)
 public function email()
 {
 
-if ($this->email_id)
-	return email($this->email_id);
+return email()->get($this->email_id);
 
 }
 

@@ -35,6 +35,7 @@ static public $_f = array
 	"actif" => array("type"=>"bool"),
 	"manager_id" => array("type"=>"object", "otype"=>"account"),
 	"offre_id" => array("type"=>"object", "otype"=>"offer"),
+	"civilite" => array("type"=>"select", "list"=>array('m', 'mme', 'mlle')),
 	"nom" => array("type"=>"string"),
 	"prenom" => array("type"=>"string"),
 	"email" => array("type"=>"string"),
@@ -68,8 +69,7 @@ return "account.php?id=$this->id";
 function manager()
 {
 
-if ($this->manager_id)
-	return account($this->manager_id);
+return account()->get($this->manager_id);
 
 }
 
@@ -79,8 +79,7 @@ if ($this->manager_id)
 function offer()
 {
 
-if  ($this->offre_id)
-	return offer($this->offre_id);
+return offer()->get($this->offre_id);
 
 }
 
@@ -411,12 +410,12 @@ if (login()->perm("admin"))
 	return "admin";
 }
 // Manager
-elseif (($account=account($this->account_id)) && ($account->manager_id == login()->id))
+elseif (($manager=$this->manager()) && $manager->id == login()->id)
 {
 	return "manager";
 }
 // User
-elseif ($this->account_id == login()->id)
+elseif ($this->id && $this->id == login()->id)
 {
 	return "user";
 }
@@ -864,6 +863,7 @@ filesystem::setacl($this->log_folder(), WEBSERVER_USER);
 filesystem::setacl($this->log_folder(), AWSTATS_USER);
 $this->mkdir("log/apache", "1750", "root");
 filesystem::setacl($this->log_folder()."apache", WEBSERVER_USER);
+filesystem::setacl($this->log_folder()."apache", AWSTATS_USER);
 $this->mkdir("log/php", "1750", $this->php_user());
 $this->mkdir("log/awstats", "1770", "root");
 filesystem::setacl($this->log_folder()."/awstats", AWSTATS_USER, "rwx");
@@ -899,12 +899,20 @@ $this->mkdir("mail", "700", $this->email_user());
 function script_update()
 {
 
+$disk_quota_soft = ($this->disk_quota_soft)?$this->disk_quota_soft:0;
+$disk_quota_hard = ($this->disk_quota_hard)?$this->disk_quota_hard:0;
+
 // gestion de quota
 if ($offer=$this->offer)
 {
-	exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$offer->disk_quota_soft)."MB ".QUOTA_DISK);
-	exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$offer->disk_quota_hard)."MB ".QUOTA_DISK);
+	if ($offer->disk_quota_soft && !$disk_quota_soft)
+		$disk_quota_soft = $offer->disk_quota_soft;
+	if ($offer->disk_quota_hard && !$disk_quota_hard)
+		$disk_quota_hard = $offer->disk_quota_hard;
 }
+
+exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$disk_quota_soft)."MB ".QUOTA_DISK);
+exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$disk_quota_hard)."MB ".QUOTA_DISK);
 
 }
 

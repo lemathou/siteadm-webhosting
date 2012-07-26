@@ -86,8 +86,7 @@ else
 public function domain()
 {
 
-if ($this->domain_id)
-	return domain($this->domain_id);
+return domain()->get($this->domain_id);
 
 }
 
@@ -98,8 +97,7 @@ if ($this->domain_id)
 public function webapp()
 {
 
-if ($this->webapp_id)
-	return webapp($this->webapp_id);
+return webapp()->get($this->webapp_id);
 
 }
 
@@ -110,8 +108,7 @@ if ($this->webapp_id)
 public function phppool()
 {
 
-if ($this->phppool_id)
-	return phppool($this->phppool_id);
+return phppool()->get($this->phppool_id);
 
 }
 
@@ -122,7 +119,7 @@ if ($this->phppool_id)
 public function account()
 {
 
-if ($account=account($this->account_id))
+if ($account=account()->get($this->account_id))
 	return $account;
 elseif (($domain=$this->domain()) && ($account=$domain->account()))
 	return $account;
@@ -174,15 +171,13 @@ return $this->public_folder();
 public function public_folder()
 {
 
-if (($account=$this->account()) && $this->folder)
-	return $account->public_folder()."/".$this->folder;
+return $this->account()->public_folder()."/".$this->folder;
 
 }
 public function private_folder()
 {
 
-if ($account=$this->account())
-	return $account->private_folder()."/".$this->folder;
+return $this->account()->private_folder()."/".$this->folder;
 
 }
 /**
@@ -193,8 +188,7 @@ if ($account=$this->account())
 function config_folder()
 {
 
-if ($account=$this->account())
-	return $account->public_folder()."/config";
+return $this->account()->public_folder()."/config";
 
 }
 
@@ -205,8 +199,7 @@ if ($account=$this->account())
 function apache_log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/apache";
+return $this->account()->log_folder()."/apache";
 
 }
 /**
@@ -216,8 +209,7 @@ if ($account=$this->account())
 function apache_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/apache";
+return $this->account()->conf_folder()."/apache";
 
 }
 
@@ -228,8 +220,7 @@ if ($account=$this->account())
 function awstats_log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/awstats";
+return $this->account()->log_folder()."/awstats";
 
 }
 /**
@@ -239,8 +230,7 @@ if ($account=$this->account())
 function awstats_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/awstats";
+return $this->account()->conf_folder()."/awstats";
 
 }
 
@@ -251,8 +241,7 @@ if ($account=$this->account())
 function php_log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/php";
+return $this->account()->log_folder()."/php";
 
 }
 /**
@@ -262,8 +251,7 @@ if ($account=$this->account())
 function php_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/php";
+return $this->account()->conf_folder()."/php";
 
 }
 /**
@@ -272,8 +260,7 @@ if ($account=$this->account())
 function php_vhost_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/php/vhost";
+return $this->account()->conf_folder()."/php/vhost";
 
 }
 

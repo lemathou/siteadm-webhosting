@@ -61,8 +61,7 @@ if ($this->id)
 function alias()
 {
 
-if ($this->website_id)
-	return website($this->website_id);
+return website()->get($this->website_id);
 
 }
 
@@ -83,8 +82,15 @@ else
 function domain()
 {
 
-if ($this->domain_id)
-	return domain($this->domain_id);
+return domain()->get($this->domain_id);
+
+}
+
+function account()
+{
+
+if ($domain=$this->domain())
+	return $domain->account();
 
 }
 
@@ -127,7 +133,7 @@ if (login()->perm("admin"))
 	return "admin";
 }
 // Special account access
-elseif ($account=account($this->account_id))
+elseif ($account=$this->account())
 {
 	if ($this->account_id == login()->id)
 		return "user";

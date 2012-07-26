@@ -61,8 +61,7 @@ else
 function language()
 {
 
-if ($this->language_id)
-	return language($this->language_id);
+return language()->get($this->language_id);
 
 }
 

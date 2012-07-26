@@ -44,8 +44,7 @@ static public $_f = array
 public function account()
 {
 
-if ($this->account_id)
-	return account($this->account_id);
+return account()->get($this->account_id);
 
 }
 

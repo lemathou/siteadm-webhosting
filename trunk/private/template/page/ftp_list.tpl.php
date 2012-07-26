@@ -2,7 +2,7 @@
 <table cellspacing="2" cellpadding="2" border="1">
 <?php
 
-if ($account)
+if (isset($account) && $account)
 	$query_ftp_where = "WHERE t2.id='".$account->id."'";
 else
 	$query_ftp_where = "";

@@ -62,8 +62,7 @@ return $this->name."@".$this->domain()->name;
 function domain()
 {
 
-if ($this->domain_id)
-	return domain($this->domain_id);
+return domain()->get($this->domain_id);
 
 }
 
@@ -76,7 +75,7 @@ if ($this->domain_id)
 function account()
 {
 
-if ($this->account_id && ($account=account($this->account_id)))
+if ($account=account()->get($this->account_id))
 	return $account;
 elseif ($domain=$this->domain())
 	return $domain->account();

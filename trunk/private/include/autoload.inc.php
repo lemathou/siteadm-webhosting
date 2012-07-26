@@ -5,7 +5,7 @@
  */
 $GLOBALS["object_list"] = array
 (
-	//"account" => array(),
+	"account" => array(),
 	"offer" => array(),
 	"domain" => array(),
 	"phpapp" => array(),
@@ -41,32 +41,16 @@ function login()
 
 /**
  * Returns account object
- * @param integer $id
+ * @param int $id
  * @return account
  */
-function account($id)
+function account($id=null)
 {
 
-	static $list;
-	if (!$list)
-		$list = array();
-
-	if (!is_numeric($id) || $id < 0)
-		return false;
-	$id = (int)$id;
-	if (isset($list[$id]))
-		return $list[$id];
-	if ($id == login()->id)
-		return $_SESSION["login"];
-
-	$account = new account($id);
-
-	//var_dump($account);
-
-	if ($account->id)
-		return $list[$id] = $account;
+	if (is_numeric($id) && $id>0 && $id == login()->id)
+		return login();
 	else
-		return false;
+		return object("account", $id);
 
 }
 

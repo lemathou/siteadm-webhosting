@@ -116,6 +116,10 @@ echo "Ejabberd..."
 apt-get install ejabberd
 echo "Penser à télécharger et compiler le module MySQL"
 
+# Bind
+echo "Bind..."
+apt-get install bind9 bindgraph
+
 # ASterisk
 echo "Asterisk..."
 apt-get install asterisk

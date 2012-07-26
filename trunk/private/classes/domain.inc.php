@@ -47,8 +47,8 @@ static public $_f = array
 public function account()
 {
 
-if ($this->account_id)
-	return account($this->account_id);
+if ($account=account()->get($this->account_id))
+	return $account;
 else
 	return account_common();
 
@@ -63,8 +63,7 @@ else
 function apache_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/apache";
+return $account->conf_folder()."/apache";
 
 }
 /**
@@ -74,8 +73,7 @@ if ($account=$this->account())
 public function apache_log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/apache";
+return $account->log_folder()."/apache";
 
 }
 
@@ -86,8 +84,7 @@ if ($account=$this->account())
 public function awstats_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/awstats";
+return $account->conf_folder()."/awstats";
 
 }
 /**
@@ -97,8 +94,7 @@ if ($account=$this->account())
 public function awstats_log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/awstats";
+return $account->log_folder()."/awstats";
 
 }
 
@@ -112,7 +108,7 @@ if ($account=$this->account())
 public function logaccess_file()
 {
 
-	return $this->apache_log_folder()."/$this->name.access.log";
+return $this->apache_log_folder()."/$this->name.access.log";
 
 }
 /**
@@ -133,7 +129,7 @@ return $this->awstats_conf_folder()."/$this->name.conf";
 function ssl_cert_file()
 {
 
-	return $this->apache_conf_folder()."/".$this->name.".crt";
+return $this->apache_conf_folder()."/".$this->name.".crt";
 
 }
 /**
@@ -142,7 +138,7 @@ function ssl_cert_file()
 function ssl_key_file()
 {
 
-	return $this->apache_conf_folder()."/".$this->name.".key";
+return $this->apache_conf_folder()."/".$this->name.".key";
 
 }
 /**
@@ -151,7 +147,7 @@ function ssl_key_file()
 function ssl_csr_file()
 {
 
-	return $this->apache_conf_folder()."/".$this->name.".csr";
+return $this->apache_conf_folder()."/".$this->name.".csr";
 
 }
 /**
@@ -160,7 +156,7 @@ function ssl_csr_file()
 function ssl_info_file()
 {
 
-	return $this->apache_conf_folder()."/".$this->name.".sslinfo";
+return $this->apache_conf_folder()."/".$this->name.".sslinfo";
 
 }
 

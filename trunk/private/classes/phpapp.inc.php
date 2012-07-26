@@ -65,8 +65,7 @@ return "php.php?app_id=$this->id";
 function folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/php/$this->name";
+return $this->account()->conf_folder()."/php/$this->name";
 
 }
 /**
@@ -75,8 +74,7 @@ if ($account=$this->account())
 function log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/php";
+return $this->account()->log_folder()."/php";
 
 }
 /**
@@ -203,7 +201,7 @@ return (int)file_get_contents($this->pid_file());
 public function account()
 {
 
-if ($account=account($this->account_id))
+if ($account=account()->get($this->account_id))
 	return $account;
 else
 	return account_common();
@@ -217,8 +215,7 @@ else
 public function language_bin()
 {
 
-if ($this->language_bin_id)
-	return language_bin($this->language_bin_id);
+return language_bin()->get($this->language_bin_id);
 
 }
 
@@ -247,7 +244,7 @@ public function phpext_list()
 {
 
 $list = array();
-if (is_array($this->extension))
+if (is_array($this->extension) && count($this->extension))
 {
 	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
 	$query = mysql_query($query_string);
@@ -262,7 +259,7 @@ public function phpext_loaded_list()
 {
 
 $list = array();
-if (is_array($this->extension_loaded))
+if (is_array($this->extension_loaded) && count($this->extension_loaded))
 {
 	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension_loaded).")";
 	$query = mysql_query($query_string);

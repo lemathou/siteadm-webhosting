@@ -59,8 +59,8 @@ return $this->account()->name."_".$this->username;
 public function account()
 {
 
-if ($this->account_id)
-	return account($this->account_id);
+if ($account=account()->get($this->account_id))
+	return $account;
 else
 	return account_common();
 
