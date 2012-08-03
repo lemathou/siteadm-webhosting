@@ -22,14 +22,14 @@ if (isset($_POST["_domain_add"]))
 	if ($domain->id)
 		$_GET["id"] = $domain->id;
 }
-if (isset($_POST["_domain_update"]) && isset($_POST["id"]) && ($domain=domain($_POST["id"])))
+if (isset($_POST["_domain_update"]) && isset($_POST["id"]) && ($domain=domain()->get($_POST["id"])))
 {
 	$domain->update($_POST);
 }
 if (isset($_POST["_domain_action"]) && isset($_POST["_list_id"]) && is_array($_POST["_list_id"]))
 {
 	foreach($_POST["_list_id"] as $id)
-		if (($object=domain($id)))
+		if (($object=domain()->get($id)))
 		{
 			switch ($_POST["_domain_action"])
 			{

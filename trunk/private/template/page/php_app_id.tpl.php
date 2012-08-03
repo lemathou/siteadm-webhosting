@@ -3,7 +3,7 @@
 <div style="float: right;width: 320px;" class="cadre">
 <h3>Error log file</h3>
 <div style="border: 1px black solid;padding: 4px;overflow: auto;max-height: 200px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$phpapp->errorlog_file(), $exec); echo implode("<hr />\n", $exec); ?>
+<?php echo $phpapp->account()->root_tail($phpapp->errorlog_file()); ?>
 </div>
 <h3>Processus</h3>
 <div style="border: 1px black solid;padding: 4px;overflow: auto;max-height: 200px;">

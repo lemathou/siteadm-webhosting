@@ -25,8 +25,8 @@ static protected $_db_table = "ftp_user";
 
 static public $_f = array
 (
-	"actif" => array("type"=>"bool"),
 	"account_id" => array("type"=>"object", "otype"=>"account"),
+	"actif" => array("type"=>"bool"),
 	"username" => array("type"=>"string"),
 	"password" => array("type"=>"string"),
 	"type" => array("type"=>"select", "list"=>array("public", "private"), "default"=>"public"),

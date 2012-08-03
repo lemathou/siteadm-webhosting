@@ -135,21 +135,23 @@ if ($domain)
 }
 
 // Contenu de page
-if (isset($_GET["add"]) && isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website::insert_perm())
-{
-	include "template/page/website_add.tpl.php";
-}
-elseif (isset($_GET["alias_add"]) && ((website_alias::insert_perm() == "admin") || (isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website_alias::insert_perm())))
-{
-	include "template/page/website_alias_add.tpl.php";
-}
-elseif (isset($_GET["id"]) && ($website=website($_GET["id"])) && $website->update_perm())
+if (isset($_GET["id"]) && ($website=website($_GET["id"])) && $website->update_perm())
 {
 	include "template/page/website_id.tpl.php";
+}
+elseif (isset($_GET["add"]) && isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website::insert_perm())
+{
+	$website = new website();
+	include "template/page/website_add.tpl.php";
 }
 elseif (isset($_GET["alias_id"]) && ($website_alias=website_alias($_GET["alias_id"])) && $website_alias->update_perm())
 {
 	include "template/page/website_alias_id.tpl.php";
+}
+elseif (isset($_GET["alias_add"]) && ((website_alias::insert_perm() == "admin") || (isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && ($domain->update_perm()) && website_alias::insert_perm())))
+{
+	$website_alias = new website_alias();
+	include "template/page/website_alias_add.tpl.php";
 }
 elseif (isset($_GET["domain_id"]) && ($domain=domain($_GET["domain_id"])) && $domain->update_perm())
 {

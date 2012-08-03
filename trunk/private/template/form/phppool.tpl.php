@@ -185,22 +185,24 @@
 	<td class="label"><a href="http://www.php.net/manual/en/ini.core.php#ini.extension" target="_blank">Extensions dynamique chargées</a> :<br />(Parmis la liste des modules disponibles à l'utilisateur - certains modules sont aussi intégrés à PHP à la compilation)</td>
 	<td class="field"><input type="hidden" name="extension" /><select name="extension[]" multiple size="5">
 	<?php
-	$phpapp_ext_loaded_list = $phpapp->phpext_loaded_list();
-	foreach($phpapp_ext_loaded_list as $ext)
-	{
-		echo "<option value=\"".$ext["id"]."\" disabled><i>".$ext["description"]."</i> (déjà chargée)</option>\n";
-	}
-	foreach($phpapp->phpext_list() as $ext)
-	{
-		if (isset($phpapp_ext_loaded_list[$ext["id"]]))
-			echo "";
-		elseif (in_array($ext["id"], $phppool->extension))
-			echo "<option value=\"".$ext["id"]."\" selected>".$ext["description"]."</option>\n";
-		else
-			echo "<option value=\"".$ext["id"]."\">".$ext["description"]."</option>\n";
+	if ($phpapp) {
+		$phpapp_ext_loaded_list = $phpapp->phpext_loaded_list();
+		foreach($phpapp_ext_loaded_list as $ext)
+		{
+			echo "<option value=\"".$ext["id"]."\" disabled><i>".$ext["description"]."</i> (déjà chargée)</option>\n";
+		}
+		foreach($phpapp->phpext_list() as $ext)
+		{
+			if (isset($phpapp_ext_loaded_list[$ext["id"]]))
+				echo "";
+			elseif (in_array($ext["id"], $phppool->extension))
+				echo "<option value=\"".$ext["id"]."\" selected>".$ext["description"]."</option>\n";
+			else
+				echo "<option value=\"".$ext["id"]."\">".$ext["description"]."</option>\n";
+		}
 	}
 	?>
-	</select><?php echo mysql_error(); ?></td>
+	</select></td>
 	</tr>
 <tr>
 	<td class="label"><a href="http://www.php.net/manual/en/ini.core.php#ini.disable-functions" target="_blank">Fonctions désactivées</a> :<br />(Pour des raisons de sécurité)</td>

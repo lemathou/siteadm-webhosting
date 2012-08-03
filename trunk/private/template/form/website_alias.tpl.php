@@ -1,4 +1,4 @@
-<form method="post" action="?domain_id=<?php echo $website_alias->domain_id; ?>">
+<form method="post" action="<?php echo $website_alias->url(); ?>">
 <?php if ($website_alias->id) { ?>
 <input type="hidden" name="id" value="<?php echo $website_alias->id; ?>" />
 <?php } else { ?>
@@ -9,7 +9,7 @@
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 	<td>Sous-domaine :</td>
-	<td><input name="alias_name" value="<?php echo $website_alias->name; ?>" />.<?php if ($domain) echo $domain->name; else echo "*"; ?></td>
+	<td><input name="alias_name" value="<?php echo $website_alias->alias_name; ?>" />.<?php if ($domain) echo $domain->name; else echo "*"; ?></td>
 </tr>
 <tr>
 	<td>Alias de :</td>
@@ -25,7 +25,7 @@
 			echo "<optgroup label=\"$row[domain_name]\">\n";
 			$d=$row["domain_id"];
 		}
-		if ($website_alias->website_id && $row["id"])
+		if ($website_alias->website_id == $row["id"])
 			echo "<option value=\"$row[id]\" selected>$row[name].$row[domain_name]</option>\n";
 		else
 			echo "<option value=\"$row[id]\">$row[name].$row[domain_name]</option>\n";

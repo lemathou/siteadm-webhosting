@@ -32,7 +32,7 @@ static public $_f = array
 (
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"account_id" => array("type"=>"object", "otype"=>"account"),
-	"phpapp_id" => array("type"=>"object", "otype"=>"phpapp"),
+	"phpapp_id" => array("type"=>"object", "otype"=>"phpapp", "nonempty"=>true),
 	"worker_nb_max" => array("type"=>"int", "default"=>PHP_WORKER_NB_MAX),
 	"worker_max_requests" => array("type"=>"int", "default"=>PHP_WORKER_MAX_REQUESTS),
 	"webmaster_email" => array("type"=>"string"),
@@ -144,8 +144,7 @@ return $list;
 public function log_folder()
 {
 
-if ($account=$this->account())
-	return $account->log_folder()."/php";
+return $this->account()->log_folder()."/php";
 
 }
 /**
@@ -154,8 +153,7 @@ if ($account=$this->account())
 public function conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/php/pool";
+return $this->account()->conf_folder()."/php/pool";
 
 }
 /**
@@ -164,8 +162,7 @@ if ($account=$this->account())
 public function socket_folder()
 {
 
-if ($account=$this->account())
-	return $account->socket_folder();
+return $this->account()->socket_folder();
 
 }
 /**
@@ -184,8 +181,7 @@ if ($phpapp=$this->phpapp())
 public function apache_conf_folder()
 {
 
-if ($account=$this->account())
-	return $account->conf_folder()."/apache";
+return $this->account()->conf_folder()."/apache";
 
 }
 /**
@@ -194,8 +190,7 @@ if ($account=$this->account())
 public function session_folder()
 {
 
-if ($account=$this->account())
-	return $account->session_folder();
+return $this->account()->session_folder();
 
 }
 
@@ -370,7 +365,7 @@ if ($perm != "admin" && ($perm != "manager" || !isset($infos["account_id"]) || !
 {
 	$infos["account_id"] = login()->id;
 }
-if (isset($infos["phpapp_id"]) && ($phpapp=phpapp($infos["phpapp_id"])) && $phpapp->account_id && $phpapp->account_id != login()->id)
+if (isset($infos["phpapp_id"]) && (!($phpapp=phpapp()->get($infos["phpapp_id"])) || (!login()->perm("admin") && $phpapp->account_id && $phpapp->account_id != login()->id)))
 {
 	unset($infos["phpapp_id"]);
 }
@@ -497,7 +492,7 @@ $map = array
 	"{PHP_INI}" => $this->ini_file(),
 	"{PHP_PID}" => $this->pid_file(),
 	"{PHP_TMP_DIR}" => $account->tmp_folder(),
-	"{PHP_SESSION_FOLDER}" => $this->session_folder(),
+	"{PHP_SESSION_DIR}" => $this->session_folder(),
 	"{WEBSERVER_GROUP}" => WEBSERVER_GROUP,
 	"{PHP_WORKER_NB_MAX}" => $this->worker_nb_max,
 	"{PHP_WORKER_SPARE_NB_MIN}" => 1,

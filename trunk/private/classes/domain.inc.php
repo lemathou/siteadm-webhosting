@@ -63,7 +63,7 @@ else
 function apache_conf_folder()
 {
 
-return $account->conf_folder()."/apache";
+return $this->account()->conf_folder()."/apache";
 
 }
 /**
@@ -73,7 +73,7 @@ return $account->conf_folder()."/apache";
 public function apache_log_folder()
 {
 
-return $account->log_folder()."/apache";
+return $this->account()->log_folder()."/apache";
 
 }
 
@@ -84,7 +84,7 @@ return $account->log_folder()."/apache";
 public function awstats_conf_folder()
 {
 
-return $account->conf_folder()."/awstats";
+return $this->account()->conf_folder()."/awstats";
 
 }
 /**
@@ -94,7 +94,7 @@ return $account->conf_folder()."/awstats";
 public function awstats_log_folder()
 {
 
-return $account->log_folder()."/awstats";
+return $this->account()->log_folder()."/awstats";
 
 }
 

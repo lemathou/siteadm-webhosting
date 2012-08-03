@@ -1,5 +1,5 @@
 <?php if ($ftp->id) { ?>
-<form method="post" class="edit">
+<form method="post" action="?id=<?php echo $ftp->id; ?>" class="edit">
 <input type="hidden" name="id" value="<?php echo $ftp->id; ?>" />
 <table>
 <tr>
@@ -17,7 +17,7 @@
 </form>
 <?php } ?>
 
-<form method="post" class="edit">
+<form method="post" action="<?php echo ($ftp->id?"?id=$ftp->id":"?add") ?>" class="edit">
 <input type="hidden" name="account_id" value="<?php echo $ftp->account_id; ?>" />
 <table>
 <tr>

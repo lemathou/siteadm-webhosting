@@ -126,7 +126,7 @@
 </tr>
 <tr>
 	<td class="label">Max memory limit</td>
-	<td class="field"><input name="php_max_memory_limit" value="<?php echo $website->php_max_memory_limit; ?>" /> MO</td>
+	<td class="field"><input name="php_memory_limit" value="<?php echo $website->php_memory_limit; ?>" /> MO</td>
 </tr>
 <tr>
 	<td class="label">Short open tag</td>

@@ -52,7 +52,9 @@ function url()
 {
 
 if ($this->id)
-	return "website.php?alias_id=$this->id";
+	return "website.php?domain_id=$this->domain_id&alias_id=$this->id";
+else
+	return "website.php?domain_id=$this->domain_id&alias_add";
 
 }
 
@@ -91,6 +93,8 @@ function account()
 
 if ($domain=$this->domain())
 	return $domain->account();
+else
+	return account_common();
 
 }
 

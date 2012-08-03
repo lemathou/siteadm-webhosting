@@ -15,20 +15,20 @@ $menu = "ftp";
 
 // ACTIONS
 
-if (isset($_POST["_ftp_add"]) && isset($_POST["name"]))
+if (isset($_POST["_insert"]))
 {
 	$ftp = new ftp();
-	$ftp->db_insert($_POST);
+	$ftp->insert($_POST);
 	if ($ftp->id)
 		$_GET["id"] = $ftp->id;
 }
-if (isset($_POST["_ftp_update"]) && isset($_POST["id"]) && ($ftp=ftp($_POST["id"])))
+if (isset($_POST["_update"]) && isset($_POST["id"]) && ($ftp=ftp()->get($_POST["id"])))
 {
-	$ftp->db_update($_POST);
+	$ftp->update($_POST);
 }
-if (isset($_POST["ftp_del"]) && isset($_POST["id"]) && ($ftp=ftp($_POST["id"])))
+if (isset($_POST["_delete"]) && isset($_POST["id"]) && ($ftp=ftp()->get($_POST["id"])))
 {
-	$ftp->db_delete();
+	$ftp->delete();
 }
 
 

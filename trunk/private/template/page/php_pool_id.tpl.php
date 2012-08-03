@@ -5,15 +5,15 @@
 <h3>FPM PING</h3>
 <h3>Error log file</h3>
 <div style="border: 1px black solid;padding: 4px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$phppool->errorlog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php echo $account->root_tail($phppool->errorlog_file()); ?>
 </div>
 <h3>Slow log file</h3>
 <div style="border: 1px black solid;padding: 4px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$phppool->slowlog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php echo $account->root_tail($phppool->slowlog_file()); ?>
 </div>
 <h3>Mail log file</h3>
 <div style="border: 1px black solid;padding: 4px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ".$phppool->maillog_file(), $exec); echo implode("<br />\n", $exec); ?>
+<?php echo $account->root_tail($phppool->maillog_file()); ?>
 </div>
 <div>
 <h3>PHP INFO</h3>
@@ -21,11 +21,11 @@
 </div>
 <h3>Compile log file</h3>
 <div style="border: 1px black solid;padding: 4px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail /home/workspace/SiteAdm/sources/compile-php-5.3.6-test.log", $exec); echo implode("<br />\n", $exec); ?>
+<?php //echo $account->root_tail("/home/siteadm_admin/sources/compile-php-5.3.6-test.log"); ?>
 </div>
 <h3>Compile error log file</h3>
 <div style="border: 1px black solid;padding: 4px;">
-<?php $exec = ""; exec("sudo /usr/bin/tail ", $exec); echo implode("<br />\n", $exec); ?>
+<?php  ?>
 </div>
 </div>
 
