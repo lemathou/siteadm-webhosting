@@ -2,6 +2,7 @@
 
 require_once "config/config.inc.php";
 require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common_logged.inc.php";
 
 // AUTH
 

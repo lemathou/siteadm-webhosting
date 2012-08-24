@@ -4,7 +4,7 @@
 # Application requirements
 ###
 
-# Subversion & hg
+# Subversion & Mercurial
 apt-get install hg subversion
 
 # Directories
@@ -56,7 +56,7 @@ echo "Base installation completed"
 
 # Awstats
 echo "Awstats..."
-apt-get install awstats libgeo-ipfree-perl libgeo-ip-perl
+apt-get install awstats libgeo-ipfree-perl libgeo-ip-perl libencode-perl liburi-perl
 cp /home/siteadm_admin/template/awstats/awstats.common /etc/awstats/awstats.common
 
 # Passwords
@@ -75,6 +75,10 @@ quotaoff -a
 quotacheck -vgumc /home
 # @todo : update fstab avec SED : ,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,acl
 quotaon -avug
+
+# Mercurial sur apache
+apt-get install libapache2-mod-wsgi
+a2enmod wsgi
 
 # ProftpD
 echo "ProftpD..."

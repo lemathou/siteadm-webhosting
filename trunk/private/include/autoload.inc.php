@@ -49,6 +49,8 @@ function account($id=null)
 
 	if (is_numeric($id) && $id>0 && $id == login()->id)
 		return login();
+	elseif (is_numeric($id) && $id == 0)
+		return account_common();
 	else
 		return object("account", $id);
 

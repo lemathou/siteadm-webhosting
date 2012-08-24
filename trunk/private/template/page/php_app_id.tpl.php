@@ -1,7 +1,7 @@
 <h1>Processus PHP parent : <?php echo $phpapp->name; ?></h1>
 
 <div style="float: right;width: 320px;" class="cadre">
-<h3>Error log file</h3>
+<h3>Error log file : <?php echo $phpapp->errorlog_file(); ?></h3>
 <div style="border: 1px black solid;padding: 4px;overflow: auto;max-height: 200px;">
 <?php echo $phpapp->account()->root_tail($phpapp->errorlog_file()); ?>
 </div>

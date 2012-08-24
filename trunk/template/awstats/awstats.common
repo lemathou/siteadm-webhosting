@@ -256,7 +256,7 @@ AllowToUpdateStatsFromBrowser=0
 #  3 - Possible on CLI and CGI
 # Default: 2
 #
-AllowFullYearView=2
+AllowFullYearView=3
 
 
 
@@ -326,7 +326,7 @@ SkipDNSLookupFor=""
 # Possible values: 0 or 1
 # Default: 0
 #
-AllowAccessFromWebToAuthenticatedUsersOnly=0
+AllowAccessFromWebToAuthenticatedUsersOnly=1
 
 
 # This parameter gives the list of all authorized authenticated users to view
@@ -582,7 +582,7 @@ OnlyFiles=""
 # Example: ""
 # Default: "css js class gif jpg jpeg png bmp ico rss xml swf"
 #
-NotPageList="css js class gif jpg jpeg png bmp ico rss xml swf"
+NotPageList="css js class gif jpg jpeg png bmp ico rss xml swf zip arj rar gz z bz2 wav mp3 wma mpg avi"
 
 
 # By default, AWStats considers that records found in web log file are

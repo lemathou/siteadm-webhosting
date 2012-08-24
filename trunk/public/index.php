@@ -2,6 +2,7 @@
 
 require_once "config/config.inc.php";
 require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common_logged.inc.php";
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

@@ -781,7 +781,7 @@ function root_foldersize($folder)
 
 $this->subfolder($folder);
 
-$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id foldersize $folder";
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh account $this->id foldersize $folder";
 return shell_exec($command);
 
 }
@@ -791,7 +791,8 @@ function root_tail($filename)
 
 $this->subfolder($filename);
 
-$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id tail $filename";
+
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh account $this->id tail $filename";
 return shell_exec($command);
 
 }
@@ -799,7 +800,7 @@ return shell_exec($command);
 function root_quota()
 {
 
-$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id quota";
+$command = "sudo ".SITEADM_SCRIPT_DIR."/db_object.psh account $this->id quota";
 return shell_exec($command);
 
 }
@@ -862,11 +863,13 @@ $this->mkdir("log", "750", "root");
 filesystem::setacl($this->log_folder(), WEBSERVER_USER);
 filesystem::setacl($this->log_folder(), AWSTATS_USER);
 $this->mkdir("log/apache", "1750", "root");
-filesystem::setacl($this->log_folder()."apache", WEBSERVER_USER);
-filesystem::setacl($this->log_folder()."apache", AWSTATS_USER);
+filesystem::setacl($this->log_folder()."/apache", WEBSERVER_USER);
+filesystem::setacl($this->log_folder()."/apache", AWSTATS_USER);
 $this->mkdir("log/php", "1750", $this->php_user());
 $this->mkdir("log/awstats", "1770", "root");
 filesystem::setacl($this->log_folder()."/awstats", AWSTATS_USER, "rwx");
+exec("setfacl -m m::rwx ".$this->log_folder()."/awstats");
+exec("setfacl -m g::rx ".$this->log_folder()."/awstats");
 
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
@@ -903,7 +906,7 @@ $disk_quota_soft = ($this->disk_quota_soft)?$this->disk_quota_soft:0;
 $disk_quota_hard = ($this->disk_quota_hard)?$this->disk_quota_hard:0;
 
 // gestion de quota
-if ($offer=$this->offer)
+if ($offer=$this->offer())
 {
 	if ($offer->disk_quota_soft && !$disk_quota_soft)
 		$disk_quota_soft = $offer->disk_quota_soft;
