@@ -14,6 +14,8 @@ if (isset($_FILES))
 ?>
 
 <form enctype="multipart/form-data" method="post">
-<p><input type="file" name="file" /> <input type="submit" value="Envoyer" /></p>
+	<p>
+		<input type="file" name="file" /> <input type="submit" value="Envoyer" />
+	</p>
 </form>
 

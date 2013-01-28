@@ -1,0 +1,11 @@
+
+syntax: regexp
+^trunk/cookies$
+syntax: regexp
+^trunk/log/apache$
+syntax: regexp
+^trunk/log/php$
+syntax: regexp
+^trunk/log/php-fpm$
+syntax: regexp
+^trunk/install/sql$

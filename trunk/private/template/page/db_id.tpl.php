@@ -1,4 +1,7 @@
-<h3>Base de donnée MySQL : <?php echo $db->name; ?></h3>
+<h3>
+	Base de donnée MySQL :
+	<?php echo $db->name; ?>
+</h3>
 
 <?php
 

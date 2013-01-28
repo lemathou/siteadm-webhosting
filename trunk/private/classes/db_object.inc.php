@@ -2,7 +2,7 @@
 
 /**
  * ORM list management class
- * 
+ *
  * @package siteadm
  */
 abstract class db_object_manager
@@ -10,10 +10,10 @@ abstract class db_object_manager
 
 	/*
 	 * Object name
-	 * @var string
-	 */
+	* @var string
+	*/
 	static protected $name;
-	
+
 	/*
 	 * Database main table
 	* @var string
@@ -22,15 +22,15 @@ abstract class db_object_manager
 
 	/*
 	 * Use cache for objects
-	 * @var bool
-	 */
+	* @var bool
+	*/
 	static public $object_cache = false;
 	static public $object_cache_ttl = 60;
-	
+
 	/*
 	 * Objects list
-	 * @var array
-	 */
+	* @var array
+	*/
 	public $list = array();
 
 	/**
@@ -45,7 +45,7 @@ abstract class db_object_manager
 
 	/**
 	 * Récupération d'une liste d'objets en base de donnée à partir de paramètres de recherche
-	 * 
+	 *
 	 * @todo créer un modèle standard pour les paramètres de recherche
 	 * @param mixed $params
 	 */
@@ -54,9 +54,9 @@ abstract class db_object_manager
 
 
 	}
-	
+
 	/* ACTIONS */
-	
+
 	/**
 	 * Insert an object
 	 * @param array $infos
@@ -71,7 +71,7 @@ abstract class db_object_manager
 			return $this->list[$object->id] = $object;
 		}
 	}
-	
+
 	/**
 	 * Returns an object
 	 * @param int $params
@@ -98,7 +98,7 @@ abstract class db_object_manager
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns all objects
 	 * @return array
@@ -114,7 +114,7 @@ abstract class db_object_manager
 		}
 		return $list;
 	}
-	
+
 	/**
 	 * Delete an object
 	 * @param int $id
@@ -128,12 +128,12 @@ abstract class db_object_manager
 			$this->cache_delete($id);
 		}
 	}
-	
+
 	/* CACHE */
-	
+
 	/**
 	 * Cache an object
-	 * 
+	 *
 	 * @param int $id
 	 * @return db_object
 	 */
@@ -144,10 +144,10 @@ abstract class db_object_manager
 			return $object;
 		}
 	}
-	
+
 	/**
 	 * Cache an object
-	 * 
+	 *
 	 * @param db_object $object
 	 */
 	public function cache_update(db_object $object)
@@ -157,10 +157,10 @@ abstract class db_object_manager
 			apc_store(static::$name."_".$object->id, $object, static::$object_cache_ttl);
 		}
 	}
-	
+
 	/**
 	 * Cache an object
-	 * 
+	 *
 	 * @param mixed $param
 	 * @return bool
 	 */
@@ -171,10 +171,10 @@ abstract class db_object_manager
 			if (is_numeric($param))
 				return apc_delete(static::$name."_".(int)$param);
 			elseif (get_class($param) == static::$name && $param->id)
-				return apc_delete(static::$name."_".$param->id);
+			return apc_delete(static::$name."_".$param->id);
 		}
 	}
-	
+
 }
 
 /**
@@ -187,40 +187,40 @@ abstract class db_object
 
 	/*
 	 * Object name (get_called_class())
-	 * @var string
-	 */
+	* @var string
+	*/
 	static protected $_name = "";
 
 	/*
 	 * Database main table
-	 * @var string
-	 */
+	* @var string
+	*/
 	static protected $_db_table = "";
-	
+
 	/*
 	 * Last update timestamp
-	 * @var int (timestamp)
-	 */
+	* @var int (timestamp)
+	*/
 	protected $_update;
 
 	/*
 	 * Database PRIMARY key
-	 * @var int
-	 */
+	* @var int
+	*/
 	public $id;
 
 	/*
 	 * Fields Specifications
-	 * @example array(
-	 * 	"machin_id" => array("type"=>"object", "otype"=>"account", "dep"=>true),
-	 * 	"name" => array("type"=>"string", "size"=>32),
-	 * 	"choice" => array("type"=>"select", "list"=>array(0, 1, 2)),
-	 * 	"number" => array("type"=>"number", "size"=>8),
-	 * 	"ok" => array("type"=>"bool"),
-	 * 	"price" => array("type"=>"float"),
-	 * );
-	 * @var array
-	 */
+	* @example array(
+			* 	"machin_id" => array("type"=>"object", "otype"=>"account", "dep"=>true),
+			* 	"name" => array("type"=>"string", "size"=>32),
+			* 	"choice" => array("type"=>"select", "list"=>array(0, 1, 2)),
+			* 	"number" => array("type"=>"number", "size"=>8),
+			* 	"ok" => array("type"=>"bool"),
+			* 	"price" => array("type"=>"float"),
+			* );
+	* @var array
+	*/
 	static protected $_f = array();
 
 	static function _manager()
@@ -228,7 +228,7 @@ abstract class db_object
 		$classname = static::$_name;
 		return $classname();
 	}
-	
+
 	/**
 	 * Retrieve info about a field
 	 *
@@ -250,12 +250,12 @@ abstract class db_object
 		{
 			return static::$_f;
 		}
-		
+
 	}
 
 	/**
 	 * Object name
-	 * 
+	 *
 	 * Recommanded to overload
 	 * @return string
 	 */
@@ -265,7 +265,7 @@ abstract class db_object
 		if (array_key_exists("label", static::$_f) && !is_null($this->label))
 			return "$this->label";
 		elseif (array_key_exists("name", static::$_f) && !is_null($this->name))
-			return "$this->name";
+		return "$this->name";
 		else
 			return get_called_class()." ID#$this->id";
 
@@ -273,7 +273,7 @@ abstract class db_object
 
 	/**
 	 * Object update url
-	 * 
+	 *
 	 * Recommanded to overload
 	 * @return string
 	 */
@@ -301,17 +301,17 @@ abstract class db_object
 
 	/**
 	 * Construct
-	 * 
+	 *
 	 * Two ways : directly using $infos or using database query $params
 	 * @param mixed $params
 	 * @param array $infos
 	 */
 	function __construct($params=null, $infos=array())
 	{
-		
+
 		if (!is_array($infos))
 			$infos = array();
-		
+
 		foreach(static::$_f as $name=>$field)
 		{
 			if (!isset($infos[$name]))
@@ -332,71 +332,71 @@ abstract class db_object
 	}
 
 	// PERM
-	
+
 	/**
-	 * Returns the insert permission level of the connected user for this object 
-	 * 
+	 * Returns the insert permission level of the connected user for this object
+	 *
 	 * TO BE OVERLOADED
 	 * @return string|bool
 	 */
 	static public function insert_perm()
 	{
-	
-	if (login()->perm("admin"))
-		return "admin";
-	else
-		return false;
-	
+
+		if (login()->perm("admin"))
+			return "admin";
+		else
+			return false;
+
 	}
-	
+
 	/**
-	 * Returns the update permission level of the connected user for this object 
-	 * 
+	 * Returns the update permission level of the connected user for this object
+	 *
 	 * TO BE OVERLOADED
 	 * @return string|bool
 	 */
 	public function update_perm()
 	{
-	
-	if (login()->perm("admin"))
-		return "admin";
-	else
-		return false;
-	
+
+		if (login()->perm("admin"))
+			return "admin";
+		else
+			return false;
+
 	}
-	
+
 	/**
-	 * Returns the delete permission level of the connected user for this object 
-	 * 
+	 * Returns the delete permission level of the connected user for this object
+	 *
 	 * TO BE OVERLOADED
 	 * @return string|bool
 	 */
 	public function delete_perm()
 	{
-	
-	if (login()->perm("admin"))
-		return "admin";
-	else
-		return false;
-	
+
+		if (login()->perm("admin"))
+			return "admin";
+		else
+			return false;
+
 	}
-	
+
 	/**
 	 * Returns the init reload permission level of the connected user for this object
-	 * 
+	 *
 	 * TO BE OVERLOADED
 	 * @return string|bool
 	 */
 	public function reload_perm()
 	{
-	
-	if (login()->perm("admin"))
-		return "admin";
-	else
-		return false;
-	
+
+		if (login()->perm("admin"))
+			return "admin";
+		else
+			return false;
+
 	}
-	
+
 	// UPDATE
 
 	/**
@@ -414,7 +414,7 @@ abstract class db_object
 		$this->{$name} = $value;
 		$this->convert($name, $this->{$name});
 	}
-	
+
 	/**
 	 * Standard field converter
 	 *
@@ -425,7 +425,7 @@ abstract class db_object
 	 */
 	public function convert($name, &$value)
 	{
-		
+
 		if (!is_string($name) || !array_key_exists($name, static::$_f))
 			return false;
 		if (!array_key_exists("type", static::$_f[$name]))
@@ -439,21 +439,21 @@ abstract class db_object
 				if ($value === "1")
 					$value = "1";
 				elseif ($value !== "0")
-					$value = null;
+				$value = null;
 				break;
-			// String (param size)
+				// String (param size)
 			case "str":
 			case "string":
 				if (!is_string($value))
 					$value = null;
 				break;
-			// Object (param otype)
+				// Object (param otype)
 			case "obj":
 			case "object":
 				if (!is_numeric($value) || !($class=static::$_f[$name]["otype"]) || !($class($value)))
 					$value = null;
 				break;
-			// Object list (param otype)
+				// Object list (param otype)
 			case "obj_list":
 			case "object_list":
 				if (!is_array($value) || !($class=static::$_f[$name]["otype"]))
@@ -464,41 +464,41 @@ abstract class db_object
 				{
 					foreach($value as $nb=>$v)
 						if ($class($v))
-							unset($value[$nb]);
+						unset($value[$nb]);
 				}
 				break;
-			// Number (param size)
+				// Number (param size)
 			case "numeric":
 			case "number":
 				if (!is_numeric($value))
 					$value = (float)$value;
 				break;
-			// Integer (param size)
+				// Integer (param size)
 			case "int":
 			case "integer":
 				if (!is_int($value))
 					$value = (int)$value;
 				break;
-			// Floating point number (param size)
+				// Floating point number (param size)
 			case "float":
 				if (!is_float($value))
 					$value = (float)$value;
 				break;
-			// Element of a list (param list)
+				// Element of a list (param list)
 			case "enum":
 			case "select":
 				if (!(is_string($value) || is_numeric($value)) || !in_array($value, static::$_f[$name]["list"]))
 					if (isset(static::$_f[$name]["default"]))
-						$value = static::$_f[$name]["default"];
-					else
-						$value = null;
-			// Default (no control)
+					$value = static::$_f[$name]["default"];
+				else
+					$value = null;
+				// Default (no control)
 			default :
 				break;
 		}
-		
+
 		return true;
-	
+
 	}
 
 	/**
@@ -524,9 +524,9 @@ abstract class db_object
 			if (!$this->convert($name, $value))
 				unset($infos[$name]);
 		}
-		
+
 		//var_dump($infos);
-		
+
 		if (count($infos) && ($this->db_insert($infos)))
 		{
 			foreach($infos as $name=>$value)
@@ -542,7 +542,7 @@ abstract class db_object
 		}
 
 	}
-	
+
 	/**
 	 * On force la mise à jour des objets liés
 	 */
@@ -562,7 +562,7 @@ abstract class db_object
 			}
 		}
 	}
-	
+
 	/**
 	 * Update object with dependances, preupdate, script, cache and database triggers
 	 *
@@ -584,7 +584,7 @@ abstract class db_object
 			if (!$this->convert($name, $value))
 				unset($infos[$name]);
 		}
-		
+
 		//var_dump($infos);
 
 		if (count($infos) && $this->db_update($infos))
@@ -628,10 +628,10 @@ abstract class db_object
 			}
 		}
 	}
-	
+
 	/**
 	 * Delete object
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function delete()
@@ -664,19 +664,19 @@ abstract class db_object
 			}
 		}
 	}
-	
+
 	public function reload()
 	{
-	
-	if (!$this->reload_perm())
-		return false;
-	if (!$this->id)
-		return false;
-	
-	$this->root_reload();
-	
+
+		if (!$this->reload_perm())
+			return false;
+		if (!$this->id)
+			return false;
+
+		$this->root_reload();
+
 	}
-	
+
 	// DB
 
 	/**
@@ -727,15 +727,15 @@ abstract class db_object
 				 * TODO : A FINIR !
 				if (isset($field["type"]) && $field["type"] == "object_list")
 				{
-					$this->{$name} = array(); 
-					if (!($fieldname=$field["fieldname"]))
-						$fieldname = $name."_id";
-					if (!($paramname=$field["paramname"]))
-						$paramname = static::get_called_class($this)."_id";
-					$query_string = "SELECT `".$fieldname."` FROM `".$field["tablename"]."` WHERE `".$paramname."`='$this->id'";
-					$query = mysql_query($query_string);
-					while(list($id)=mysql_fetch_row($query))
-						$this->{$name}[] = $id;
+				$this->{$name} = array();
+				if (!($fieldname=$field["fieldname"]))
+					$fieldname = $name."_id";
+				if (!($paramname=$field["paramname"]))
+					$paramname = static::get_called_class($this)."_id";
+				$query_string = "SELECT `".$fieldname."` FROM `".$field["tablename"]."` WHERE `".$paramname."`='$this->id'";
+				$query = mysql_query($query_string);
+				while(list($id)=mysql_fetch_row($query))
+					$this->{$name}[] = $id;
 				}
 				*/
 			}
@@ -744,10 +744,10 @@ abstract class db_object
 		}
 
 	}
-	
+
 	/**
 	 * Retrieve more infos from DB
-	 * 
+	 *
 	 * OVERLOAD
 	 * @param int $id
 	 */
@@ -755,7 +755,7 @@ abstract class db_object
 	{
 		// OVERLOAD IF NEEDED
 	}
-	
+
 	/**
 	 * Insert object into database
 	 *
@@ -767,13 +767,13 @@ abstract class db_object
 
 		if ($this->id || !is_array($infos))
 			return false;
-		
+
 		//var_dump($infos);
-		
+
 		// Verif required fields
 		foreach (static::$_f as $name=>$field)
 			if (!empty($field["nonempty"]) && !isset($infos[$name]))
-				return false;
+			return false;
 
 		// Construct query
 		$query_fields = array();
@@ -867,7 +867,7 @@ abstract class db_object
 
 	/**
 	 * Delete recording in database
-	 * 
+	 *
 	 * @return bool
 	 */
 	protected function db_delete()
@@ -890,17 +890,17 @@ abstract class db_object
 	}
 
 	// ROOT ACCESS SCRIPTS
-	
+
 	protected function root_script($action, $var1=null, $var2=null, $var3=null, $var4=null)
 	{
-	
+
 		// To be extended
 		if ($this->id)
 		{
 			$command = "(sleep 2; sudo ".SITEADM_SCRIPT_DIR."/db_object.psh ".get_called_class()." $this->id $action $var1 $var2 $var3 $var4) > /dev/null 2> /dev/null &";
 			exec($command);
 		}
-	
+
 	}
 
 	/**
@@ -924,7 +924,7 @@ abstract class db_object
 		$this->root_script("preupdate");
 
 	}
-	
+
 	/**
 	 * Script to execute as root
 	 * post-update trigger
@@ -935,93 +935,93 @@ abstract class db_object
 		$this->root_script("update");
 
 	}
-	
+
 	/**
 	 * Script to execute as root
 	 * post-deletion trigger
 	 */
 	protected function root_delete()
 	{
-	
+
 		$this->root_script("delete");
-	
+
 	}
-	
+
 	/**
 	 * Script to execute as root
 	 * post-deletion trigger
 	 */
 	protected function root_reload()
 	{
-	
+
 		$this->root_script("reload");
-	
+
 	}
-	
+
 	/* SCRIPTS EXECUTED AS ROOT */
-	
+
 	/**
 	 * Structure creation trigger
 	 */
 	function script_structure()
 	{
-	
+
 		// TO BE OVERLOADED
-	
+
 	}
-	
+
 	/**
 	 * Post-insert trigger
 	 */
 	function script_insert()
 	{
-	
+
 		// TO BE OVERLOADED
 		$this->script_structure();
 		$this->script_update();
-	
+
 	}
-	
+
 	/**
 	 * Pre-update trigger
 	 */
 	function script_preupdate()
 	{
-	
+
 		// TO BE OVERLOADED
-	
+
 	}
-	
+
 	/**
 	 * Post-update trigger
 	 */
 	function script_update()
 	{
-	
+
 		// TO BE OVERLOADED
-	
+
 	}
-	
+
 	/**
 	 * Post-delete trigger
 	 */
 	function script_delete()
 	{
-	
+
 		// TO BE OVERLOADED
-	
+
 	}
-	
+
 	/**
 	 * Reload associated service
 	 */
 	function script_reload()
 	{
-	
+
 		// TO BE OVERLOADED
-	
+
 	}
-	
+
 }
 
 ?>

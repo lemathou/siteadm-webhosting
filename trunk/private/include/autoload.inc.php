@@ -2,24 +2,24 @@
 
 /*
  * List of classes using accessors
- */
+*/
 $GLOBALS["object_list"] = array
 (
-	"account" => array(),
-	"offer" => array(),
-	"domain" => array(),
-	"phpapp" => array(),
-	"language" => array(),
-	"language_bin" => array(),
-	"phppool" => array(),
-	"webapp" => array(),
-	"website" => array(),
-	"website_alias" => array(),
-	"email" => array(),
-	"email_alias" => array(),
-	"email_sync" => array(),
-	"db" => array(),
-	"ftp" => array()
+		"account" => array(),
+		"offer" => array(),
+		"domain" => array(),
+		"phpapp" => array(),
+		"language" => array(),
+		"language_bin" => array(),
+		"phppool" => array(),
+		"webapp" => array(),
+		"website" => array(),
+		"website_alias" => array(),
+		"email" => array(),
+		"email_alias" => array(),
+		"email_sync" => array(),
+		"db" => array(),
+		"ftp" => array()
 );
 
 // ACCESSORS DEFINITION
@@ -50,7 +50,7 @@ function account($id=null)
 	if (is_numeric($id) && $id>0 && $id == login()->id)
 		return login();
 	elseif (is_numeric($id) && $id == 0)
-		return account_common();
+	return account_common();
 	else
 		return object("account", $id);
 
@@ -75,7 +75,7 @@ function account_common()
 
 /**
  * Retrieve an objet defined
- * 
+ *
  * @param string $t
  * @param int $id
  * @return mixed
@@ -83,44 +83,44 @@ function account_common()
 function object($t, $params=null)
 {
 
-static $list;
-if (!$list)
-	$list = $GLOBALS["object_list"];
-if (!is_string($t) || !isset($list[$t]))
-	return;
+	static $list;
+	if (!$list)
+		$list = $GLOBALS["object_list"];
+	if (!is_string($t) || !isset($list[$t]))
+		return;
 
-$p = &$list[$t];
-$n = "${t}_manager";
-$l = &$list[$n];
+	$p = &$list[$t];
+	$n = "${t}_manager";
+	$l = &$list[$n];
 
-// Object de gestion
-if (!isset($l))
-{
-	if (!empty($p["cache"]) && ($object=apc_fetch($n)))
+	// Object de gestion
+	if (!isset($l))
 	{
-		$l = $object;
+		if (!empty($p["cache"]) && ($object=apc_fetch($n)))
+		{
+			$l = $object;
+		}
+		else
+		{
+			$l = new $n();
+			if (!empty($p["cache"]))
+				apc_store($n, $l);
+		}
 	}
+
+	// Renvoi de l'objet de gestion
+	if ($params === null)
+	{
+		return $l;
+	}
+	// Renvoi si objet existant
 	else
 	{
-		$l = new $n();
-		if (!empty($p["cache"]))
-			apc_store($n, $l);
+		if ($object=$l->get($params))
+			return $object;
+		else
+			return false;
 	}
-}
-
-// Renvoi de l'objet de gestion
-if ($params === null)
-{
-	return $l;
-}
-// Renvoi si objet existant
-else
-{
-	if ($object=$l->get($params))
-		return $object;
-	else
-		return false;
-}
 
 }
 
@@ -141,12 +141,12 @@ foreach($GLOBALS["object_list"] as $name=>$i)
 function __autoload($class_name)
 {
 
-if (!is_string($class_name))
-	return;
+	if (!is_string($class_name))
+		return;
 
-if ((substr($class_name, -8, 8) != "_manager" || ($class_name=substr($class_name, 0, -8))) && isset($GLOBALS["object_list"][$class_name]))
-	include SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php";
-elseif (file_exists($filename=SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php"))
+	if ((substr($class_name, -8, 8) != "_manager" || ($class_name=substr($class_name, 0, -8))) && isset($GLOBALS["object_list"][$class_name]))
+		include SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php";
+	elseif (file_exists($filename=SITEADM_PRIVATE_DIR."/classes/$class_name.inc.php"))
 	include $filename;
 
 }

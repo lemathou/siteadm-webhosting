@@ -2,12 +2,24 @@
 <?php
 $account = $domain->account();
 if ($account->id) { ?>
-<p>Compte de gestion du domaine <?php echo $domain->link(); ?> : <?php echo $account->link(); ?></p>
+<p>
+	Compte de gestion du domaine
+	<?php echo $domain->link(); ?>
+	:
+	<?php echo $account->link(); ?>
+</p>
 <?php if ($manager=$account->manager()) { ?>
-<p>Manager du compte : <?php echo $manager->link(); ?></p>
+<p>
+	Manager du compte :
+	<?php echo $manager->link(); ?>
+</p>
 <?php } ?>
 <?php } else { ?>
-<p>Nom de domaine <?php echo $domain->link(); ?> sans compte de gestion</p>
+<p>
+	Nom de domaine
+	<?php echo $domain->link(); ?>
+	sans compte de gestion
+</p>
 <?php }
 
 $website = new website();

@@ -1,4 +1,7 @@
-<h3>Mettre à jour une boite email : <?php echo $email->name."@".$email->domain()->name; ?></h3>
+<h3>
+	Mettre à jour une boite email :
+	<?php echo $email->name."@".$email->domain()->name; ?>
+</h3>
 <?php
 
 $form_submit_name = "_email_update";

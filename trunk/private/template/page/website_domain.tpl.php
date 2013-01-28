@@ -1,4 +1,6 @@
-<h1><?=$domain->name?></h1>
+<h1>
+	<?=$domain->name?>
+</h1>
 
 <?php
 $query_website_where = "WHERE t1.domain_id='$domain->id'";
