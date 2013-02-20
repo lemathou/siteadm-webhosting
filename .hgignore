@@ -15,3 +15,11 @@ syntax: regexp
 ^trunk/ssl_cert$
 syntax: regexp
 ^trunk/conf$
+syntax: regexp
+^ssl_cert$
+syntax: regexp
+^webapp$
+syntax: regexp
+^log$
+syntax: regexp
+^conf$
