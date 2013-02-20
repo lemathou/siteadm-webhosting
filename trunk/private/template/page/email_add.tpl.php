@@ -1,7 +1,4 @@
-<h3>
-	Ajouter une boite email :
-	<?php echo $domain->name; ?>
-</h3>
+<h3>Ajouter une boite email : <?php echo $domain->name; ?></h3>
 <?php
 
 $email = new email();

@@ -1,4 +1,15 @@
+#!/usr/bin/php -c /home/siteadm_admin/conf/php/php.ini
 <?php
+
+ini_set("include_path","/home/siteadm_admin/private:/home/siteadm_admin/public");
+
+require_once "config/config.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
+
+if (isset($argv[1]))
+	$action = $argv[1];
+else
+	$action = "";
 
 $replace_map = array(
 	"{ACCOUNT_UID_MIN}" => ACCOUNT_UID_MIN,
@@ -30,7 +41,7 @@ if ($action == "mysql")
 $fp = opendir(SITEADM_TEMPLATE_DIR."/mysql");
 while($filename=readdir($fp)) if (substr($filename, 0, 1) != ".")
 {
-	copy_tpl("mysql/$filename", "/home/siteadm_admin/install/sql/$filename", $replace_map, "0600", "root:root");
+	copy_tpl("mysql/$filename", "/home/siteadm_admin/install/$filename", $replace_map, "0600", "root:root");
 }
 
 }
@@ -61,6 +72,10 @@ copy_tpl("postfix/master.cf", "/etc/postfix/master.cf", $replace_map, "0644", "r
 
 exec("postfix reload");
 
+// Mettre à jour les tables virtual avec postconf !
+
+
+
 }
 
 // Dovecot
@@ -83,16 +98,6 @@ elseif ($action == "proftpd")
 
 copy_tpl("proftpd/proftpd.conf", "/etc/proftpd/proftpd.conf", $replace_map, "0644", "root:root");
 copy_tpl("proftpd/sql.conf", "/etc/proftpd/sql.conf", $replace_map, "0600", "root:root");
-
-exec("service proftpd restart");
-
-}
-
-// ProFTPd
-elseif ($action == "awstats")
-{
-
-exec("cp /home/siteadm_admin/template/awstats/awstats.common /etc/awstats/awstats.common");
 
 }
 

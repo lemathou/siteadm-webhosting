@@ -1,7 +1,4 @@
-<h3>
-	Ajouter un alias ou une redirection :
-	<?php echo $domain->name; ?>
-</h3>
+<h3>Ajouter un alias ou une redirection : <?php echo $domain->name; ?></h3>
 <?php
 
 $email_alias = new email_alias();
