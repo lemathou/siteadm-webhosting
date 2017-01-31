@@ -68,7 +68,7 @@ if (!is_array($map) || !is_array($map_merge))
 
 foreach($map_merge as $key=>$value)
 {
-	if (!isset($map[$key]) || ($value !== null))
+	if (! isset($map[$key]) || $map[$key] === null || $map[$key] === '')
 		$map[$key] = $value;
 }
 
@@ -170,6 +170,14 @@ if (file_exists(SITEADM_SCRIPT_DIR."/".$command))
 	exec(SITEADM_SCRIPT_DIR."/".$command." ".$params." > /dev/null 2>/dev/null &");
 elseif (file_exists(INIT_SCRIPT_DIR."/".$command))
 	exec(INIT_SCRIPT_DIR."/".$command." ".$params." > /dev/null 2>/dev/null &");
+
+}
+
+function root_exec($command, $var1=null, $var2=null, $var3=null, $var4=null)
+{
+
+$command = "sudo ".SITEADM_SCRIPT_DIR."/$command $var1 $var2 $var3 $var4";
+exec($command);
 
 }
 

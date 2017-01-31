@@ -29,6 +29,7 @@ static public $_f = array
 	"account_id" => array("type"=>"object", "otype"=>"account"),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"folder" => array("type"=>"string"),
+	"public_folder" => array("type"=>"string"),
 	"name" => array("type"=>"string", "nonempty"=>true),
 	"charset_default" => array("type"=>"select", "list"=>array("utf-8", "iso-8859-1")),
 	"webmaster_email" => array("type"=>"string"),
@@ -51,6 +52,7 @@ static public $_f = array
 	"php_file_uploads" => array("type"=>"bool"),
 	"php_upload_max_filesize" => array("type"=>"int"),
 	"php_max_file_upload" => array("type"=>"int"),
+	"allowoverride" => array("type"=>"select", "list"=>array("None", "All"), "default"=>"All"),
 );
 
 /**
@@ -166,13 +168,13 @@ return $list;
 public function folder()
 {
 
-return $this->public_folder();
+return $this->account()->public_folder()."/".$this->folder;
 
 }
 public function public_folder()
 {
 
-return $this->account()->public_folder()."/".$this->folder;
+return $this->account()->public_folder()."/".($this->public_folder ?$this->public_folder :$this->folder);
 
 }
 public function private_folder()
@@ -560,6 +562,7 @@ $map = array
 	"{WEBSITE_INDEX_FILES}" => $this->index_files,
 	"{AWSTATS_DATA_DIR}" => $this->awstats_log_folder(),
 	"{WEBSITE_CGI_PATH}" => $account->folder()."/cgi-bin",
+	"{WEBSITE_ROOT_DIR}" => $this->folder(),
 	"{WEBSITE_PUBLIC_DIR}" => $this->public_folder(),
 	"{WEBSITE_PRIVATE_DIR}" => $this->private_folder(),
 	"{WEBSITE_CONFIG_DIR}" => $this->config_folder(),
@@ -571,6 +574,9 @@ $map = array
 	"{PHP_OPEN_BASEDIR}" => ($this->php_open_basedir!==null) ?$this->php_open_basedir :$this->public_folder().":".$this->private_folder(),
 	"{PHP_INCLUDE_PATH}" => ($this->php_include_path) ?$this->php_include_path :$this->private_folder().":.",
 	"{PHP_APC_STAT}" => $this->php_apc_stat,
+	"{PHP_ERROR_REPORTING}" => $this->php_error_reporting,
+	"{WEBSITE_ALLOWOVERRIDE}" => $this->allowoverride,
+	"{PHP_MEMORY_LIMIT}" => $this->php_memory_limit,
 );
 
 if ($this->webmaster_email)
@@ -601,7 +607,6 @@ if ($webapp=$this->webapp())
 if ($this->folder_auth)
 	$map["{WEBSITE_FOLDER_AUTH}"] = 'AuthName "Authentification requise"
 	AuthUserFile '.$this->htpasswd_file().'
-	AuthGroupFile /dev/null
 	AuthType Basic
 	require valid-user';
 
@@ -609,6 +614,10 @@ replace_map_merge($map, $domain->replace_map());
 
 if ($phppool=$this->phppool())
 	replace_map_merge($map, $phppool->replace_map());
+
+//$map['{PHP_MEMORY_LIMIT_AFF}'] = $map['{PHP_MEMORY_LIMIT}'];
+
+var_dump($map);
 
 return $map;
 
@@ -632,6 +641,7 @@ $account->mkdir($this->php_conf_folder(), "750", "root");
 $account->mkdir($this->apache_log_folder(), "1750", "root");
 $account->mkdir($this->awstats_log_folder(), "1750", "root");
 $account->mkdir($this->php_log_folder(), "1770", "root");
+$account->mkdir($this->folder(), "755");
 $account->mkdir($this->public_folder(), "755");
 $account->mkdir($this->private_folder(), "750");
 $account->mkdir($this->config_folder(), "750");

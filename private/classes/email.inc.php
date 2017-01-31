@@ -208,7 +208,7 @@ return db_object::update($infos);
 function script_update()
 {
 
-filesystem::link($this->folder(), SITEADM_EMAIL_DIR."/".$this->name());
+//filesystem::link($this->folder(), SITEADM_EMAIL_DIR."/".$this->name());
 
 }
 

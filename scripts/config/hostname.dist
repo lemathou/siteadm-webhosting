@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export HOSTNAME=`hostname`
+export hostname_prod="siteadm-prod"
+export hostname_dev="siteadm-dev"
+

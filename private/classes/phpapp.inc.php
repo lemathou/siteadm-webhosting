@@ -246,7 +246,7 @@ public function phpext_list()
 $list = array();
 if (is_array($this->extension) && count($this->extension))
 {
-	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).") ORDER BY priority DESC";
 	$query = mysql_query($query_string);
 	while($row=mysql_fetch_assoc($query))
 		$list[$row["id"]] = $row;
@@ -261,7 +261,7 @@ public function phpext_loaded_list()
 $list = array();
 if (is_array($this->extension_loaded) && count($this->extension_loaded))
 {
-	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension_loaded).")";
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension_loaded).") ORDER BY priority DESC";
 	$query = mysql_query($query_string);
 	while($row=mysql_fetch_assoc($query))
 		$list[$row["id"]] = $row;
@@ -547,8 +547,9 @@ $replace_map = $this->replace_map();
 // PHP-FPM
 $account->copy_tpl("php/php-fpm.conf", $this->config_file(), $replace_map, "0644", "root");
 $account->copy_tpl("php/php-fpm-init.conf", $this->script_file(), $replace_map, "0755", "root");
-$account->copy_tpl("php/php-".$language_bin->version.".ini", $this->ini_file(), $replace_map, "0644", "root");
+$account->copy_tpl("php/php.ini", $this->ini_file(), $replace_map, "0644", "root");
 filesystem::link($this->script_file(), $this->init_script_file());
+//echo $this->script_file(). ' => '.$this->init_script_file();
 
 // PHP ext
 foreach($language_bin->phpext_list() as $ext)
@@ -592,4 +593,3 @@ if ($pid=$this->pid())
 
 }
 
-?>

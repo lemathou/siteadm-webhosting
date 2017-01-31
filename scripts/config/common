@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Couleurs
+export CT="\\033[1;34m"
+export CN="\\033[0;39m"
+

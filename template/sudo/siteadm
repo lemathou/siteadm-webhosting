@@ -1,0 +1,2 @@
+siteadm ALL = (ALL) NOPASSWD: /home/siteadm_admin/scripts/*
+

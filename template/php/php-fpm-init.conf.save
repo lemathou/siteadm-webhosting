@@ -1,0 +1,16 @@
+#! /bin/sh
+
+prefix="{PHP_INSTALL_PREFIX}";
+exec_prefix=${prefix};
+
+php_fpm_BIN="${exec_prefix}/sbin/php-fpm";
+php_fpm_CONF="{PHP_CONF}";
+php_fpm_PID="{PHP_PID}";
+php_fpm_INI="{PHP_INI}";
+PHP_INI_SCAN_DIR="{PHP_INI_DIR}";
+
+php_opts="--fpm-config $php_fpm_CONF -c $php_fpm_INI"
+
+export PHP_INI_SCAN_DIR;
+
+. {SITEADM_SCRIPT_DIR}/php-fpm-init.sh

@@ -3,7 +3,7 @@
 <?php
 if (!isset($account))
 {
-	$account = account($domain->account_id);
+	$account = account()->get($domain->account_id);
 }
 if ($account)
 {

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export mysql_backup_user='backup'
+export mysql_backup_pass=''
+export mysql_backup_dir='/home/backup/mysql'
+

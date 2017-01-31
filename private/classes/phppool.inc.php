@@ -127,7 +127,7 @@ public function phpext_list()
 $list = array();
 if (is_array($this->extension) && count($this->extension))
 {
-	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).")";
+	$query_string = "SELECT * FROM language_php_ext WHERE id IN (".implode(", ", $this->extension).") ORDER BY priority DESC";
 	$query = mysql_query($query_string);
 	while($row=mysql_fetch_assoc($query))
 		$list[$row["id"]] = $row;
@@ -505,8 +505,8 @@ $map = array
 	"{PHP_DISABLE_FUNCTIONS}" => "",
 	"{PHP_ERROR_REPORTING}" => $this->error_reporting,
 	"{PHP_SHORT_OPEN_TAG}" => $this->short_open_tag,
-	"{PHP_MAX_EXECUTION_TIME}" => $this->max_execution_time,
-	"{PHP_MAX_INPUT_TIME}" => $this->max_input_time,
+	"{PHP_MAX_EXECUTION_TIME}" => $this->max_execution_time ?$this->max_execution_time :30,
+	"{PHP_MAX_INPUT_TIME}" => $this->max_input_time ?$this->max_input_time :60,
 	"{PHP_MEMORY_LIMIT}" => $this->memory_limit,
 	"{PHP_POST_MAX_SIZE}" => $this->post_max_size,
 	"{PHP_FILE_UPLOADS}" => $this->file_uploads,

@@ -1,4 +1,4 @@
-#!/usr/bin/php -c /home/siteadm_admin/conf/php/php-siteadm.ini
+#!/home/siteadm_admin/bin/php -c /home/siteadm_admin/conf/php/php-siteadm.ini
 <?php
 
 ini_set("include_path", "/home/siteadm_admin/private:/home/siteadm_admin/public");

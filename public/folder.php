@@ -29,6 +29,9 @@ include "template/inc/menu.tpl.php";
 
 $origin = login()->folder();
 
+
+var_dump(filesystem::exists($origin."/".$_GET["path"]));
+
 // Context parameters
 $path =  (!isset($_GET["path"]) || !is_string($_GET["path"]) || !@is_dir($origin."/".$_GET["path"])) ? "." : $_GET["path"];
 $hidden = (empty($_GET["hidden"])) ? "0" : "1";

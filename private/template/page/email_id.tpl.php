@@ -7,3 +7,4 @@ $form_submit_text = "Mettre à jour";
 include "template/form/email.tpl.php";
 
 ?>
+<p>Quota utilisé / Taille actuelle de la boite email : <?php echo $email->account()->root_foldersize($email->folder()); ?></p>

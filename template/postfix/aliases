@@ -2,3 +2,6 @@
 postmaster:		{POSTMASTER_EMAIL}
 root:			{ROOT_EMAIL}
 webmaster: 		{WEBMASTER_EMAIL}
+www-data:		{WEBMASTER_EMAIL}
+clamav:			{ROOT_EMAIL}
+

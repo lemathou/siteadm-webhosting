@@ -60,6 +60,11 @@ if (file_exists($filename))
 
 }
 
+static function exists($filename)
+{
+	return file_exists($filename);
+}
+
 /**
  * Write data in a file
  * @param string $filename

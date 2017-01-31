@@ -152,19 +152,19 @@ function __construct()
 {
 
 }
-function insert()
+function insert($infos)
 {
 
 }
-function db_insert()
+function db_insert($infos)
 {
 
 }
-function update()
+function update($infos)
 {
 
 }
-function db_update()
+function db_update($infos)
 {
 
 }

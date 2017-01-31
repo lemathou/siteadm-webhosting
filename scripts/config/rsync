@@ -1,0 +1,21 @@
+#!/bin/bash
+
+rsync="rsync -e ssh -aAHX -z -v -h"
+rsync_prod="root@$hostname_prod:";
+rsync_dev="root@$hostname_dev:";
+
+if [ "$hostname_prod" = "$HOSTNAME" ]
+then
+        echo "Depuis le serveur PROD : $HOSTNAME";
+	rsync_prod="";
+	rsync_dev="root@$hostname_dev:";
+elif [ "$hostname_dev" = "$HOSTNAME" ]
+then
+        echo "Depuis le serveur DEV : $HOSTNAME";
+	rsync_prod="root@$hostname_prod:";
+	rsync_dev="";
+else
+	echo "Je ne sais pas où je suis ni que faire ici : $HOSTNAME";
+	exit 1
+fi
+

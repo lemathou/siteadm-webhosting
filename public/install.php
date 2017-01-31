@@ -37,6 +37,16 @@ if (empty($_POST["MYSQL_PASS"]))
 <body>
 <h1>Installation</h1>
 
+<?php
+
+if (isset($_GET['step1']) && isset($_SESSION['MYSQL_HOST'])) {
+
+install_mysql($_SESSION['MYSQL_HOST'], $_SESSION['MYSQL_PASS']);
+
+}
+
+?>
+
 <p>Si vous en êtes à cette étape, c'est que vous avez déjà lancé le script d'installation : <i>install/install.sh</i></p>
 <p>En effet, l'installeur doit en premier lieu disposer de certains droits d'administration sur la machine.</p>
 

@@ -1272,7 +1272,7 @@ LoadPlugin="tooltips"
 # Allow AWStats to show correctly (in language charset) keywords/keyphrases
 # strings even if they were UTF8 coded by the referer search engine.
 #
-#LoadPlugin="decodeutfkeys"
+LoadPlugin="decodeutfkeys"
 
 # Plugin: IPv6
 # Perl modules required: Net::IP and Net::DNS
@@ -1423,7 +1423,7 @@ LoadPlugin="hostinfo"
 # This plugin adds a form in AWStats main page to allow users to see raw
 # content of current log files. A filter is also available.
 #
-#LoadPlugin="rawlog"
+LoadPlugin="rawlog"
 
 # Plugin: GraphApplet
 # Perl modules required: None

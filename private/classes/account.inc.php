@@ -10,6 +10,15 @@ class account_manager extends db_object_manager
 
 static protected $name = "account";
 
+public function get($params){
+
+if (is_numeric($params) && $params==0)
+	return account_common();
+else
+	return parent::get($params);
+
+}
+
 }
 
 /**
@@ -914,8 +923,8 @@ if ($offer=$this->offer)
 		$disk_quota_hard = $offer->disk_quota_hard;
 }
 
-exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$disk_quota_soft)."MB ".QUOTA_DISK);
-exec("quotatool -g ".$this->system_group()." -b -q ".(1024*$disk_quota_hard)."MB ".QUOTA_DISK);
+exec("quotatool -g ".$this->system_group()." -b -q ".($disk_quota_soft>0 ?(1024*$disk_quota_soft)."MB" :"0")." ".QUOTA_DISK);
+exec("quotatool -g ".$this->system_group()." -b -q ".($disk_quota_hard>0 ?(1024*$disk_quota_hard)."MB" :"0")." ".QUOTA_DISK);
 
 }
 

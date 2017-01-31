@@ -1,0 +1,23 @@
+#!/bin/bash
+
+. /home/scripts/config/ip
+
+HOST=`who am i | sed -r "s/.*\((.*)\).*/\\1/"`
+IP=`host $HOST | sed -r "s/.* has address (.*)/\\1/"`
+HOSTNAME=`hostname`
+ME=`whoami`
+
+#echo $IP
+for (( i = 0; i < ${#ip[@]}; i++ )); do
+	if [ "${ip[$i]}" = "${HOST}" ]; then
+		myip="Adresse IP enregistrée comme : ${ip2[$i]}\n";
+	fi
+done
+
+if [ -z "$myip" ]
+then
+	echo -e "Connexion en Bash sur $HOSTNAME\nutilisateur : $ME\nDepuis $IP alias $HOST\n\nLa sécurité MatNat" | mail -s "[ATTENTION] Connexion Bash sur $HOSTNAME" "security@siteadm"
+else
+	echo -e "Connexion en Bash sur $HOSTNAME\nutilisateur : $ME\nDepuis $IP alias $HOST\n$myip\nLa sécurité MatNat" | mail -s "Connexion Bash sur $HOSTNAME" "security@siteadm"
+fi
+

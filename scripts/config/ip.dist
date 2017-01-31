@@ -1,0 +1,13 @@
+#!/bin/bash
+
+i=0
+ip[$i]="127.0.0.1"
+ip2[$i]="Local"
+
+i=$i+1
+ip[$i]="127.0.1.1"
+ip2[$i]="Local2"
+
+export ip
+export ip2
+

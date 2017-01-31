@@ -1,0 +1,25 @@
+#!/usr/bin/php -c /home/siteadm_admin/conf/php/php-siteadm.ini
+<?php
+
+ini_set("include_path", "/home/siteadm_admin/private:/home/siteadm_admin/public");
+ini_set("log_errors", "On");
+ini_set("error_log", "/home/siteadm_admin/log/php/root_errors.log");
+
+require_once "config/config.inc.php";
+require_once SITEADM_PRIVATE_DIR."/include/common.inc.php";
+
+// ACTION
+
+//var_dump();
+
+var_dump($argv);
+$a = array_shift($argv);
+var_dump($argv);
+
+if (isset($argv[0]) && is_string($method=array_shift($argv)) && method_exists('filesystem', $method))
+{
+	$r = call_user_func_array("filesystem::$method", $argv);
+	var_dump($r);
+}
+
+?>

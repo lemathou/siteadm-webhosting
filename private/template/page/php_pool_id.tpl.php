@@ -1,5 +1,5 @@
 <h1>Pool Applicatif : <?php echo $phppool->name; ?></h1>
-
+<?php $account = $phppool->account(); ?>
 <div style="float: right;width: 320px;" class="cadre">
 <h3>FPM STATUS</h3>
 <h3>FPM PING</h3>
