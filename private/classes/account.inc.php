@@ -833,6 +833,8 @@ $this->password_update($password);
 public function script_structure()
 {
 
+$php_user = $this->php_user();
+
 $this->mkdir("", "750", "root");
 filesystem::setacl($this->folder(), WEBSERVER_USER);
 
@@ -850,6 +852,7 @@ filesystem::setacl($this->conf_folder()."/awstats", AWSTATS_USER);
 $this->mkdir("conf/apache", "750", "root");
 filesystem::setacl($this->folder()."/conf/apache", WEBSERVER_USER);
 // PHP
+$this->mkdir("php", "750", $php_user);
 $this->mkdir("conf/php", "750", "root");
 $this->mkdir("conf/php/pool", "755", "root");
 $this->mkdir("conf/php/ext", "755", "root");
@@ -874,7 +877,7 @@ filesystem::setacl($this->log_folder(), AWSTATS_USER);
 $this->mkdir("log/apache", "1750", "root");
 filesystem::setacl($this->log_folder()."/apache", WEBSERVER_USER);
 filesystem::setacl($this->log_folder()."/apache", AWSTATS_USER);
-$this->mkdir("log/php", "1750", $this->php_user());
+$this->mkdir("log/php", "1750", $php_user);
 $this->mkdir("log/awstats", "1770", "root");
 filesystem::setacl($this->log_folder()."/awstats", AWSTATS_USER, "rwx");
 exec("setfacl -m m::rwx ".$this->log_folder()."/awstats");
@@ -882,11 +885,13 @@ exec("setfacl -m g::rx ".$this->log_folder()."/awstats");
 
 // Temp (PHP)
 $this->mkdir("tmp", "1777", "root");
-// Cookies (PHP)
-$this->mkdir("cookies", "700", $this->php_user());
+// Sessions/Cookies (PHP & autre)
+//$this->mkdir("cookies", "700", $php_user);
+$this->mkdir("sessions", "1777", 'root');
+
 // Socket (PHP)
 $this->mkdir("socket", "750", "root:root");
-filesystem::setacl($this->socket_folder(), $this->php_user());
+//filesystem::setacl($this->socket_folder(), $php_user);
 filesystem::setacl($this->socket_folder(), WEBSERVER_USER);
 
 // Private data & config
@@ -894,14 +899,16 @@ $this->mkdir("private", "750", "root");
 $this->mkdir("private/data", "750");
 $this->mkdir("private/ftp", "750");
 
-// Public websites
+// Public websites & co
 $this->mkdir("public", "750", "root");
 filesystem::setacl($this->public_folder(), WEBSERVER_USER);
 $this->mkdir("public/data", "750");
 $this->mkdir("public/ftp", "755");
+$this->mkdir("public/common", "755");
 
 // eMail
-$this->mkdir("mail", "700", $this->email_user());
+//$this->mkdir("mail", "700", $this->email_user());
+$this->mkdir("mail", "700", 'vmail');
 
 }
 

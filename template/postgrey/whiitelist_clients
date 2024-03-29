@@ -1,0 +1,71 @@
+# 2013-12-18: orange.fr (big pool, reported by fulax)
+/^smtp\d+\.smtpout\.orange\.fr$/
+# 2014-01-29: gmx/web.de/1&1 (long retry, reported by Axel Beckert)
+mout-xforward.gmx.net
+mout-xforward.web.de
+mout-xforward.kundenserver.de
+mout-xforward.perfora.net
+# 2014-12-18: mail.ru (retries from fallback*.mail.ru, reported by Andriy Yurchuk)
+/^fallback\d+\.mail\.ru$/
+# French tax authority, no retry
+dgfip.finances.gouv.fr 
+# 2015-06-10: magisto.com (requested by postmaster)
+/^o\d+\.ntdc\.magisto\.com$/
+# 2015-07-23: outlook.com (github #20)
+outlook.com
+# 2015-08-19 (big pool)
+mail.alibaba.com
+mail.aliyun.com
+# 2016-09-13: amazonses.com (github #35, #37, #38)
+amazonses.com
+# 2016-09-13: startcom.org (github #7)
+startcom.org
+# 2016-09-20: Microsoft Exchange Online (Office 365), by IP
+23.103.132.0/22
+23.103.136.0/21
+23.103.144.0/20
+23.103.198.0/23
+23.103.200.0/21
+40.92.0.0/14
+40.107.0.0/16  
+65.55.88.0/24
+65.55.169.0/24
+94.245.120.64/26
+104.47.0.0/17
+134.170.101.0/24
+134.170.140.0/24
+134.170.171.0/24
+157.55.133.0/25
+157.56.87.192/26
+157.56.110.0/23
+157.56.112.0/24
+157.56.116.0/25
+157.56.120.0/25
+207.46.51.64/26
+207.46.100.0/24
+207.46.108.0/25
+207.46.163.0/24
+213.199.154.0/24
+213.199.180.128/26
+216.32.180.0/23
+2a01:111:f400:7c00::/54
+2a01:111:f400:fc00::/54
+# 2016-10-28: Microsoft Exchange Online (Office 365), by Name
+outbound.protection.outlook.com
+# 2016-11-01: gem.godaddy.com (github #39)
+gem.godaddy.com
+# 2016-11-16: github long retry (github #41)
+github.com
+github.net
+# 2017-01-06: biglumber.com, sends verification email and doesn't retry
+206.222.31.58
+# 2017-01-11: battle.net (long retry, #44)
+battle.net
+# 2017-02-09: twitter.com (big pool, #46)
+twitter.com
+
+# Fucking Outlook
+/outbound\.protection\.outlook\.com$/
+/\.mail\-out\.ovh\.net$\
+/\.google\.com$\
+

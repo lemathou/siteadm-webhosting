@@ -488,8 +488,12 @@ $map = array(
 	"{PHP_APP_EXTENSIONS}" => "",
 );
 
-foreach($this->phpext_loaded_list() as $ext)
-	$map["{PHP_APP_EXTENSIONS}"] .= "extension=".$ext["name"].".so\n";
+foreach($this->phpext_loaded_list() as $ext) {
+	if ($ext["type"]=='zend')
+		$map["{PHP_APP_EXTENSIONS}"] .= "zend_extension=".$ext["name"].".so\n";
+	else
+		$map["{PHP_APP_EXTENSIONS}"] .= "extension=".$ext["name"].".so\n";
+}
 
 replace_map_merge($map, $account->replace_map());
 

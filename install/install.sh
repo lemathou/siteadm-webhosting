@@ -5,13 +5,12 @@
 ###
 
 # Divers
-apt-get install aptitude
-apt-get install acl
-apt-get install bash-completion
-apt-get install mcrypt
+apt install acl
+apt install bash-completion
+apt install mcrypt
 
 # Git & Mercurial
-apt-get install subversion mercurial git
+apt install subversion mercurial git
 #apt-get install mercurial-server mercurial-git git-svn gitweb
 groupadd --system git
 useradd --system -g git -d /home/git git
@@ -50,7 +49,7 @@ service php-siteadm start
 # Apache
 echo "Apache..."
 apt-get install apache2
-apt-get install apache2-mpm-event
+#apt-get install apache2-mpm-event
 apt-get install libapache2-mod-fastcgi
 echo "Apache configuration..."
 rm /etc/apache2/sites-available/siteadm.conf
